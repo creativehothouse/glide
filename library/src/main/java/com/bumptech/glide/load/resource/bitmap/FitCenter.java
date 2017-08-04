@@ -6,7 +6,8 @@ import android.graphics.Bitmap;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 
 /**
- * Scales the image uniformly (maintaining the image's aspect ratio) so that one of the dimensions of the image
+ * Scales the image uniformly (maintaining the image's aspect ratio) so that one of the dimensions
+ * of the image
  * will be equal to the given dimension and the other will be less than the given dimension.
  */
 public class FitCenter extends BitmapTransformation {
@@ -26,7 +27,7 @@ public class FitCenter extends BitmapTransformation {
 
     @Override
     public String getId() {
-        return "FitCenter.com.bumptech.glide.load.resource.bitmap";
+        return "FitCenter.com.jet8.sdk.ui.screen.marketplace.glide.load.resource.bitmap";
     }
 }
 

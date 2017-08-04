@@ -1,7 +1,8 @@
 package com.bumptech.glide.request;
 
 /**
- * A coordinator that coordinates two individual {@link Request}s that load a small thumbnail version of an image and
+ * A coordinator that coordinates two individual {@link Request}s that load a small thumbnail
+ * version of an image and
  * the full size version of the image at the same time.
  */
 public class ThumbnailRequestCoordinator implements RequestCoordinator, Request {
@@ -23,8 +24,8 @@ public class ThumbnailRequestCoordinator implements RequestCoordinator, Request 
     }
 
     /**
-     *
-     * Returns true if the request is either the request loading the fullsize image or if the request loading the
+     * Returns true if the request is either the request loading the fullsize image or if the request
+     * loading the
      * full size image has not yet completed.
      *
      * @param request {@inheritDoc}
@@ -39,7 +40,8 @@ public class ThumbnailRequestCoordinator implements RequestCoordinator, Request 
     }
 
     /**
-     * Returns true if the request is the request loading the fullsize image and if neither the full nor the thumbnail
+     * Returns true if the request is the request loading the fullsize image and if neither the full
+     * nor the thumbnail
      * image have completed sucessfully.
      *
      * @param request {@inheritDoc}.
@@ -70,7 +72,7 @@ public class ThumbnailRequestCoordinator implements RequestCoordinator, Request 
         // as a layer in a cross fade for example. The only way we know the thumb is not being
         // displayed and is therefore safe to clear is if the thumb request has not yet completed.
         if (!thumb.isComplete()) {
-          thumb.clear();
+            thumb.clear();
         }
     }
 

@@ -2,22 +2,24 @@ package com.bumptech.glide.request.target;
 
 import android.graphics.drawable.Drawable;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.request.Request;
 
 /**
- * A base {@link Target} for loading {@link com.bumptech.glide.load.engine.Resource}s that provides basic or empty
+ * A base {@link Target} for loading {@link Resource}s that provides basic or empty
  * implementations for most methods.
- *
  * <p>
- *     For maximum efficiency, clear this target when you have finished using or displaying the
- *     {@link com.bumptech.glide.load.engine.Resource} loaded into it using
- *     {@link com.bumptech.glide.Glide#clear(Target)}.
+ * <p>
+ * For maximum efficiency, clear this target when you have finished using or displaying the
+ * {@link Resource} loaded into it using
+ * {@link Glide#clear(Target)}.
  * </p>
- *
  * <p>
- *     For loading {@link com.bumptech.glide.load.engine.Resource}s into {@link android.view.View}s,
- *     {@link com.bumptech.glide.request.target.ViewTarget} or {@link com.bumptech.glide.request.target.ImageViewTarget}
- *     are preferable.
+ * <p>
+ * For loading {@link Resource}s into {@link android.view.View}s,
+ * {@link ViewTarget} or {@link ImageViewTarget}
+ * are preferable.
  * </p>
  *
  * @param <Z> The type of resource that will be received by this target.
@@ -30,16 +32,16 @@ public abstract class BaseTarget<Z> implements Target<Z> {
      * {@inheritDoc}
      */
     @Override
-    public void setRequest(Request request) {
-        this.request = request;
+    public Request getRequest() {
+        return request;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Request getRequest() {
-        return request;
+    public void setRequest(Request request) {
+        this.request = request;
     }
 
     /**

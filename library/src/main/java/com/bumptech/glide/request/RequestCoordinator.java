@@ -1,7 +1,9 @@
 package com.bumptech.glide.request;
 
+import com.bumptech.glide.request.target.Target;
+
 /**
- * An interface for coordinating multiple requests with the same {@link com.bumptech.glide.request.target.Target}.
+ * An interface for coordinating multiple requests with the same {@link Target}.
  */
 public interface RequestCoordinator {
 

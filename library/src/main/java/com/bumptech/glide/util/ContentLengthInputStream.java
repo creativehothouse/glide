@@ -18,6 +18,11 @@ public final class ContentLengthInputStream extends FilterInputStream {
   private final long contentLength;
   private int readSoFar;
 
+  ContentLengthInputStream(InputStream in, long contentLength) {
+    super(in);
+    this.contentLength = contentLength;
+  }
+
   public static InputStream obtain(InputStream other, String contentLengthHeader) {
     return obtain(other, parseContentLength(contentLengthHeader));
   }
@@ -40,15 +45,10 @@ public final class ContentLengthInputStream extends FilterInputStream {
     return result;
   }
 
-  ContentLengthInputStream(InputStream in, long contentLength) {
-    super(in);
-    this.contentLength = contentLength;
-  }
-
   @Override
   public synchronized int available() throws IOException {
     return (int) Math.max(contentLength - readSoFar, in.available());
- }
+  }
 
   @Override
   public synchronized int read() throws IOException {
@@ -61,7 +61,8 @@ public final class ContentLengthInputStream extends FilterInputStream {
   }
 
   @Override
-  public synchronized int read(byte[] buffer, int byteOffset, int byteCount) throws IOException {
+  public synchronized int read(byte[] buffer, int byteOffset, int byteCount)
+          throws IOException {
     return checkReadSoFarOrThrow(super.read(buffer, byteOffset, byteCount));
   }
 
@@ -70,8 +71,10 @@ public final class ContentLengthInputStream extends FilterInputStream {
       readSoFar += read;
     } else if (contentLength - readSoFar > 0) {
       throw new IOException("Failed to read all expected data"
-          + ", expected: " + contentLength
-          + ", but read: " + readSoFar);
+              + ", expected: "
+              + contentLength
+              + ", but read: "
+              + readSoFar);
     }
     return read;
   }

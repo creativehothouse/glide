@@ -10,14 +10,19 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A utility class for obtaining a {@link com.bumptech.glide.load.Key} signature containing the application version
+ * A utility class for obtaining a {@link Key} signature containing the application version
  * name using {@link android.content.pm.PackageInfo#versionCode}.
  */
 public final class ApplicationVersionSignature {
-    private static final ConcurrentHashMap<String, Key> PACKAGE_NAME_TO_KEY = new ConcurrentHashMap<String, Key>();
+    private static final ConcurrentHashMap<String, Key> PACKAGE_NAME_TO_KEY =
+            new ConcurrentHashMap<String, Key>();
+
+    private ApplicationVersionSignature() {
+        // Empty for visibility.
+    }
 
     /**
-     * Returns the signature {@link com.bumptech.glide.load.Key} for version code of the Application of the given
+     * Returns the signature {@link Key} for version code of the Application of the given
      * Context.
      */
     public static Key obtain(Context context) {
@@ -55,9 +60,5 @@ public final class ApplicationVersionSignature {
             versionCode = UUID.randomUUID().toString();
         }
         return new StringSignature(versionCode);
-    }
-
-    private ApplicationVersionSignature() {
-        // Empty for visibility.
     }
 }

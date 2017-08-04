@@ -18,7 +18,7 @@ public class ViewPropertyAnimationFactory<R> implements GlideAnimationFactory<R>
      * isMemoryCache is {@code true} or isFirstImage is {@code false}, returns a
      * {@link NoAnimation} and otherwise returns a new
      * {@link ViewPropertyAnimation} for the
-     * {@link com.bumptech.glide.request.animation.ViewPropertyAnimation.Animator} provided in the constructor.
+     * {@link ViewPropertyAnimation.Animator} provided in the constructor.
      */
     @Override
     public GlideAnimation<R> build(boolean isFromMemoryCache, boolean isFirstResource) {

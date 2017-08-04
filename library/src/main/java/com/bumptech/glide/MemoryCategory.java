@@ -13,7 +13,8 @@ public enum MemoryCategory {
      */
     NORMAL(1f),
     /**
-     * Tells Glide's memory cache and bitmap pool to use at most one and a half times their initial maximum size.
+     * Tells Glide's memory cache and bitmap pool to use at most one and a half times their initial
+     * maximum size.
      */
     HIGH(1.5f);
 
@@ -24,7 +25,8 @@ public enum MemoryCategory {
     }
 
     /**
-     * Returns the multiplier that should be applied to the initial maximum size of Glide's memory cache and bitmap
+     * Returns the multiplier that should be applied to the initial maximum size of Glide's memory
+     * cache and bitmap
      * pool.
      */
     public float getMultiplier() {

@@ -61,8 +61,8 @@ public final class Util {
      * Returns the allocated byte size of the given bitmap.
      *
      * @see #getBitmapByteSize(android.graphics.Bitmap)
-     *
-     * @deprecated Use {@link #getBitmapByteSize(android.graphics.Bitmap)} instead. Scheduled to be removed in Glide
+     * @deprecated Use {@link #getBitmapByteSize(android.graphics.Bitmap)} instead. Scheduled to be
+     * removed in Glide
      * 4.0.
      */
     @Deprecated
@@ -87,7 +87,8 @@ public final class Util {
     }
 
     /**
-     * Returns the in memory size of {@link android.graphics.Bitmap} with the given width, height, and
+     * Returns the in memory size of {@link android.graphics.Bitmap} with the given width, height,
+     * and
      * {@link android.graphics.Bitmap.Config}.
      */
     public static int getBitmapByteSize(int width, int height, Bitmap.Config config) {
@@ -128,7 +129,8 @@ public final class Util {
     }
 
     /**
-     * Throws an {@link java.lang.IllegalArgumentException} if called on a thread other than the main thread.
+     * Throws an {@link java.lang.IllegalArgumentException} if called on a thread other than the main
+     * thread.
      */
     public static void assertMainThread() {
         if (!isOnMainThread()) {
@@ -169,7 +171,7 @@ public final class Util {
     /**
      * Returns a copy of the given list that is safe to iterate over and perform actions that may
      * modify the original list.
-     *
+     * <p>
      * <p> See #303 and #375. </p>
      */
     public static <T> List<T> getSnapshot(Collection<T> other) {
@@ -178,7 +180,7 @@ public final class Util {
         List<T> result = new ArrayList<T>(other.size());
         for (T item : other) {
             result.add(item);
-        }
+    }
         return result;
     }
 }

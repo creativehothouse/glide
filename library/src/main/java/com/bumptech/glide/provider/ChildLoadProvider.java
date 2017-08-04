@@ -9,8 +9,8 @@ import com.bumptech.glide.load.resource.transcode.ResourceTranscoder;
 import java.io.File;
 
 /**
- * A {@link com.bumptech.glide.provider.LoadProvider} that returns classes preferentially from those set on it but
- * that also defaults to a wrapped {@link com.bumptech.glide.provider.LoadProvider} when a particular class is not set.
+ * A {@link LoadProvider} that returns classes preferentially from those set on it but
+ * that also defaults to a wrapped {@link LoadProvider} when a particular class is not set.
  *
  * @param <A> The type of the model the resource will be loaded from.
  * @param <T> The type of the data that will be retrieved for the model.
@@ -36,53 +36,6 @@ public class ChildLoadProvider<A, T, Z, R> implements LoadProvider<A, T, Z, R>, 
     }
 
     /**
-     * Sets the {@link com.bumptech.glide.load.ResourceDecoder} to use for decoding the resource from the disk cache.
-     *
-     * @param cacheDecoder The decoder to use.
-     */
-    public void setCacheDecoder(ResourceDecoder<File, Z> cacheDecoder) {
-        this.cacheDecoder = cacheDecoder;
-    }
-
-    /**
-     * Sets the {@link com.bumptech.glide.load.ResourceDecoder} to use to decoding the resource from the original data.
-     *
-     * @param sourceDecoder The decoder to use.
-     */
-    public void setSourceDecoder(ResourceDecoder<T, Z> sourceDecoder) {
-        this.sourceDecoder = sourceDecoder;
-    }
-
-    /**
-     * Sets the {@link com.bumptech.glide.load.ResourceEncoder} to use to write the decoded and transformed resource to
-     * the disk cache.
-     *
-     * @param encoder The encoder to use.
-     */
-    public void setEncoder(ResourceEncoder<Z> encoder) {
-        this.encoder = encoder;
-    }
-
-    /**
-     * Sets the {@link com.bumptech.glide.load.resource.transcode.ResourceTranscoder} to use to transcode the decoded
-     * resource.
-     *
-     * @param transcoder The transcoder to use.
-     */
-    public void setTranscoder(ResourceTranscoder<Z, R> transcoder) {
-        this.transcoder = transcoder;
-    }
-
-    /**
-     * Sets the {@link com.bumptech.glide.load.Encoder} to use to write the original data to the disk cache.
-     *
-     * @param sourceEncoder The encoder to use.
-     */
-    public void setSourceEncoder(Encoder<T> sourceEncoder) {
-        this.sourceEncoder = sourceEncoder;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -92,6 +45,15 @@ public class ChildLoadProvider<A, T, Z, R> implements LoadProvider<A, T, Z, R>, 
         } else {
             return parent.getCacheDecoder();
         }
+    }
+
+    /**
+     * Sets the {@link ResourceDecoder} to use for decoding the resource from the disk cache.
+     *
+     * @param cacheDecoder The decoder to use.
+     */
+    public void setCacheDecoder(ResourceDecoder<File, Z> cacheDecoder) {
+        this.cacheDecoder = cacheDecoder;
     }
 
     /**
@@ -107,6 +69,15 @@ public class ChildLoadProvider<A, T, Z, R> implements LoadProvider<A, T, Z, R>, 
     }
 
     /**
+     * Sets the {@link ResourceDecoder} to use to decoding the resource from the original data.
+     *
+     * @param sourceDecoder The decoder to use.
+     */
+    public void setSourceDecoder(ResourceDecoder<T, Z> sourceDecoder) {
+        this.sourceDecoder = sourceDecoder;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -116,6 +87,15 @@ public class ChildLoadProvider<A, T, Z, R> implements LoadProvider<A, T, Z, R>, 
         } else {
             return parent.getSourceEncoder();
         }
+    }
+
+    /**
+     * Sets the {@link Encoder} to use to write the original data to the disk cache.
+     *
+     * @param sourceEncoder The encoder to use.
+     */
+    public void setSourceEncoder(Encoder<T> sourceEncoder) {
+        this.sourceEncoder = sourceEncoder;
     }
 
     /**
@@ -131,6 +111,16 @@ public class ChildLoadProvider<A, T, Z, R> implements LoadProvider<A, T, Z, R>, 
     }
 
     /**
+     * Sets the {@link ResourceEncoder} to use to write the decoded and transformed resource to
+     * the disk cache.
+     *
+     * @param encoder The encoder to use.
+     */
+    public void setEncoder(ResourceEncoder<Z> encoder) {
+        this.encoder = encoder;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -142,6 +132,16 @@ public class ChildLoadProvider<A, T, Z, R> implements LoadProvider<A, T, Z, R>, 
         }
     }
 
+    /**
+     * Sets the {@link ResourceTranscoder} to use to transcode the decoded
+     * resource.
+     *
+     * @param transcoder The transcoder to use.
+     */
+    public void setTranscoder(ResourceTranscoder<Z, R> transcoder) {
+        this.transcoder = transcoder;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public ChildLoadProvider<A, T, Z, R> clone() {
@@ -149,6 +149,6 @@ public class ChildLoadProvider<A, T, Z, R> implements LoadProvider<A, T, Z, R>, 
             return (ChildLoadProvider<A, T, Z, R>) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
-        }
+    }
     }
 }

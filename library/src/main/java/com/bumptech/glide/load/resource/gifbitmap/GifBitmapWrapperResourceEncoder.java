@@ -9,8 +9,8 @@ import com.bumptech.glide.load.resource.gif.GifDrawable;
 import java.io.OutputStream;
 
 /**
- * A {@link com.bumptech.glide.load.ResourceEncoder} that can encode either an {@link Bitmap} or
- * {@link com.bumptech.glide.load.resource.gif.GifDrawable}.
+ * A {@link ResourceEncoder} that can encode either an {@link Bitmap} or
+ * {@link GifDrawable}.
  */
 public class GifBitmapWrapperResourceEncoder implements ResourceEncoder<GifBitmapWrapper> {
     private final ResourceEncoder<Bitmap> bitmapEncoder;
@@ -32,7 +32,7 @@ public class GifBitmapWrapperResourceEncoder implements ResourceEncoder<GifBitma
             return bitmapEncoder.encode(bitmapResource, os);
         } else {
             return gifEncoder.encode(gifBitmap.getGifResource(), os);
-        }
+    }
     }
 
     @Override

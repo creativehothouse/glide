@@ -13,7 +13,8 @@ import com.bumptech.glide.load.model.ModelLoader;
 import java.io.InputStream;
 
 /**
- * A base class for loading images over http/https. Can be subclassed for use with any model that can be translated
+ * A base class for loading images over http/https. Can be subclassed for use with any model that
+ * can be translated
  * in to {@link java.io.InputStream} data.
  *
  * @param <T> The type of the model.
@@ -34,7 +35,8 @@ public abstract class BaseGlideUrlLoader<T> implements StreamModelLoader<T> {
         this(concreteLoader, null);
     }
 
-    public BaseGlideUrlLoader(ModelLoader<GlideUrl, InputStream> concreteLoader, ModelCache<T, GlideUrl> modelCache) {
+    public BaseGlideUrlLoader(ModelLoader<GlideUrl, InputStream> concreteLoader,
+            ModelCache<T, GlideUrl> modelCache) {
         this.concreteLoader = concreteLoader;
         this.modelCache = modelCache;
     }
@@ -49,7 +51,7 @@ public abstract class BaseGlideUrlLoader<T> implements StreamModelLoader<T> {
         if (result == null) {
             String stringURL = getUrl(model, width, height);
             if (TextUtils.isEmpty(stringURL)) {
-               return null;
+                return null;
             }
 
             result = new GlideUrl(stringURL, getHeaders(model, width, height));
@@ -65,8 +67,8 @@ public abstract class BaseGlideUrlLoader<T> implements StreamModelLoader<T> {
     /**
      * Get a valid url http:// or https:// for the given model and dimensions as a string.
      *
-     * @param model The model.
-     * @param width The width in pixels of the view/target the image will be loaded into.
+     * @param model  The model.
+     * @param width  The width in pixels of the view/target the image will be loaded into.
      * @param height The height in pixels of the view/target the image will be loaded into.
      * @return The String url.
      */
@@ -75,8 +77,8 @@ public abstract class BaseGlideUrlLoader<T> implements StreamModelLoader<T> {
     /**
      * Get the headers for the given model and dimensions as a map of strings to sets of strings.
      *
-     * @param model The model.
-     * @param width The width in pixels of the view/target the image will be loaded into.
+     * @param model  The model.
+     * @param width  The width in pixels of the view/target the image will be loaded into.
      * @param height The height in pixels of the view/target the image will be loaded into.
      * @return The Headers object containing the headers, or null if no headers should be added.
      */

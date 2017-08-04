@@ -5,6 +5,7 @@ import android.os.Build;
 
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.Engine;
+import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPoolAdapter;
 import com.bumptech.glide.load.engine.bitmap_recycle.LruBitmapPool;
@@ -36,7 +37,7 @@ public class GlideBuilder {
     }
 
     /**
-     * Sets the {@link com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool} implementation to use to store and
+     * Sets the {@link BitmapPool} implementation to use to store and
      * retrieve reused {@link android.graphics.Bitmap}s.
      *
      * @param bitmapPool The pool to use.
@@ -48,10 +49,10 @@ public class GlideBuilder {
     }
 
     /**
-     * Sets the {@link com.bumptech.glide.load.engine.cache.MemoryCache} implementation to store
-     * {@link com.bumptech.glide.load.engine.Resource}s that are not currently in use.
+     * Sets the {@link MemoryCache} implementation to store
+     * {@link Resource}s that are not currently in use.
      *
-     * @param memoryCache  The cache to use.
+     * @param memoryCache The cache to use.
      * @return This builder.
      */
     public GlideBuilder setMemoryCache(MemoryCache memoryCache) {
@@ -60,14 +61,15 @@ public class GlideBuilder {
     }
 
     /**
-     * Sets the {@link com.bumptech.glide.load.engine.cache.DiskCache} implementation to use to store
-     * {@link com.bumptech.glide.load.engine.Resource} data and thumbnails.
+     * Sets the {@link DiskCache} implementation to use to store
+     * {@link Resource} data and thumbnails.
      *
-     * @deprecated Creating a disk cache directory on the main thread causes strict mode violations, use
-     * {@link #setDiskCache(com.bumptech.glide.load.engine.cache.DiskCache.Factory)} instead. Scheduled to be removed
-     * in Glide 4.0.
      * @param diskCache The disk cache to use.
      * @return This builder.
+     * @deprecated Creating a disk cache directory on the main thread causes strict mode violations,
+     * use
+     * {@link #setDiskCache(DiskCache.Factory)} instead. Scheduled to be removed
+     * in Glide 4.0.
      */
     @Deprecated
     public GlideBuilder setDiskCache(final DiskCache diskCache) {
@@ -80,9 +82,9 @@ public class GlideBuilder {
     }
 
     /**
-     * Sets the {@link com.bumptech.glide.load.engine.cache.DiskCache.Factory} implementation to use to construct
-     * the {@link com.bumptech.glide.load.engine.cache.DiskCache} to use to store
-     * {@link com.bumptech.glide.load.engine.Resource} data on disk.
+     * Sets the {@link DiskCache.Factory} implementation to use to construct
+     * the {@link DiskCache} to use to store
+     * {@link Resource} data on disk.
      *
      * @param diskCacheFactory The disk cche factory to use.
      * @return This builder.
@@ -94,18 +96,17 @@ public class GlideBuilder {
 
     /**
      * Sets the {@link java.util.concurrent.ExecutorService} implementation to use when retrieving
-     * {@link com.bumptech.glide.load.engine.Resource}s that are not already in the cache.
-     *
+     * {@link Resource}s that are not already in the cache.
      * <p>
-     *     Any implementation must order requests based on their {@link com.bumptech.glide.Priority} for thumbnail
-     *     requests to work properly.
+     * <p>
+     * Any implementation must order requests based on their {@link Priority} for thumbnail
+     * requests to work properly.
      * </p>
-     *
-     * @see #setDiskCacheService(java.util.concurrent.ExecutorService)
-     * @see com.bumptech.glide.load.engine.executor.FifoPriorityThreadPoolExecutor
      *
      * @param service The ExecutorService to use.
      * @return This builder.
+     * @see #setDiskCacheService(java.util.concurrent.ExecutorService)
+     * @see FifoPriorityThreadPoolExecutor
      */
     public GlideBuilder setResizeService(ExecutorService service) {
         this.sourceService = service;
@@ -114,18 +115,17 @@ public class GlideBuilder {
 
     /**
      * Sets the {@link java.util.concurrent.ExecutorService} implementation to use when retrieving
-     * {@link com.bumptech.glide.load.engine.Resource}s that are currently in cache.
-     *
+     * {@link Resource}s that are currently in cache.
      * <p>
-     *     Any implementation must order requests based on their {@link com.bumptech.glide.Priority} for thumbnail
-     *     requests to work properly.
+     * <p>
+     * Any implementation must order requests based on their {@link Priority} for thumbnail
+     * requests to work properly.
      * </p>
-     *
-     * @see #setResizeService(java.util.concurrent.ExecutorService)
-     * @see com.bumptech.glide.load.engine.executor.FifoPriorityThreadPoolExecutor
      *
      * @param service The ExecutorService to use.
      * @return This builder.
+     * @see #setResizeService(java.util.concurrent.ExecutorService)
+     * @see FifoPriorityThreadPoolExecutor
      */
     public GlideBuilder setDiskCacheService(ExecutorService service) {
         this.diskCacheService = service;
@@ -133,22 +133,23 @@ public class GlideBuilder {
     }
 
     /**
-     * Sets the {@link com.bumptech.glide.load.DecodeFormat} that will be the default format for all the default
-     * decoders that can change the {@link android.graphics.Bitmap.Config} of the {@link android.graphics.Bitmap}s they
+     * Sets the {@link DecodeFormat} that will be the default format for all the default
+     * decoders that can change the {@link android.graphics.Bitmap.Config} of the {@link
+     * android.graphics.Bitmap}s they
      * decode.
-     *
      * <p>
-     *     Decode format is always a suggestion, not a requirement. See {@link com.bumptech.glide.load.DecodeFormat} for
-     *     more details.
+     * <p>
+     * Decode format is always a suggestion, not a requirement. See {@link DecodeFormat} for
+     * more details.
      * </p>
-     *
      * <p>
-     *     If you instantiate and use a custom decoder, it will use
-     *     {@link com.bumptech.glide.load.DecodeFormat#DEFAULT} as its default.
+     * <p>
+     * If you instantiate and use a custom decoder, it will use
+     * {@link DecodeFormat#DEFAULT} as its default.
      * </p>
-     *
      * <p>
-     *     Calls to this method are ignored on KitKat and Lollipop. See #301.
+     * <p>
+     * Calls to this method are ignored on KitKat and Lollipop. See #301.
      * </p>
      *
      * @param decodeFormat The format to use.
@@ -198,7 +199,7 @@ public class GlideBuilder {
 
         if (decodeFormat == null) {
             decodeFormat = DecodeFormat.DEFAULT;
-        }
+    }
 
         return new Glide(engine, memoryCache, bitmapPool, context, decodeFormat);
     }

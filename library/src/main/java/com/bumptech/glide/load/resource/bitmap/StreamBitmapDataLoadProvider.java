@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.InputStream;
 
 /**
- * An {@link com.bumptech.glide.provider.DataLoadProvider} that provides decoders and encoders for decoding and caching
+ * An {@link DataLoadProvider} that provides decoders and encoders for decoding and caching
  * {@link android.graphics.Bitmap}s using {@link java.io.InputStream} data.
  */
 public class StreamBitmapDataLoadProvider implements DataLoadProvider<InputStream, Bitmap> {

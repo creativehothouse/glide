@@ -5,8 +5,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 /**
- * A {@link com.bumptech.glide.request.animation.GlideAnimationFactory} that produces
- * {@link com.bumptech.glide.request.animation.ViewAnimation}s.
+ * A {@link GlideAnimationFactory} that produces
+ * {@link ViewAnimation}s.
  *
  * @param <R> The type of the resource displayed in the view that is animated
  */
@@ -27,10 +27,10 @@ public class ViewAnimationFactory<R> implements GlideAnimationFactory<R> {
     }
 
     /**
-     * Returns a new {@link com.bumptech.glide.request.animation.GlideAnimation} for the given arguments. If
+     * Returns a new {@link GlideAnimation} for the given arguments. If
      * isFromMemoryCache is {@code true} or isFirstImage is {@code false}, returns a
-     * {@link com.bumptech.glide.request.animation.NoAnimation} and otherwise returns a new
-     * {@link com.bumptech.glide.request.animation.ViewAnimation}.
+     * {@link NoAnimation} and otherwise returns a new
+     * {@link ViewAnimation}.
      *
      * @param isFromMemoryCache {@inheritDoc}
      * @param isFirstResource   {@inheritDoc}
@@ -73,6 +73,6 @@ public class ViewAnimationFactory<R> implements GlideAnimationFactory<R> {
         @Override
         public Animation build() {
             return AnimationUtils.loadAnimation(context, animationId);
-        }
+    }
     }
 }

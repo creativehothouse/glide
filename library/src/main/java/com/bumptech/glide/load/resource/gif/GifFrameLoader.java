@@ -35,17 +35,14 @@ class GifFrameLoader {
     private DelayTarget current;
     private boolean isCleared;
 
-    public interface FrameCallback {
-        void onFrameReady(int index);
-    }
-
-    public GifFrameLoader(Context context, FrameCallback callback, GifDecoder gifDecoder, int width, int height) {
+    public GifFrameLoader(Context context, FrameCallback callback, GifDecoder gifDecoder, int width,
+            int height) {
         this(callback, gifDecoder, null,
                 getRequestBuilder(context, gifDecoder, width, height, Glide.get(context).getBitmapPool()));
     }
 
     GifFrameLoader(FrameCallback callback, GifDecoder gifDecoder, Handler handler,
-            GenericRequestBuilder<GifDecoder, GifDecoder, Bitmap, Bitmap>  requestBuilder) {
+            GenericRequestBuilder<GifDecoder, GifDecoder, Bitmap, Bitmap> requestBuilder) {
         if (handler == null) {
             handler = new Handler(Looper.getMainLooper(), new FrameLoaderCallback());
         }
@@ -53,6 +50,22 @@ class GifFrameLoader {
         this.gifDecoder = gifDecoder;
         this.handler = handler;
         this.requestBuilder = requestBuilder;
+    }
+
+    private static GenericRequestBuilder<GifDecoder, GifDecoder, Bitmap, Bitmap> getRequestBuilder(
+            Context context, GifDecoder gifDecoder, int width, int height, BitmapPool bitmapPool) {
+        GifFrameResourceDecoder frameResourceDecoder = new GifFrameResourceDecoder(bitmapPool);
+        GifFrameModelLoader frameLoader = new GifFrameModelLoader();
+        Encoder<GifDecoder> sourceEncoder = NullEncoder.get();
+        return Glide.with(context)
+                .using(frameLoader, GifDecoder.class)
+                .load(gifDecoder)
+                .as(Bitmap.class)
+                .sourceEncoder(sourceEncoder)
+                .decoder(frameResourceDecoder)
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .override(width, height);
     }
 
     @SuppressWarnings("unchecked")
@@ -100,9 +113,7 @@ class GifFrameLoader {
         long targetTime = SystemClock.uptimeMillis() + gifDecoder.getNextDelay();
         gifDecoder.advance();
         DelayTarget next = new DelayTarget(handler, gifDecoder.getCurrentFrameIndex(), targetTime);
-        requestBuilder
-                .signature(new FrameSignature())
-                .into(next);
+        requestBuilder.signature(new FrameSignature()).into(next);
     }
 
     // Visible for testing.
@@ -124,22 +135,8 @@ class GifFrameLoader {
         loadNextFrame();
     }
 
-    private class FrameLoaderCallback implements Handler.Callback {
-        public static final int MSG_DELAY = 1;
-        public static final int MSG_CLEAR = 2;
-
-        @Override
-        public boolean handleMessage(Message msg) {
-            if (msg.what == MSG_DELAY) {
-                GifFrameLoader.DelayTarget target = (DelayTarget) msg.obj;
-                onFrameReady(target);
-                return true;
-            } else if (msg.what == MSG_CLEAR) {
-                GifFrameLoader.DelayTarget target = (DelayTarget) msg.obj;
-                Glide.clear(target);
-            }
-            return false;
-        }
+    public interface FrameCallback {
+        void onFrameReady(int index);
     }
 
     // Visible for testing.
@@ -164,24 +161,7 @@ class GifFrameLoader {
             this.resource = resource;
             Message msg = handler.obtainMessage(FrameLoaderCallback.MSG_DELAY, this);
             handler.sendMessageAtTime(msg, targetTime);
-        }
     }
-
-    private static GenericRequestBuilder<GifDecoder, GifDecoder, Bitmap, Bitmap> getRequestBuilder(Context context,
-            GifDecoder gifDecoder, int width, int height, BitmapPool bitmapPool) {
-        GifFrameResourceDecoder frameResourceDecoder = new GifFrameResourceDecoder(bitmapPool);
-        GifFrameModelLoader frameLoader = new GifFrameModelLoader();
-        Encoder<GifDecoder> sourceEncoder = NullEncoder.get();
-        return Glide.with(context)
-                .using(frameLoader, GifDecoder.class)
-                .load(gifDecoder)
-                .as(Bitmap.class)
-                .sourceEncoder(sourceEncoder)
-                .decoder(frameResourceDecoder)
-                .skipMemoryCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .override(width, height);
-
     }
 
     // Visible for testing.
@@ -212,8 +192,27 @@ class GifFrameLoader {
         }
 
         @Override
-        public void updateDiskCacheKey(MessageDigest messageDigest) throws UnsupportedEncodingException {
+        public void updateDiskCacheKey(MessageDigest messageDigest)
+                throws UnsupportedEncodingException {
             throw new UnsupportedOperationException("Not implemented");
+        }
+    }
+
+    private class FrameLoaderCallback implements Handler.Callback {
+        public static final int MSG_DELAY = 1;
+        public static final int MSG_CLEAR = 2;
+
+        @Override
+        public boolean handleMessage(Message msg) {
+            if (msg.what == MSG_DELAY) {
+                GifFrameLoader.DelayTarget target = (DelayTarget) msg.obj;
+                onFrameReady(target);
+                return true;
+            } else if (msg.what == MSG_CLEAR) {
+                GifFrameLoader.DelayTarget target = (DelayTarget) msg.obj;
+                Glide.clear(target);
+            }
+            return false;
         }
     }
 }

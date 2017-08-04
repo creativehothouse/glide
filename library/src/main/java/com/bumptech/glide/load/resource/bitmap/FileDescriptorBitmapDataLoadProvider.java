@@ -15,17 +15,19 @@ import com.bumptech.glide.provider.DataLoadProvider;
 import java.io.File;
 
 /**
- * An {@link com.bumptech.glide.provider.DataLoadProvider} that provides classes for decoding and encoding
+ * An {@link DataLoadProvider} that provides classes for decoding and encoding
  * {@link android.graphics.Bitmap}s from {@link android.os.ParcelFileDescriptor} data.
  */
-public class FileDescriptorBitmapDataLoadProvider implements DataLoadProvider<ParcelFileDescriptor, Bitmap> {
+public class FileDescriptorBitmapDataLoadProvider
+        implements DataLoadProvider<ParcelFileDescriptor, Bitmap> {
     private final ResourceDecoder<File, Bitmap> cacheDecoder;
     private final FileDescriptorBitmapDecoder sourceDecoder;
     private final BitmapEncoder encoder;
     private final Encoder<ParcelFileDescriptor> sourceEncoder;
 
     public FileDescriptorBitmapDataLoadProvider(BitmapPool bitmapPool, DecodeFormat decodeFormat) {
-        cacheDecoder = new FileToStreamDecoder<Bitmap>(new StreamBitmapDecoder(bitmapPool, decodeFormat));
+        cacheDecoder =
+                new FileToStreamDecoder<Bitmap>(new StreamBitmapDecoder(bitmapPool, decodeFormat));
         sourceDecoder = new FileDescriptorBitmapDecoder(bitmapPool, decodeFormat);
         encoder = new BitmapEncoder();
         sourceEncoder = NullEncoder.get();

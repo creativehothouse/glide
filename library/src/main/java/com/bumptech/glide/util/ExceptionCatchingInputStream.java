@@ -5,10 +5,13 @@ import java.io.InputStream;
 import java.util.Queue;
 
 /**
- * An {@link java.io.InputStream} that catches {@link java.io.IOException}s during read and skip calls and stores them
- * so they can later be handled or thrown. This class is a workaround for a framework issue where exceptions during
- * reads while decoding bitmaps in {@link android.graphics.BitmapFactory} can return partially decoded bitmaps.
- *
+ * An {@link java.io.InputStream} that catches {@link java.io.IOException}s during read and skip
+ * calls and stores them
+ * so they can later be handled or thrown. This class is a workaround for a framework issue where
+ * exceptions during
+ * reads while decoding bitmaps in {@link android.graphics.BitmapFactory} can return partially
+ * decoded bitmaps.
+ * <p>
  * See https://github.com/bumptech/glide/issues/126.
  */
 public class ExceptionCatchingInputStream extends InputStream {
@@ -17,6 +20,10 @@ public class ExceptionCatchingInputStream extends InputStream {
 
     private InputStream wrapped;
     private IOException exception;
+
+    ExceptionCatchingInputStream() {
+        // Do nothing.
+    }
 
     public static ExceptionCatchingInputStream obtain(InputStream toWrap) {
         ExceptionCatchingInputStream result;
@@ -34,11 +41,7 @@ public class ExceptionCatchingInputStream extends InputStream {
     static void clearQueue() {
         while (!QUEUE.isEmpty()) {
             QUEUE.remove();
-        }
     }
-
-    ExceptionCatchingInputStream() {
-        // Do nothing.
     }
 
     void setInputStream(InputStream toWrap) {

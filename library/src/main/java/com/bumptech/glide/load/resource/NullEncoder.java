@@ -5,7 +5,7 @@ import com.bumptech.glide.load.Encoder;
 import java.io.OutputStream;
 
 /**
- * A simple {@link com.bumptech.glide.load.Encoder} that never writes data.
+ * A simple {@link Encoder} that never writes data.
  *
  * @param <T> type discarded by this Encoder
  */
@@ -20,7 +20,6 @@ public class NullEncoder<T> implements Encoder<T> {
     @SuppressWarnings("unchecked")
     public static <T> Encoder<T> get() {
         return (Encoder<T>) NULL_ENCODER;
-
     }
 
     @Override

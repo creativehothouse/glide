@@ -8,8 +8,9 @@ import com.bumptech.glide.load.engine.Resource;
  * Simple wrapper for an Android {@link Drawable} which returns a
  * {@link android.graphics.drawable.Drawable.ConstantState#newDrawable() new drawable}
  * based on it's {@link android.graphics.drawable.Drawable.ConstantState state}.
- *
- * <b>Suggested usages only include {@code T}s where the new drawable is of the same or descendant class.</b>
+ * <p>
+ * <b>Suggested usages only include {@code T}s where the new drawable is of the same or descendant
+ * class.</b>
  *
  * @param <T> type of the wrapped {@link Drawable}
  */

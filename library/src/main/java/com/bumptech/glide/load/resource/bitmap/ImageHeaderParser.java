@@ -19,32 +19,6 @@ import java.nio.ByteOrder;
  */
 public class ImageHeaderParser {
     private static final String TAG = "ImageHeaderParser";
-
-    /**
-     * The format of the image data including whether or not the image may include transparent pixels.
-     */
-    public enum ImageType {
-        /** GIF type. */
-        GIF(true),
-        /** JPG type. */
-        JPEG(false),
-        /** PNG type with alpha. */
-        PNG_A(true),
-        /** PNG type without alpha. */
-        PNG(false),
-        /** Unrecognized type. */
-        UNKNOWN(false);
-        private final boolean hasAlpha;
-
-        ImageType(boolean hasAlpha) {
-            this.hasAlpha = hasAlpha;
-        }
-
-        public boolean hasAlpha() {
-            return hasAlpha;
-        }
-    }
-
     private static final int GIF_HEADER = 0x474946;
     private static final int PNG_HEADER = 0x89504E47;
     private static final int EXIF_MAGIC_NUMBER = 0xFFD8;
@@ -59,9 +33,7 @@ public class ImageHeaderParser {
     private static final int SEGMENT_START_ID = 0xFF;
     private static final int EXIF_SEGMENT_TYPE = 0xE1;
     private static final int ORIENTATION_TAG_TYPE = 0x0112;
-    private static final int[] BYTES_PER_FORMAT = { 0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8 };
-
-    private final StreamReader streamReader;
+    private static final int[] BYTES_PER_FORMAT = {0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8};
 
     static {
         byte[] bytes = new byte[0];
@@ -73,130 +45,10 @@ public class ImageHeaderParser {
         JPEG_EXIF_SEGMENT_PREAMBLE_BYTES = bytes;
     }
 
+    private final StreamReader streamReader;
+
     public ImageHeaderParser(InputStream is) {
         streamReader = new StreamReader(is);
-    }
-
-    // 0xD0A3C68 -> <htm
-    // 0xCAFEBABE -> <!DOCTYPE...
-    public boolean hasAlpha() throws IOException {
-        return getType().hasAlpha();
-    }
-
-    public ImageType getType() throws IOException {
-        int firstTwoBytes = streamReader.getUInt16();
-
-        // JPEG.
-        if (firstTwoBytes == EXIF_MAGIC_NUMBER) {
-            return JPEG;
-        }
-
-        final int firstFourBytes = firstTwoBytes << 16 & 0xFFFF0000 | streamReader.getUInt16() & 0xFFFF;
-        // PNG.
-        if (firstFourBytes == PNG_HEADER) {
-            // See: http://stackoverflow.com/questions/2057923/how-to-check-a-png-for-grayscale-alpha-color-type
-            streamReader.skip(25 - 4);
-            int alpha = streamReader.getByte();
-            // A RGB indexed PNG can also have transparency. Better safe than sorry!
-            return alpha >= 3 ? PNG_A : PNG;
-        }
-
-        // GIF from first 3 bytes.
-        if (firstFourBytes >> 8 == GIF_HEADER) {
-            return GIF;
-        }
-
-        return UNKNOWN;
-    }
-
-    /**
-     * Parse the orientation from the image header. If it doesn't handle this image type (or this is not an image)
-     * it will return a default value rather than throwing an exception.
-     *
-     * @return The exif orientation if present or -1 if the header couldn't be parsed or doesn't contain an orientation
-     * @throws IOException
-     */
-    public int getOrientation() throws IOException {
-        final int magicNumber = streamReader.getUInt16();
-
-        if (!handles(magicNumber)) {
-            return -1;
-        } else {
-            byte[] exifData = getExifSegment();
-            boolean hasJpegExifPreamble = exifData != null
-                    && exifData.length > JPEG_EXIF_SEGMENT_PREAMBLE_BYTES.length;
-
-            if (hasJpegExifPreamble) {
-                for (int i = 0; i < JPEG_EXIF_SEGMENT_PREAMBLE_BYTES.length; i++) {
-                    if (exifData[i] != JPEG_EXIF_SEGMENT_PREAMBLE_BYTES[i]) {
-                        hasJpegExifPreamble = false;
-                        break;
-                    }
-                }
-            }
-
-            if (hasJpegExifPreamble) {
-                return parseExifSegment(new RandomAccessReader(exifData));
-            } else {
-                return -1;
-            }
-        }
-    }
-
-    private byte[] getExifSegment() throws IOException {
-        short segmentId, segmentType;
-        int segmentLength;
-        while (true) {
-            segmentId = streamReader.getUInt8();
-
-            if (segmentId != SEGMENT_START_ID) {
-                if (Log.isLoggable(TAG, Log.DEBUG)) {
-                    Log.d(TAG, "Unknown segmentId=" + segmentId);
-                }
-                return null;
-            }
-
-            segmentType = streamReader.getUInt8();
-
-            if (segmentType == SEGMENT_SOS) {
-                return null;
-            } else if (segmentType == MARKER_EOI) {
-                if (Log.isLoggable(TAG, Log.DEBUG)) {
-                    Log.d(TAG, "Found MARKER_EOI in exif segment");
-                }
-                return null;
-            }
-
-            // Segment length includes bytes for segment length.
-            segmentLength = streamReader.getUInt16() - 2;
-
-            if (segmentType != EXIF_SEGMENT_TYPE) {
-                long skipped = streamReader.skip(segmentLength);
-                if (skipped != segmentLength) {
-                    if (Log.isLoggable(TAG, Log.DEBUG)) {
-                        Log.d(TAG, "Unable to skip enough data"
-                            + ", type: " + segmentType
-                            + ", wanted to skip: " + segmentLength
-                            + ", but actually skipped: " + skipped);
-                    }
-                    return null;
-                }
-            } else {
-                byte[] segmentData = new byte[segmentLength];
-                int read = streamReader.read(segmentData);
-                if (read != segmentLength) {
-                    if (Log.isLoggable(TAG, Log.DEBUG)) {
-                        Log.d(TAG, "Unable to read segment data"
-                            + ", type: " + segmentType
-                            + ", length: " + segmentLength
-                            + ", actually read: " + read);
-                    }
-                    return null;
-                } else {
-                    return segmentData;
-                }
-            }
-        }
     }
 
     private static int parseExifSegment(RandomAccessReader segmentData) {
@@ -251,8 +103,14 @@ public class ImageHeaderParser {
             }
 
             if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "Got tagIndex=" + i + " tagType=" + tagType + " formatCode=" + formatCode
-                        + " componentCount=" + componentCount);
+                Log.d(TAG, "Got tagIndex="
+                        + i
+                        + " tagType="
+                        + tagType
+                        + " formatCode="
+                        + formatCode
+                        + " componentCount="
+                        + componentCount);
             }
 
             final int byteCount = componentCount + BYTES_PER_FORMAT[formatCode];
@@ -297,6 +155,172 @@ public class ImageHeaderParser {
                 || imageMagicNumber == INTEL_TIFF_MAGIC_NUMBER;
     }
 
+    // 0xD0A3C68 -> <htm
+    // 0xCAFEBABE -> <!DOCTYPE...
+    public boolean hasAlpha() throws IOException {
+        return getType().hasAlpha();
+    }
+
+    public ImageType getType() throws IOException {
+        int firstTwoBytes = streamReader.getUInt16();
+
+        // JPEG.
+        if (firstTwoBytes == EXIF_MAGIC_NUMBER) {
+            return JPEG;
+        }
+
+        final int firstFourBytes = firstTwoBytes << 16 & 0xFFFF0000 | streamReader.getUInt16() & 0xFFFF;
+        // PNG.
+        if (firstFourBytes == PNG_HEADER) {
+            // See: http://stackoverflow.com/questions/2057923/how-to-check-a-png-for-grayscale-alpha-color-type
+            streamReader.skip(25 - 4);
+            int alpha = streamReader.getByte();
+            // A RGB indexed PNG can also have transparency. Better safe than sorry!
+            return alpha >= 3 ? PNG_A : PNG;
+        }
+
+        // GIF from first 3 bytes.
+        if (firstFourBytes >> 8 == GIF_HEADER) {
+            return GIF;
+        }
+
+        return UNKNOWN;
+    }
+
+    /**
+     * Parse the orientation from the image header. If it doesn't handle this image type (or this is
+     * not an image)
+     * it will return a default value rather than throwing an exception.
+     *
+     * @return The exif orientation if present or -1 if the header couldn't be parsed or doesn't
+     * contain an orientation
+     * @throws IOException
+     */
+    public int getOrientation() throws IOException {
+        final int magicNumber = streamReader.getUInt16();
+
+        if (!handles(magicNumber)) {
+            return -1;
+        } else {
+            byte[] exifData = getExifSegment();
+            boolean hasJpegExifPreamble =
+                    exifData != null && exifData.length > JPEG_EXIF_SEGMENT_PREAMBLE_BYTES.length;
+
+            if (hasJpegExifPreamble) {
+                for (int i = 0; i < JPEG_EXIF_SEGMENT_PREAMBLE_BYTES.length; i++) {
+                    if (exifData[i] != JPEG_EXIF_SEGMENT_PREAMBLE_BYTES[i]) {
+                        hasJpegExifPreamble = false;
+                        break;
+                    }
+                }
+            }
+
+            if (hasJpegExifPreamble) {
+                return parseExifSegment(new RandomAccessReader(exifData));
+            } else {
+                return -1;
+            }
+        }
+    }
+
+    private byte[] getExifSegment() throws IOException {
+        short segmentId, segmentType;
+        int segmentLength;
+        while (true) {
+            segmentId = streamReader.getUInt8();
+
+            if (segmentId != SEGMENT_START_ID) {
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                    Log.d(TAG, "Unknown segmentId=" + segmentId);
+                }
+                return null;
+            }
+
+            segmentType = streamReader.getUInt8();
+
+            if (segmentType == SEGMENT_SOS) {
+                return null;
+            } else if (segmentType == MARKER_EOI) {
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                    Log.d(TAG, "Found MARKER_EOI in exif segment");
+                }
+                return null;
+            }
+
+            // Segment length includes bytes for segment length.
+            segmentLength = streamReader.getUInt16() - 2;
+
+            if (segmentType != EXIF_SEGMENT_TYPE) {
+                long skipped = streamReader.skip(segmentLength);
+                if (skipped != segmentLength) {
+                    if (Log.isLoggable(TAG, Log.DEBUG)) {
+                        Log.d(TAG, "Unable to skip enough data"
+                                + ", type: "
+                                + segmentType
+                                + ", wanted to skip: "
+                                + segmentLength
+                                + ", but actually skipped: "
+                                + skipped);
+                    }
+                    return null;
+                }
+            } else {
+                byte[] segmentData = new byte[segmentLength];
+                int read = streamReader.read(segmentData);
+                if (read != segmentLength) {
+                    if (Log.isLoggable(TAG, Log.DEBUG)) {
+                        Log.d(TAG, "Unable to read segment data"
+                                + ", type: "
+                                + segmentType
+                                + ", length: "
+                                + segmentLength
+                                + ", actually read: "
+                                + read);
+                    }
+                    return null;
+                } else {
+                    return segmentData;
+                }
+            }
+        }
+    }
+
+    /**
+     * The format of the image data including whether or not the image may include transparent
+     * pixels.
+     */
+    public enum ImageType {
+        /**
+         * GIF type.
+         */
+        GIF(true),
+        /**
+         * JPG type.
+         */
+        JPEG(false),
+        /**
+         * PNG type with alpha.
+         */
+        PNG_A(true),
+        /**
+         * PNG type without alpha.
+         */
+        PNG(false),
+        /**
+         * Unrecognized type.
+         */
+        UNKNOWN(false);
+        private final boolean hasAlpha;
+
+        ImageType(boolean hasAlpha) {
+            this.hasAlpha = hasAlpha;
+        }
+
+        public boolean hasAlpha() {
+            return hasAlpha;
+        }
+    }
+
     private static class RandomAccessReader {
         private final ByteBuffer data;
 
@@ -331,7 +355,7 @@ public class ImageHeaderParser {
         }
 
         public int getUInt16() throws IOException {
-            return  (is.read() << 8 & 0xFF00) | (is.read() & 0xFF);
+            return (is.read() << 8 & 0xFF00) | (is.read() & 0xFF);
         }
 
         public short getUInt8() throws IOException {
@@ -375,7 +399,7 @@ public class ImageHeaderParser {
 
         public int getByte() throws IOException {
             return is.read();
-        }
+    }
     }
 }
 

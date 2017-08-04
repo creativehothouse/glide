@@ -8,10 +8,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A {@link com.bumptech.glide.load.ResourceDecoder} that can decode an
- * {@link com.bumptech.glide.load.resource.gifbitmap.GifBitmapWrapper} from {@link java.io.InputStream} data.
+ * A {@link ResourceDecoder} that can decode an
+ * {@link GifBitmapWrapper} from {@link java.io.InputStream} data.
  */
-public class GifBitmapWrapperStreamResourceDecoder implements ResourceDecoder<InputStream, GifBitmapWrapper> {
+public class GifBitmapWrapperStreamResourceDecoder
+        implements ResourceDecoder<InputStream, GifBitmapWrapper> {
     private final ResourceDecoder<ImageVideoWrapper, GifBitmapWrapper> gifBitmapDecoder;
 
     public GifBitmapWrapperStreamResourceDecoder(
@@ -20,7 +21,8 @@ public class GifBitmapWrapperStreamResourceDecoder implements ResourceDecoder<In
     }
 
     @Override
-    public Resource<GifBitmapWrapper> decode(InputStream source, int width, int height) throws IOException {
+    public Resource<GifBitmapWrapper> decode(InputStream source, int width, int height)
+            throws IOException {
         return gifBitmapDecoder.decode(new ImageVideoWrapper(source, null), width, height);
     }
 

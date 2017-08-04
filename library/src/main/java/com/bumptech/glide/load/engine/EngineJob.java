@@ -16,12 +16,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 /**
- * A class that manages a load by adding and removing callbacks for for the load and notifying callbacks when the
+ * A class that manages a load by adding and removing callbacks for for the load and notifying
+ * callbacks when the
  * load completes.
  */
 class EngineJob implements EngineRunnable.EngineRunnableManager {
     private static final EngineResourceFactory DEFAULT_FACTORY = new EngineResourceFactory();
-    private static final Handler MAIN_THREAD_HANDLER = new Handler(Looper.getMainLooper(), new MainThreadCallback());
+    private static final Handler MAIN_THREAD_HANDLER =
+            new Handler(Looper.getMainLooper(), new MainThreadCallback());
 
     private static final int MSG_COMPLETE = 1;
     private static final int MSG_EXCEPTION = 2;
@@ -48,13 +50,14 @@ class EngineJob implements EngineRunnable.EngineRunnableManager {
 
     private volatile Future<?> future;
 
-    public EngineJob(Key key, ExecutorService diskCacheService, ExecutorService sourceService, boolean isCacheable,
-            EngineJobListener listener) {
+    public EngineJob(Key key, ExecutorService diskCacheService, ExecutorService sourceService,
+            boolean isCacheable, EngineJobListener listener) {
         this(key, diskCacheService, sourceService, isCacheable, listener, DEFAULT_FACTORY);
     }
 
-    public EngineJob(Key key, ExecutorService diskCacheService, ExecutorService sourceService, boolean isCacheable,
-            EngineJobListener listener, EngineResourceFactory engineResourceFactory) {
+    public EngineJob(Key key, ExecutorService diskCacheService, ExecutorService sourceService,
+            boolean isCacheable, EngineJobListener listener,
+            EngineResourceFactory engineResourceFactory) {
         this.key = key;
         this.diskCacheService = diskCacheService;
         this.sourceService = sourceService;
@@ -81,7 +84,7 @@ class EngineJob implements EngineRunnable.EngineRunnableManager {
             cb.onException(exception);
         } else {
             cbs.add(cb);
-        }
+    }
     }
 
     public void removeCallback(ResourceCallback cb) {
@@ -93,7 +96,7 @@ class EngineJob implements EngineRunnable.EngineRunnableManager {
             if (cbs.isEmpty()) {
                 cancel();
             }
-        }
+    }
     }
 
     // We cannot remove callbacks while notifying our list of callbacks directly because doing so would cause a
@@ -182,14 +185,14 @@ class EngineJob implements EngineRunnable.EngineRunnableManager {
             if (!isInIgnoredCallbacks(cb)) {
                 cb.onException(exception);
             }
-        }
+    }
     }
 
     // Visible for testing.
     static class EngineResourceFactory {
         public <R> EngineResource<R> build(Resource<R> resource, boolean isMemoryCacheable) {
             return new EngineResource<R>(resource, isMemoryCacheable);
-        }
+    }
     }
 
     private static class MainThreadCallback implements Handler.Callback {

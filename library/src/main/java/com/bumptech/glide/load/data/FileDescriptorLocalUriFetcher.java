@@ -17,7 +17,8 @@ public class FileDescriptorLocalUriFetcher extends LocalUriFetcher<ParcelFileDes
     }
 
     @Override
-    protected ParcelFileDescriptor loadResource(Uri uri, ContentResolver contentResolver) throws FileNotFoundException {
+    protected ParcelFileDescriptor loadResource(Uri uri, ContentResolver contentResolver)
+            throws FileNotFoundException {
         return contentResolver.openAssetFileDescriptor(uri, "r").getParcelFileDescriptor();
     }
 

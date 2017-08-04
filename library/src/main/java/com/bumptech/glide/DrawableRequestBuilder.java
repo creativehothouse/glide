@@ -14,6 +14,8 @@ import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.ImageVideoWrapper;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.load.resource.gifbitmap.GifBitmapWrapper;
 import com.bumptech.glide.load.resource.gifbitmap.GifBitmapWrapperTransformation;
@@ -23,7 +25,6 @@ import com.bumptech.glide.manager.RequestTracker;
 import com.bumptech.glide.provider.LoadProvider;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.animation.DrawableCrossFadeFactory;
-import com.bumptech.glide.request.animation.GlideAnimationFactory;
 import com.bumptech.glide.request.animation.ViewPropertyAnimation;
 import com.bumptech.glide.request.target.Target;
 
@@ -31,10 +32,11 @@ import java.io.File;
 
 /**
  * A class for creating a request to load a {@link GlideDrawable}.
- *
  * <p>
- *     Warning - It is <em>not</em> safe to use this builder after calling <code>into()</code>, it may be pooled and
- *     reused.
+ * <p>
+ * Warning - It is <em>not</em> safe to use this builder after calling <code>into()</code>, it may
+ * be pooled and
+ * reused.
  * </p>
  *
  * @param <ModelType> The type of model that will be loaded into the target.
@@ -44,38 +46,44 @@ public class DrawableRequestBuilder<ModelType>
         implements BitmapOptions, DrawableOptions {
 
     DrawableRequestBuilder(Context context, Class<ModelType> modelClass,
-            LoadProvider<ModelType, ImageVideoWrapper, GifBitmapWrapper, GlideDrawable> loadProvider, Glide glide,
-            RequestTracker requestTracker, Lifecycle lifecycle) {
+            LoadProvider<ModelType, ImageVideoWrapper, GifBitmapWrapper, GlideDrawable> loadProvider,
+            Glide glide, RequestTracker requestTracker, Lifecycle lifecycle) {
         super(context, modelClass, loadProvider, GlideDrawable.class, glide, requestTracker, lifecycle);
         // Default to animating.
         crossFade();
     }
 
     /**
-     * Loads and displays the {@link GlideDrawable} retrieved by the given thumbnail request if it finishes before this
-     * request. Best used for loading thumbnail {@link GlideDrawable}s that are smaller and will be loaded more quickly
-     * than the fullsize {@link GlideDrawable}. There are no guarantees about the order in which the requests will
-     * actually finish. However, if the thumb request completes after the full request, the thumb {@link GlideDrawable}
+     * Loads and displays the {@link GlideDrawable} retrieved by the given thumbnail request if it
+     * finishes before this
+     * request. Best used for loading thumbnail {@link GlideDrawable}s that are smaller and will be
+     * loaded more quickly
+     * than the fullsize {@link GlideDrawable}. There are no guarantees about the order in which the
+     * requests will
+     * actually finish. However, if the thumb request completes after the full request, the thumb
+     * {@link GlideDrawable}
      * will never replace the full image.
-     *
-     * @see #thumbnail(float)
-     *
-     * <p>
-     *     Note - Any options on the main request will not be passed on to the thumbnail request. For example, if
-     *     you want an animation to occur when either the full {@link GlideDrawable} loads or the thumbnail loads,
-     *     you need to call {@link #animate(int)} on both the thumb and the full request. For a simpler thumbnail
-     *     option where these options are applied to the humbnail as well, see {@link #thumbnail(float)}.
-     * </p>
-     *
-     * <p>
-     *     Only the thumbnail call on the main request will be obeyed, recursive calls to this method are ignored.
-     * </p>
      *
      * @param thumbnailRequest The request to use to load the thumbnail.
      * @return This builder object.
+     * @see #thumbnail(float)
+     * <p>
+     * <p>
+     * Note - Any options on the main request will not be passed on to the thumbnail request. For
+     * example, if
+     * you want an animation to occur when either the full {@link GlideDrawable} loads or the
+     * thumbnail loads,
+     * you need to call {@link #animate(int)} on both the thumb and the full request. For a simpler
+     * thumbnail
+     * option where these options are applied to the humbnail as well, see {@link #thumbnail(float)}.
+     * </p>
+     * <p>
+     * <p>
+     * Only the thumbnail call on the main request will be obeyed, recursive calls to this method are
+     * ignored.
+     * </p>
      */
-    public DrawableRequestBuilder<ModelType> thumbnail(
-            DrawableRequestBuilder<?> thumbnailRequest) {
+    public DrawableRequestBuilder<ModelType> thumbnail(DrawableRequestBuilder<?> thumbnailRequest) {
         super.thumbnail(thumbnailRequest);
         return this;
     }
@@ -112,7 +120,8 @@ public class DrawableRequestBuilder<ModelType>
      * {@inheritDoc}
      */
     @Override
-    public DrawableRequestBuilder<ModelType> decoder(ResourceDecoder<ImageVideoWrapper, GifBitmapWrapper> decoder) {
+    public DrawableRequestBuilder<ModelType> decoder(
+            ResourceDecoder<ImageVideoWrapper, GifBitmapWrapper> decoder) {
         super.decoder(decoder);
         return this;
     }
@@ -121,7 +130,8 @@ public class DrawableRequestBuilder<ModelType>
      * {@inheritDoc}
      */
     @Override
-    public DrawableRequestBuilder<ModelType> cacheDecoder(ResourceDecoder<File, GifBitmapWrapper> cacheDecoder) {
+    public DrawableRequestBuilder<ModelType> cacheDecoder(
+            ResourceDecoder<File, GifBitmapWrapper> cacheDecoder) {
         super.cacheDecoder(cacheDecoder);
         return this;
     }
@@ -130,7 +140,8 @@ public class DrawableRequestBuilder<ModelType>
      * {@inheritDoc}
      */
     @Override
-    public DrawableRequestBuilder<ModelType> encoder(ResourceEncoder<GifBitmapWrapper> encoder) {
+    public DrawableRequestBuilder<ModelType> encoder(
+            ResourceEncoder<GifBitmapWrapper> encoder) {
         super.encoder(encoder);
         return this;
     }
@@ -146,34 +157,33 @@ public class DrawableRequestBuilder<ModelType>
 
     /**
      * Transform {@link GlideDrawable}s using the given
-     * {@link com.bumptech.glide.load.resource.bitmap.BitmapTransformation}s.
-     *
+     * {@link BitmapTransformation}s.
      * <p>
-     *     Note - Bitmap transformations will apply individually to each frame of animated GIF images and also to
-     *     individual {@link Bitmap}s.
+     * <p>
+     * Note - Bitmap transformations will apply individually to each frame of animated GIF images and
+     * also to
+     * individual {@link Bitmap}s.
      * </p>
-     *
-     * @see #centerCrop()
-     * @see #fitCenter()
-     * @see #bitmapTransform(com.bumptech.glide.load.Transformation[])
-     * @see #transform(com.bumptech.glide.load.Transformation[])
      *
      * @param transformations The transformations to apply in order.
      * @return This request builder.
+     * @see #centerCrop()
+     * @see #fitCenter()
+     * @see #bitmapTransform(Transformation[])
+     * @see #transform(Transformation[])
      */
     public DrawableRequestBuilder<ModelType> transform(BitmapTransformation... transformations) {
         return bitmapTransform(transformations);
     }
 
     /**
-     * Transform {@link GlideDrawable}s using {@link com.bumptech.glide.load.resource.bitmap.CenterCrop}.
-     *
-     * @see #fitCenter()
-     * @see #transform(com.bumptech.glide.load.resource.bitmap.BitmapTransformation...)
-     * @see #bitmapTransform(com.bumptech.glide.load.Transformation[])
-     * @see #transform(com.bumptech.glide.load.Transformation[])
+     * Transform {@link GlideDrawable}s using {@link CenterCrop}.
      *
      * @return This request builder.
+     * @see #fitCenter()
+     * @see #transform(BitmapTransformation...)
+     * @see #bitmapTransform(Transformation[])
+     * @see #transform(Transformation[])
      */
     @SuppressWarnings("unchecked")
     public DrawableRequestBuilder<ModelType> centerCrop() {
@@ -181,14 +191,13 @@ public class DrawableRequestBuilder<ModelType>
     }
 
     /**
-     * Transform {@link GlideDrawable}s using {@link com.bumptech.glide.load.resource.bitmap.FitCenter}.
-     *
-     * @see #centerCrop()
-     * @see #transform(com.bumptech.glide.load.resource.bitmap.BitmapTransformation...)
-     * @see #bitmapTransform(com.bumptech.glide.load.Transformation[])
-     * @see #transform(com.bumptech.glide.load.Transformation[])
+     * Transform {@link GlideDrawable}s using {@link FitCenter}.
      *
      * @return This request builder.
+     * @see #centerCrop()
+     * @see #transform(BitmapTransformation...)
+     * @see #bitmapTransform(Transformation[])
+     * @see #transform(Transformation[])
      */
     @SuppressWarnings("unchecked")
     public DrawableRequestBuilder<ModelType> fitCenter() {
@@ -196,36 +205,37 @@ public class DrawableRequestBuilder<ModelType>
     }
 
     /**
-     * Transform {@link GlideDrawable}s using the given {@link android.graphics.Bitmap} transformations. Replaces any
+     * Transform {@link GlideDrawable}s using the given {@link android.graphics.Bitmap}
+     * transformations. Replaces any
      * previous transformations.
      *
+     * @return This request builder.
      * @see #fitCenter()
      * @see #centerCrop()
-     * @see #transform(com.bumptech.glide.load.resource.bitmap.BitmapTransformation...)
-     * @see #transform(com.bumptech.glide.load.Transformation[])
-     *
-     * @return This request builder.
+     * @see #transform(BitmapTransformation...)
+     * @see #transform(Transformation[])
      */
-    public DrawableRequestBuilder<ModelType> bitmapTransform(Transformation<Bitmap>... bitmapTransformations) {
+    public DrawableRequestBuilder<ModelType> bitmapTransform(
+            Transformation<Bitmap>... bitmapTransformations) {
         GifBitmapWrapperTransformation[] transformations =
                 new GifBitmapWrapperTransformation[bitmapTransformations.length];
         for (int i = 0; i < bitmapTransformations.length; i++) {
-            transformations[i] = new GifBitmapWrapperTransformation(glide.getBitmapPool(), bitmapTransformations[i]);
+            transformations[i] =
+                    new GifBitmapWrapperTransformation(glide.getBitmapPool(), bitmapTransformations[i]);
         }
         return transform(transformations);
     }
 
-
-
     /**
      * {@inheritDoc}
      *
-     * @see #bitmapTransform(com.bumptech.glide.load.Transformation[])
+     * @see #bitmapTransform(Transformation[])
      * @see #centerCrop()
      * @see #fitCenter()
      */
     @Override
-    public DrawableRequestBuilder<ModelType> transform(Transformation<GifBitmapWrapper>... transformation) {
+    public DrawableRequestBuilder<ModelType> transform(
+            Transformation<GifBitmapWrapper>... transformation) {
         super.transform(transformation);
         return this;
     }
@@ -260,7 +270,8 @@ public class DrawableRequestBuilder<ModelType>
      * {@inheritDoc}
      */
     @Deprecated
-    public DrawableRequestBuilder<ModelType> crossFade(Animation animation, int duration) {
+    public DrawableRequestBuilder<ModelType> crossFade(Animation animation,
+            int duration) {
         super.animate(new DrawableCrossFadeFactory<GlideDrawable>(animation, duration));
         return this;
     }
@@ -286,17 +297,9 @@ public class DrawableRequestBuilder<ModelType>
      * {@inheritDoc}
      */
     @Override
-    public DrawableRequestBuilder<ModelType> animate(ViewPropertyAnimation.Animator animator) {
+    public DrawableRequestBuilder<ModelType> animate(
+            ViewPropertyAnimation.Animator animator) {
         super.animate(animator);
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DrawableRequestBuilder<ModelType> animate(GlideAnimationFactory<GlideDrawable> animationFactory) {
-        super.animate(animationFactory);
         return this;
     }
 
@@ -409,7 +412,8 @@ public class DrawableRequestBuilder<ModelType>
      * {@inheritDoc}
      */
     @Override
-    public DrawableRequestBuilder<ModelType> sourceEncoder(Encoder<ImageVideoWrapper> sourceEncoder) {
+    public DrawableRequestBuilder<ModelType> sourceEncoder(
+            Encoder<ImageVideoWrapper> sourceEncoder) {
         super.sourceEncoder(sourceEncoder);
         return this;
     }
@@ -442,11 +446,13 @@ public class DrawableRequestBuilder<ModelType>
 
     /**
      * {@inheritDoc}
-     *
      * <p>
-     *     Note - If no transformation is set for this load, a default transformation will be applied based on the
-     *     value returned from {@link android.widget.ImageView#getScaleType()}. To avoid this default transformation,
-     *     use {@link #dontTransform()}.
+     * <p>
+     * Note - If no transformation is set for this load, a default transformation will be applied
+     * based on the
+     * value returned from {@link android.widget.ImageView#getScaleType()}. To avoid this default
+     * transformation,
+     * use {@link #dontTransform()}.
      * </p>
      *
      * @param view {@inheritDoc}

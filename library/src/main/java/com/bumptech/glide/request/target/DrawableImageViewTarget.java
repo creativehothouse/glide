@@ -13,6 +13,6 @@ public class DrawableImageViewTarget extends ImageViewTarget<Drawable> {
 
     @Override
     protected void setResource(Drawable resource) {
-       view.setImageDrawable(resource);
+        view.setImageDrawable(resource);
     }
 }

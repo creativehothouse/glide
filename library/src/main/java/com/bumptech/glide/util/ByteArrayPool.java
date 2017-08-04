@@ -14,9 +14,11 @@ public final class ByteArrayPool {
     // 512 KB.
     private static final int MAX_SIZE = 2 * 1048 * 1024;
     private static final int MAX_BYTE_ARRAY_COUNT = MAX_SIZE / TEMP_BYTES_SIZE;
-
-    private final Queue<byte[]> tempQueue = Util.createQueue(0);
     private static final ByteArrayPool BYTE_ARRAY_POOL = new ByteArrayPool();
+    private final Queue<byte[]> tempQueue = Util.createQueue(0);
+
+    private ByteArrayPool() {
+    }
 
     /**
      * Returns a constant singleton byte array pool.
@@ -24,8 +26,6 @@ public final class ByteArrayPool {
     public static ByteArrayPool get() {
         return BYTE_ARRAY_POOL;
     }
-
-    private ByteArrayPool() {  }
 
     /**
      * Removes all byte arrays from the pool.
@@ -37,7 +37,8 @@ public final class ByteArrayPool {
     }
 
     /**
-     * Returns a byte array by retrieving one from the pool if the pool is non empty or otherwise by creating a new
+     * Returns a byte array by retrieving one from the pool if the pool is non empty or otherwise by
+     * creating a new
      * byte array.
      */
     public byte[] getBytes() {
@@ -55,7 +56,8 @@ public final class ByteArrayPool {
     }
 
     /**
-     * Adds the given byte array to the pool if it is the correct size and the pool is not full and returns true if
+     * Adds the given byte array to the pool if it is the correct size and the pool is not full and
+     * returns true if
      * the byte array was added and false otherwise.
      *
      * @param bytes The bytes to try to add to the pool.

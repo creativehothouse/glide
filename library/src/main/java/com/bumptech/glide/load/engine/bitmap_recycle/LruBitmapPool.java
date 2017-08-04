@@ -13,9 +13,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * An {@link com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool} implementation that uses an
- * {@link com.bumptech.glide.load.engine.bitmap_recycle.LruPoolStrategy} to bucket {@link Bitmap}s and then uses an LRU
- * eviction policy to evict {@link android.graphics.Bitmap}s from the least recently used bucket in order to keep
+ * An {@link BitmapPool} implementation that uses an
+ * {@link LruPoolStrategy} to bucket {@link Bitmap}s and then uses an LRU
+ * eviction policy to evict {@link android.graphics.Bitmap}s from the least recently used bucket in
+ * order to keep
  * the pool below a given maximum size limit.
  */
 public class LruBitmapPool implements BitmapPool {
@@ -55,12 +56,32 @@ public class LruBitmapPool implements BitmapPool {
     /**
      * Constructor for LruBitmapPool.
      *
-     * @param maxSize The initial maximum size of the pool in bytes.
-     * @param allowedConfigs A white listed set of {@link android.graphics.Bitmap.Config} that are allowed to be put
+     * @param maxSize        The initial maximum size of the pool in bytes.
+     * @param allowedConfigs A white listed set of {@link android.graphics.Bitmap.Config} that are
+     *                       allowed to be put
      *                       into the pool. Configs not in the allowed set will be rejected.
      */
     public LruBitmapPool(int maxSize, Set<Bitmap.Config> allowedConfigs) {
         this(maxSize, getDefaultStrategy(), allowedConfigs);
+    }
+
+    private static LruPoolStrategy getDefaultStrategy() {
+        final LruPoolStrategy strategy;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            strategy = new SizeConfigStrategy();
+        } else {
+            strategy = new AttributeStrategy();
+        }
+        return strategy;
+    }
+
+    private static Set<Bitmap.Config> getDefaultAllowedConfigs() {
+        Set<Bitmap.Config> configs = new HashSet<Bitmap.Config>();
+        configs.addAll(Arrays.asList(Bitmap.Config.values()));
+        if (Build.VERSION.SDK_INT >= 19) {
+            configs.add(null);
+        }
+        return Collections.unmodifiableSet(configs);
     }
 
     @Override
@@ -79,12 +100,16 @@ public class LruBitmapPool implements BitmapPool {
         if (bitmap == null) {
             throw new NullPointerException("Bitmap must not be null");
         }
-        if (!bitmap.isMutable() || strategy.getSize(bitmap) > maxSize || !allowedConfigs.contains(bitmap.getConfig())) {
+        if (!bitmap.isMutable() || strategy.getSize(bitmap) > maxSize || !allowedConfigs.contains(
+                bitmap.getConfig())) {
             if (Log.isLoggable(TAG, Log.VERBOSE)) {
                 Log.v(TAG, "Reject bitmap from pool"
-                        + ", bitmap: " + strategy.logBitmap(bitmap)
-                        + ", is mutable: " + bitmap.isMutable()
-                        + ", is allowed config: " + allowedConfigs.contains(bitmap.getConfig()));
+                        + ", bitmap: "
+                        + strategy.logBitmap(bitmap)
+                        + ", is mutable: "
+                        + bitmap.isMutable()
+                        + ", is allowed config: "
+                        + allowedConfigs.contains(bitmap.getConfig()));
             }
             return false;
         }
@@ -201,36 +226,25 @@ public class LruBitmapPool implements BitmapPool {
     }
 
     private void dumpUnchecked() {
-        Log.v(TAG, "Hits="  + hits
-                    + ", misses=" + misses
-                    + ", puts=" + puts
-                    + ", evictions=" + evictions
-                    + ", currentSize=" + currentSize
-                    + ", maxSize=" + maxSize
-                    + "\nStrategy=" + strategy);
-    }
-
-    private static LruPoolStrategy getDefaultStrategy() {
-        final LruPoolStrategy strategy;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            strategy = new SizeConfigStrategy();
-        } else {
-            strategy = new AttributeStrategy();
-        }
-        return strategy;
-    }
-
-    private static Set<Bitmap.Config> getDefaultAllowedConfigs() {
-        Set<Bitmap.Config> configs = new HashSet<Bitmap.Config>();
-        configs.addAll(Arrays.asList(Bitmap.Config.values()));
-        if (Build.VERSION.SDK_INT >= 19) {
-            configs.add(null);
-        }
-        return Collections.unmodifiableSet(configs);
+        Log.v(TAG, "Hits="
+                + hits
+                + ", misses="
+                + misses
+                + ", puts="
+                + puts
+                + ", evictions="
+                + evictions
+                + ", currentSize="
+                + currentSize
+                + ", maxSize="
+                + maxSize
+                + "\nStrategy="
+                + strategy);
     }
 
     private interface BitmapTracker {
         void add(Bitmap bitmap);
+
         void remove(Bitmap bitmap);
     }
 
@@ -242,8 +256,13 @@ public class LruBitmapPool implements BitmapPool {
         @Override
         public void add(Bitmap bitmap) {
             if (bitmaps.contains(bitmap)) {
-                throw new IllegalStateException("Can't add already added bitmap: " + bitmap + " [" + bitmap.getWidth()
-                        + "x" + bitmap.getHeight() + "]");
+                throw new IllegalStateException("Can't add already added bitmap: "
+                        + bitmap
+                        + " ["
+                        + bitmap.getWidth()
+                        + "x"
+                        + bitmap.getHeight()
+                        + "]");
             }
             bitmaps.add(bitmap);
         }
@@ -266,6 +285,6 @@ public class LruBitmapPool implements BitmapPool {
         @Override
         public void remove(Bitmap bitmap) {
             // Do nothing.
-        }
+    }
     }
 }

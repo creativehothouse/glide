@@ -3,7 +3,7 @@ package com.bumptech.glide.request.animation;
 import android.view.View;
 
 /**
- * A {@link com.bumptech.glide.request.animation.GlideAnimation GlideAnimation} that accepts an interface
+ * A {@link GlideAnimation GlideAnimation} that accepts an interface
  * that can apply an animation like a {@link android.view.ViewPropertyAnimator}
  * or a {@link android.animation.ObjectAnimator} to an {@link View}.
  *
@@ -15,7 +15,7 @@ public class ViewPropertyAnimation<R> implements GlideAnimation<R> {
 
     /**
      * Constructor for a view property animation that takes an
-     * {@link com.bumptech.glide.request.animation.ViewPropertyAnimation.Animator} interface that can apply an animation
+     * {@link ViewPropertyAnimation.Animator} interface that can apply an animation
      * to a view.
      *
      * @param animator The animator to use.
@@ -25,8 +25,10 @@ public class ViewPropertyAnimation<R> implements GlideAnimation<R> {
     }
 
     /**
-     * Always applies the {@link com.bumptech.glide.request.animation.ViewPropertyAnimation.Animator} given in the
-     * constructor to the given view and returns {@code false} because the animator cannot set the new resource on
+     * Always applies the {@link ViewPropertyAnimation.Animator} given in the
+     * constructor to the given view and returns {@code false} because the animator cannot set the
+     * new
+     * resource on
      * the view.
      *
      * @param current {@inheritDoc}
@@ -43,7 +45,8 @@ public class ViewPropertyAnimation<R> implements GlideAnimation<R> {
     }
 
     /**
-     * An interface that allows an animation to be applied on or started from an {@link android.view.View}.
+     * An interface that allows an animation to be applied on or started from an {@link
+     * android.view.View}.
      */
     public interface Animator {
         /**
@@ -53,5 +56,4 @@ public class ViewPropertyAnimation<R> implements GlideAnimation<R> {
          */
         void animate(View view);
     }
-
 }

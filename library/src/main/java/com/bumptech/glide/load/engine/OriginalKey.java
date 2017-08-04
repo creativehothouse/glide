@@ -31,12 +31,8 @@ class OriginalKey implements Key {
 
         if (!id.equals(that.id)) {
             return false;
-        }
-        if (!signature.equals(that.signature)) {
-            return false;
-        }
-
-        return true;
+    }
+        return signature.equals(that.signature);
     }
 
     @Override
@@ -47,7 +43,8 @@ class OriginalKey implements Key {
     }
 
     @Override
-    public void updateDiskCacheKey(MessageDigest messageDigest) throws UnsupportedEncodingException {
+    public void updateDiskCacheKey(MessageDigest messageDigest)
+            throws UnsupportedEncodingException {
         messageDigest.update(id.getBytes(STRING_CHARSET_NAME));
         signature.updateDiskCacheKey(messageDigest);
     }

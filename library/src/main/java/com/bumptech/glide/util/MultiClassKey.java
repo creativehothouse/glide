@@ -22,10 +22,7 @@ public class MultiClassKey {
 
     @Override
     public String toString() {
-        return "MultiClassKey{"
-                + "first=" + first
-                + ", second=" + second
-                + '}';
+        return "MultiClassKey{" + "first=" + first + ", second=" + second + '}';
     }
 
     @Override
@@ -42,11 +39,7 @@ public class MultiClassKey {
         if (!first.equals(that.first)) {
             return false;
         }
-        if (!second.equals(that.second)) {
-            return false;
-        }
-
-        return true;
+        return second.equals(that.second);
     }
 
     @Override

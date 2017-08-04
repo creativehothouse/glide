@@ -8,8 +8,8 @@ import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapResource;
 
 /**
- * An {@link com.bumptech.glide.load.Transformation} that wraps a transformation for a {@link Bitmap}
- * and can apply it to every frame of any {@link com.bumptech.glide.load.resource.gif.GifDrawable}.
+ * An {@link Transformation} that wraps a transformation for a {@link Bitmap}
+ * and can apply it to every frame of any {@link GifDrawable}.
  */
 public class GifDrawableTransformation implements Transformation<GifDrawable> {
     private final Transformation<Bitmap> wrapped;
@@ -21,7 +21,8 @@ public class GifDrawableTransformation implements Transformation<GifDrawable> {
     }
 
     @Override
-    public Resource<GifDrawable> transform(Resource<GifDrawable> resource, int outWidth, int outHeight) {
+    public Resource<GifDrawable> transform(Resource<GifDrawable> resource, int outWidth,
+            int outHeight) {
         GifDrawable drawable = resource.get();
 
         // The drawable needs to be initialized with the correct width and height in order for a view displaying it

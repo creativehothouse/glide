@@ -6,7 +6,7 @@ import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
 
 /**
- * A resource that wraps an {@link com.bumptech.glide.load.resource.gifbitmap.GifBitmapWrapper}.
+ * A resource that wraps an {@link GifBitmapWrapper}.
  */
 public class GifBitmapWrapperResource implements Resource<GifBitmapWrapper> {
     private final GifBitmapWrapper data;

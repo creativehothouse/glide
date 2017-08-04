@@ -1,25 +1,21 @@
 package com.bumptech.glide.load.engine.cache;
 
+import com.bumptech.glide.disklrucache.DiskLruCache;
+
 import java.io.File;
 
 /**
- * Creates an {@link com.bumptech.glide.disklrucache.DiskLruCache} based disk cache in the specified disk cache
+ * Creates an {@link DiskLruCache} based disk cache in the specified disk cache
  * directory.
  * <p/>
  * If you need to make I/O access before returning the cache directory use
- * the {@link DiskLruCacheFactory#DiskLruCacheFactory(CacheDirectoryGetter, int)} constructor variant.
+ * the {@link DiskLruCacheFactory#DiskLruCacheFactory(CacheDirectoryGetter, int)} constructor
+ * variant.
  */
 public class DiskLruCacheFactory implements DiskCache.Factory {
 
     private final int diskCacheSize;
     private final CacheDirectoryGetter cacheDirectoryGetter;
-
-    /**
-     * Interface called out of UI thread to get the cache folder.
-     */
-    public interface CacheDirectoryGetter {
-        File getCacheDirectory();
-    }
 
     public DiskLruCacheFactory(final String diskCacheFolder, int diskCacheSize) {
         this(new CacheDirectoryGetter() {
@@ -30,7 +26,8 @@ public class DiskLruCacheFactory implements DiskCache.Factory {
         }, diskCacheSize);
     }
 
-    public DiskLruCacheFactory(final String diskCacheFolder, final String diskCacheName, int diskCacheSize) {
+    public DiskLruCacheFactory(final String diskCacheFolder, final String diskCacheName,
+            int diskCacheSize) {
         this(new CacheDirectoryGetter() {
             @Override
             public File getCacheDirectory() {
@@ -40,7 +37,9 @@ public class DiskLruCacheFactory implements DiskCache.Factory {
     }
 
     /**
-     * When using this constructor {@link CacheDirectoryGetter#getCacheDirectory()} will be called out of UI thread,
+     * When using this constructor {@link CacheDirectoryGetter#getCacheDirectory()} will be called
+     * out
+     * of UI thread,
      * allowing to do I/O access without performance impacts.
      *
      * @param cacheDirectoryGetter Interface called out of UI thread to get the cache folder.
@@ -64,5 +63,12 @@ public class DiskLruCacheFactory implements DiskCache.Factory {
         }
 
         return DiskLruCacheWrapper.get(cacheDir, diskCacheSize);
+    }
+
+    /**
+     * Interface called out of UI thread to get the cache folder.
+     */
+    public interface CacheDirectoryGetter {
+        File getCacheDirectory();
     }
 }

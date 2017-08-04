@@ -6,7 +6,7 @@ import com.bumptech.glide.load.engine.Resource;
 import java.io.OutputStream;
 
 /**
- * A simple {@link com.bumptech.glide.load.ResourceEncoder} that never writes data.
+ * A simple {@link ResourceEncoder} that never writes data.
  *
  * @param <T> The type of the resource that will always fail to be encoded.
  */

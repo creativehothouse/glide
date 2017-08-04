@@ -16,23 +16,26 @@ import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
  * A class with methods to efficiently resize Bitmaps.
  */
 public final class TransformationUtils {
-    private static final String TAG = "TransformationUtils";
     public static final int PAINT_FLAGS = Paint.DITHER_FLAG | Paint.FILTER_BITMAP_FLAG;
+    private static final String TAG = "TransformationUtils";
 
     private TransformationUtils() {
         // Utility class.
     }
 
     /**
-     * A potentially expensive operation to crop the given Bitmap so that it fills the given dimensions. This operation
-     * is significantly less expensive in terms of memory if a mutable Bitmap with the given dimensions is passed in
+     * A potentially expensive operation to crop the given Bitmap so that it fills the given
+     * dimensions. This operation
+     * is significantly less expensive in terms of memory if a mutable Bitmap with the given
+     * dimensions is passed in
      * as well.
      *
-     * @param recycled A mutable Bitmap with dimensions width and height that we can load the cropped portion of toCrop
+     * @param recycled A mutable Bitmap with dimensions width and height that we can load the cropped
+     *                 portion of toCrop
      *                 into.
-     * @param toCrop The Bitmap to resize.
-     * @param width The width in pixels of the final Bitmap.
-     * @param height The height in pixels of the final Bitmap.
+     * @param toCrop   The Bitmap to resize.
+     * @param width    The width in pixels of the final Bitmap.
+     * @param height   The height in pixels of the final Bitmap.
      * @return The resized Bitmap (will be recycled if recycled is not null).
      */
     public static Bitmap centerCrop(Bitmap recycled, Bitmap toCrop, int width, int height) {
@@ -72,14 +75,16 @@ public final class TransformationUtils {
     }
 
     /**
-     * An expensive operation to resize the given Bitmap down so that it fits within the given dimensions maintain
+     * An expensive operation to resize the given Bitmap down so that it fits within the given
+     * dimensions maintain
      * the original proportions.
      *
-     * @param toFit The Bitmap to shrink.
-     * @param pool The BitmapPool to try to reuse a bitmap from.
-     * @param width The width in pixels the final image will fit within.
+     * @param toFit  The Bitmap to shrink.
+     * @param pool   The BitmapPool to try to reuse a bitmap from.
+     * @param width  The width in pixels the final image will fit within.
      * @param height The height in pixels the final image will fit within.
-     * @return A new Bitmap shrunk to fit within the given dimensions, or toFit if toFit's width or height matches the
+     * @return A new Bitmap shrunk to fit within the given dimensions, or toFit if toFit's width or
+     * height matches the
      * given dimensions and toFit fits within the given dimensions
      */
     public static Bitmap fitCenter(Bitmap toFit, BitmapPool pool, int width, int height) {
@@ -131,15 +136,19 @@ public final class TransformationUtils {
     }
 
     /**
-     * Sets the alpha of the Bitmap we're going to re-use to the alpha of the Bitmap we're going to transform. This
-     * keeps {@link android.graphics.Bitmap#hasAlpha()}} consistent before and after the transformation for
+     * Sets the alpha of the Bitmap we're going to re-use to the alpha of the Bitmap we're going to
+     * transform. This
+     * keeps {@link android.graphics.Bitmap#hasAlpha()}} consistent before and after the
+     * transformation for
      * transformations that don't add or remove transparent pixels.
      *
      * @param toTransform The {@link android.graphics.Bitmap} that will be transformed.
-     * @param outBitmap The {@link android.graphics.Bitmap} that will be returned from the transformation.
+     * @param outBitmap   The {@link android.graphics.Bitmap} that will be returned from the
+     *                    transformation.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
-    public static void setAlpha(Bitmap toTransform, Bitmap outBitmap) {
+    public static void setAlpha(Bitmap toTransform,
+            Bitmap outBitmap) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1 && outBitmap != null) {
             outBitmap.setHasAlpha(toTransform.hasAlpha());
         }
@@ -149,17 +158,19 @@ public final class TransformationUtils {
      * Returns a matrix with rotation set based on Exif orientation tag.
      * If the orientation is undefined or 0 null is returned.
      *
-     * @deprecated No longer used by Glide, scheduled to be removed in Glide 4.0
      * @param pathToOriginal Path to original image file that may have exif data.
-     * @return  A rotation in degrees based on exif orientation
+     * @return A rotation in degrees based on exif orientation
+     * @deprecated No longer used by Glide, scheduled to be removed in Glide 4.0
      */
     @TargetApi(Build.VERSION_CODES.ECLAIR)
     @Deprecated
-    public static int getOrientation(String pathToOriginal) {
+    public static int getOrientation(
+            String pathToOriginal) {
         int degreesToRotate = 0;
         try {
             ExifInterface exif = new ExifInterface(pathToOriginal);
-            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+            int orientation =
+                    exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
             return getExifOrientationDegrees(orientation);
         } catch (Exception e) {
             if (Log.isLoggable(TAG, Log.ERROR)) {
@@ -173,10 +184,10 @@ public final class TransformationUtils {
      * This is an expensive operation that copies the image in place with the pixels rotated.
      * If possible rather use getOrientationMatrix, and set that as the imageMatrix on an ImageView.
      *
-     * @deprecated No longer used by Glide, scheduled to be removed in Glide 4.0
      * @param pathToOriginal Path to original image file that may have exif data.
-     * @param imageToOrient Image Bitmap to orient.
+     * @param imageToOrient  Image Bitmap to orient.
      * @return The oriented bitmap. May be the imageToOrient without modification, or a new Bitmap.
+     * @deprecated No longer used by Glide, scheduled to be removed in Glide 4.0
      */
     @Deprecated
     public static Bitmap orientImage(String pathToOriginal, Bitmap imageToOrient) {
@@ -188,8 +199,9 @@ public final class TransformationUtils {
      * This is an expensive operation that copies the image in place with the pixels rotated.
      * If possible rather use getOrientationMatrix, and set that as the imageMatrix on an ImageView.
      *
-     * @param imageToOrient Image Bitmap to orient.
-     * @param degreesToRotate number of degrees to rotate the image by. If zero the original image is returned
+     * @param imageToOrient   Image Bitmap to orient.
+     * @param degreesToRotate number of degrees to rotate the image by. If zero the original image is
+     *                        returned
      *                        unmodified.
      * @return The oriented bitmap. May be the imageToOrient without modification, or a new Bitmap.
      */
@@ -199,14 +211,8 @@ public final class TransformationUtils {
             if (degreesToRotate != 0) {
                 Matrix matrix = new Matrix();
                 matrix.setRotate(degreesToRotate);
-                result = Bitmap.createBitmap(
-                        imageToOrient,
-                        0,
-                        0,
-                        imageToOrient.getWidth(),
-                        imageToOrient.getHeight(),
-                        matrix,
-                        true);
+                result = Bitmap.createBitmap(imageToOrient, 0, 0, imageToOrient.getWidth(),
+                        imageToOrient.getHeight(), matrix, true);
             }
         } catch (Exception e) {
             if (Log.isLoggable(TAG, Log.ERROR)) {
@@ -239,7 +245,6 @@ public final class TransformationUtils {
                 break;
             default:
                 degreesToRotate = 0;
-
         }
         return degreesToRotate;
     }
@@ -247,8 +252,8 @@ public final class TransformationUtils {
     /**
      * Rotate and/or flip the image to match the given exif orientation.
      *
-     * @param toOrient The bitmap to rotate/flip.
-     * @param pool A pool that may or may not contain an image of the necessary dimensions.
+     * @param toOrient        The bitmap to rotate/flip.
+     * @param pool            A pool that may or may not contain an image of the necessary dimensions.
      * @param exifOrientation the exif orientation [1-8].
      * @return The rotated and/or flipped image or toOrient if no rotation or flip was necessary.
      */
@@ -282,7 +287,7 @@ public final class TransformationUtils {
     }
 
     private static Bitmap.Config getSafeConfig(Bitmap bitmap) {
-      return bitmap.getConfig() != null ? bitmap.getConfig() : Bitmap.Config.ARGB_8888;
+        return bitmap.getConfig() != null ? bitmap.getConfig() : Bitmap.Config.ARGB_8888;
     }
 
     // Visible for testing.
@@ -314,6 +319,6 @@ public final class TransformationUtils {
                 break;
             default:
                 // Do nothing.
-        }
+    }
     }
 }

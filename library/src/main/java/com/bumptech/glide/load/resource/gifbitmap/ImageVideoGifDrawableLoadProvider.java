@@ -15,27 +15,29 @@ import java.io.File;
 import java.io.InputStream;
 
 /**
- * An {@link com.bumptech.glide.provider.DataLoadProvider} that can load either an
- * {@link com.bumptech.glide.load.resource.gif.GifDrawable} or an {@link Bitmap} from either an
+ * An {@link DataLoadProvider} that can load either an
+ * {@link GifDrawable} or an {@link Bitmap} from either an
  * {@link java.io.InputStream} or an {@link android.os.ParcelFileDescriptor}.
  */
-public class ImageVideoGifDrawableLoadProvider implements DataLoadProvider<ImageVideoWrapper, GifBitmapWrapper> {
+public class ImageVideoGifDrawableLoadProvider
+        implements DataLoadProvider<ImageVideoWrapper, GifBitmapWrapper> {
     private final ResourceDecoder<File, GifBitmapWrapper> cacheDecoder;
     private final ResourceDecoder<ImageVideoWrapper, GifBitmapWrapper> sourceDecoder;
     private final ResourceEncoder<GifBitmapWrapper> encoder;
     private final Encoder<ImageVideoWrapper> sourceEncoder;
 
-    public ImageVideoGifDrawableLoadProvider(DataLoadProvider<ImageVideoWrapper, Bitmap> bitmapProvider,
+    public ImageVideoGifDrawableLoadProvider(
+            DataLoadProvider<ImageVideoWrapper, Bitmap> bitmapProvider,
             DataLoadProvider<InputStream, GifDrawable> gifProvider, BitmapPool bitmapPool) {
 
-        final GifBitmapWrapperResourceDecoder decoder = new GifBitmapWrapperResourceDecoder(
-                bitmapProvider.getSourceDecoder(),
-                gifProvider.getSourceDecoder(),
-                bitmapPool
-        );
-        cacheDecoder = new FileToStreamDecoder<GifBitmapWrapper>(new GifBitmapWrapperStreamResourceDecoder(decoder));
+        final GifBitmapWrapperResourceDecoder decoder =
+                new GifBitmapWrapperResourceDecoder(bitmapProvider.getSourceDecoder(),
+                        gifProvider.getSourceDecoder(), bitmapPool);
+        cacheDecoder = new FileToStreamDecoder<GifBitmapWrapper>(
+                new GifBitmapWrapperStreamResourceDecoder(decoder));
         sourceDecoder = decoder;
-        encoder = new GifBitmapWrapperResourceEncoder(bitmapProvider.getEncoder(), gifProvider.getEncoder());
+        encoder =
+                new GifBitmapWrapperResourceEncoder(bitmapProvider.getEncoder(), gifProvider.getEncoder());
 
         //TODO: what about the gif provider?
         sourceEncoder = bitmapProvider.getSourceEncoder();

@@ -5,14 +5,16 @@ import android.graphics.Bitmap;
 import com.bumptech.glide.load.engine.Resource;
 import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.load.resource.gifbitmap.GifBitmapWrapper;
 
 /**
- * An {@link com.bumptech.glide.load.resource.transcode.ResourceTranscoder} that can transcode either an
- * {@link Bitmap} or an {@link com.bumptech.glide.load.resource.gif.GifDrawable} into an
+ * An {@link ResourceTranscoder} that can transcode either an
+ * {@link Bitmap} or an {@link GifDrawable} into an
  * {@link android.graphics.drawable.Drawable}.
  */
-public class GifBitmapWrapperDrawableTranscoder implements ResourceTranscoder<GifBitmapWrapper, GlideDrawable> {
+public class GifBitmapWrapperDrawableTranscoder
+        implements ResourceTranscoder<GifBitmapWrapper, GlideDrawable> {
     private final ResourceTranscoder<Bitmap, GlideBitmapDrawable> bitmapDrawableResourceTranscoder;
 
     public GifBitmapWrapperDrawableTranscoder(
@@ -38,6 +40,6 @@ public class GifBitmapWrapperDrawableTranscoder implements ResourceTranscoder<Gi
 
     @Override
     public String getId() {
-        return "GifBitmapWrapperDrawableTranscoder.com.bumptech.glide.load.resource.transcode";
+        return "GifBitmapWrapperDrawableTranscoder.com.jet8.sdk.ui.screen.marketplace.glide.load.resource.transcode";
     }
 }

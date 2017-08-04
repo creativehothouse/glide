@@ -1,7 +1,9 @@
 package com.bumptech.glide.request;
 
+import com.bumptech.glide.request.target.Target;
+
 /**
- * A request that loads a resource for an {@link com.bumptech.glide.request.target.Target}.
+ * A request that loads a resource for an {@link Target}.
  */
 public interface Request {
 
@@ -16,8 +18,10 @@ public interface Request {
     void pause();
 
     /**
-     * Prevents any bitmaps being loaded from previous requests, releases any resources held by this request,
-     * displays the current placeholder if one was provided, and marks the request as having been cancelled.
+     * Prevents any bitmaps being loaded from previous requests, releases any resources held by this
+     * request,
+     * displays the current placeholder if one was provided, and marks the request as having been
+     * cancelled.
      */
     void clear();
 
@@ -37,7 +41,8 @@ public interface Request {
     boolean isComplete();
 
     /**
-     * Returns true if a non-placeholder resource is set. For Requests that load more than one resource, isResourceSet
+     * Returns true if a non-placeholder resource is set. For Requests that load more than one
+     * resource, isResourceSet
      * may return true even if {@link #isComplete()}} returns false.
      */
     boolean isResourceSet();

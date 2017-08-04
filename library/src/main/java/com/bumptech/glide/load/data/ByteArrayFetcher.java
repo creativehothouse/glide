@@ -6,8 +6,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
- * A simple resource fetcher to convert byte arrays into input stream. Requires an id to be passed in to identify the
- * data in the byte array because there is no cheap/simple way to obtain a useful id from the data itself.
+ * A simple resource fetcher to convert byte arrays into input stream. Requires an id to be passed
+ * in to identify the
+ * data in the byte array because there is no cheap/simple way to obtain a useful id from the data
+ * itself.
  */
 public class ByteArrayFetcher implements DataFetcher<InputStream> {
     private final byte[] bytes;

@@ -6,19 +6,22 @@ import android.widget.ImageView;
 import com.bumptech.glide.request.animation.GlideAnimation;
 
 /**
- * A base {@link com.bumptech.glide.request.target.Target} for displaying resources in
+ * A base {@link Target} for displaying resources in
  * {@link android.widget.ImageView}s.
  *
- * @param <Z> The type of resource that this target will display in the wrapped {@link android.widget.ImageView}.
+ * @param <Z> The type of resource that this target will display in the wrapped {@link
+ * android.widget.ImageView}.
  */
-public abstract class ImageViewTarget<Z> extends ViewTarget<ImageView, Z> implements GlideAnimation.ViewAdapter {
+public abstract class ImageViewTarget<Z> extends ViewTarget<ImageView, Z>
+        implements GlideAnimation.ViewAdapter {
 
     public ImageViewTarget(ImageView view) {
         super(view);
     }
 
     /**
-     * Returns the current {@link android.graphics.drawable.Drawable} being displayed in the view using
+     * Returns the current {@link android.graphics.drawable.Drawable} being displayed in the view
+     * using
      * {@link android.widget.ImageView#getDrawable()}.
      */
     @Override
@@ -78,6 +81,5 @@ public abstract class ImageViewTarget<Z> extends ViewTarget<ImageView, Z> implem
     }
 
     protected abstract void setResource(Z resource);
-
 }
 

@@ -4,13 +4,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.bumptech.glide.load.engine.Resource;
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 
 /**
- * A wrapper for {@link com.bumptech.glide.load.resource.transcode.GlideBitmapDrawableTranscoder} that transcodes
- * to {@link com.bumptech.glide.load.resource.drawable.GlideDrawable} rather than
- * {@link com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable}.
- *
+ * A wrapper for {@link GlideBitmapDrawableTranscoder} that transcodes
+ * to {@link GlideDrawable} rather than
+ * {@link GlideBitmapDrawable}.
+ * <p>
  * TODO: use ? extends GlideDrawable rather than GlideDrawable directly and remove this class.
  */
 public class BitmapToGlideDrawableTranscoder implements ResourceTranscoder<Bitmap, GlideDrawable> {
@@ -21,15 +22,16 @@ public class BitmapToGlideDrawableTranscoder implements ResourceTranscoder<Bitma
         this(new GlideBitmapDrawableTranscoder(context));
     }
 
-    public BitmapToGlideDrawableTranscoder(GlideBitmapDrawableTranscoder glideBitmapDrawableTranscoder) {
+    public BitmapToGlideDrawableTranscoder(
+            GlideBitmapDrawableTranscoder glideBitmapDrawableTranscoder) {
         this.glideBitmapDrawableTranscoder = glideBitmapDrawableTranscoder;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Resource<GlideDrawable> transcode(Resource<Bitmap> toTranscode) {
-        return (Resource<GlideDrawable>) (Resource<? extends GlideDrawable>)
-                glideBitmapDrawableTranscoder.transcode(toTranscode);
+        return (Resource<GlideDrawable>) (Resource<? extends GlideDrawable>) glideBitmapDrawableTranscoder
+                .transcode(toTranscode);
     }
 
     @Override

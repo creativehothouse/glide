@@ -12,33 +12,36 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 /**
- * Keys {@link android.graphics.Bitmap Bitmaps} using both {@link android.graphics.Bitmap#getAllocationByteCount()} and
+ * Keys {@link android.graphics.Bitmap Bitmaps} using both {@link android.graphics.Bitmap#getAllocationByteCount()}
+ * and
  * the {@link android.graphics.Bitmap.Config} returned from {@link android.graphics.Bitmap#getConfig()}.
- *
  * <p>
- *     Using both the config and the byte size allows us to safely re-use a greater variety of
- *     {@link android.graphics.Bitmap Bitmaps}, which increases the hit rate of the pool and therefore the performance
- *     of applications. This class works around #301 by only allowing re-use of {@link android.graphics.Bitmap Bitmaps}
- *     with a matching number of bytes per pixel.
+ * <p>
+ * Using both the config and the byte size allows us to safely re-use a greater variety of
+ * {@link android.graphics.Bitmap Bitmaps}, which increases the hit rate of the pool and therefore
+ * the performance
+ * of applications. This class works around #301 by only allowing re-use of {@link
+ * android.graphics.Bitmap Bitmaps}
+ * with a matching number of bytes per pixel.
  * </p>
  */
 @TargetApi(Build.VERSION_CODES.KITKAT)
 public class SizeConfigStrategy implements LruPoolStrategy {
     private static final int MAX_SIZE_MULTIPLE = 8;
-    private static final Bitmap.Config[] ARGB_8888_IN_CONFIGS = new Bitmap.Config[] {
+    private static final Bitmap.Config[] ARGB_8888_IN_CONFIGS = new Bitmap.Config[]{
             Bitmap.Config.ARGB_8888,
             // The value returned by Bitmaps with the hidden Bitmap config.
             null,
     };
     // We probably could allow ARGB_4444 and RGB_565 to decode into each other, but ARGB_4444 is deprecated and we'd
     // rather be safe.
-    private static final Bitmap.Config[] RGB_565_IN_CONFIGS = new Bitmap.Config[] {
+    private static final Bitmap.Config[] RGB_565_IN_CONFIGS = new Bitmap.Config[]{
             Bitmap.Config.RGB_565
     };
-    private static final Bitmap.Config[] ARGB_4444_IN_CONFIGS = new Bitmap.Config[] {
+    private static final Bitmap.Config[] ARGB_4444_IN_CONFIGS = new Bitmap.Config[]{
             Bitmap.Config.ARGB_4444
     };
-    private static final Bitmap.Config[] ALPHA_8_IN_CONFIGS = new Bitmap.Config[] {
+    private static final Bitmap.Config[] ALPHA_8_IN_CONFIGS = new Bitmap.Config[]{
             Bitmap.Config.ALPHA_8
     };
 
@@ -46,6 +49,25 @@ public class SizeConfigStrategy implements LruPoolStrategy {
     private final GroupedLinkedMap<Key, Bitmap> groupedMap = new GroupedLinkedMap<Key, Bitmap>();
     private final Map<Bitmap.Config, NavigableMap<Integer, Integer>> sortedSizes =
             new HashMap<Bitmap.Config, NavigableMap<Integer, Integer>>();
+
+    private static String getBitmapString(int size, Bitmap.Config config) {
+        return "[" + size + "](" + config + ")";
+    }
+
+    private static Bitmap.Config[] getInConfigs(Bitmap.Config requested) {
+        switch (requested) {
+            case ARGB_8888:
+                return ARGB_8888_IN_CONFIGS;
+            case RGB_565:
+                return RGB_565_IN_CONFIGS;
+            case ARGB_4444:
+                return ARGB_4444_IN_CONFIGS;
+            case ALPHA_8:
+                return ALPHA_8_IN_CONFIGS;
+            default:
+                return new Bitmap.Config[]{requested};
+        }
+    }
 
     @Override
     public void put(Bitmap bitmap) {
@@ -81,8 +103,8 @@ public class SizeConfigStrategy implements LruPoolStrategy {
             NavigableMap<Integer, Integer> sizesForPossibleConfig = getSizesForConfig(possibleConfig);
             Integer possibleSize = sizesForPossibleConfig.ceilingKey(size);
             if (possibleSize != null && possibleSize <= size * MAX_SIZE_MULTIPLE) {
-                if (possibleSize != size
-                        || (possibleConfig == null ? config != null : !possibleConfig.equals(config))) {
+                if (possibleSize != size || (possibleConfig == null ? config != null
+                        : !possibleConfig.equals(config))) {
                     keyPool.offer(key);
                     result = keyPool.get(possibleSize, possibleConfig);
                 }
@@ -109,7 +131,7 @@ public class SizeConfigStrategy implements LruPoolStrategy {
             sizes.remove(size);
         } else {
             sizes.put(size, current - 1);
-        }
+    }
     }
 
     private NavigableMap<Integer, Integer> getSizesForConfig(Bitmap.Config config) {
@@ -140,8 +162,7 @@ public class SizeConfigStrategy implements LruPoolStrategy {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder()
-                .append("SizeConfigStrategy{groupedMap=")
+        StringBuilder sb = new StringBuilder().append("SizeConfigStrategy{groupedMap=")
                 .append(groupedMap)
                 .append(", sortedSizes=(");
         for (Map.Entry<Bitmap.Config, NavigableMap<Integer, Integer>> entry : sortedSizes.entrySet()) {
@@ -204,7 +225,8 @@ public class SizeConfigStrategy implements LruPoolStrategy {
         public boolean equals(Object o) {
             if (o instanceof Key) {
                 Key other = (Key) o;
-                return size == other.size && (config == null ? other.config == null : config.equals(other.config));
+                return size == other.size && (config == null ? other.config == null
+                        : config.equals(other.config));
             }
             return false;
         }
@@ -214,25 +236,6 @@ public class SizeConfigStrategy implements LruPoolStrategy {
             int result = size;
             result = 31 * result + (config != null ? config.hashCode() : 0);
             return result;
-        }
-    }
-
-    private static String getBitmapString(int size, Bitmap.Config config) {
-        return "[" + size + "](" + config + ")";
-    }
-
-    private static Bitmap.Config[] getInConfigs(Bitmap.Config requested) {
-        switch (requested) {
-            case ARGB_8888:
-                return ARGB_8888_IN_CONFIGS;
-            case RGB_565:
-                return RGB_565_IN_CONFIGS;
-            case ARGB_4444:
-                return ARGB_4444_IN_CONFIGS;
-            case ALPHA_8:
-                return ALPHA_8_IN_CONFIGS;
-            default:
-                return new Bitmap.Config[] { requested };
         }
     }
 }

@@ -16,9 +16,8 @@ import java.io.InputStream;
  */
 public class FileToStreamDecoder<T> implements ResourceDecoder<File, T> {
     private static final FileOpener DEFAULT_FILE_OPENER = new FileOpener();
-
-    private ResourceDecoder<InputStream, T> streamDecoder;
     private final FileOpener fileOpener;
+    private ResourceDecoder<InputStream, T> streamDecoder;
 
     public FileToStreamDecoder(ResourceDecoder<InputStream, T> streamDecoder) {
         this(streamDecoder, DEFAULT_FILE_OPENER);
@@ -43,7 +42,7 @@ public class FileToStreamDecoder<T> implements ResourceDecoder<File, T> {
                     is.close();
                 } catch (IOException e) {
                     // Do nothing.
-                }
+        }
             }
         }
         return result;

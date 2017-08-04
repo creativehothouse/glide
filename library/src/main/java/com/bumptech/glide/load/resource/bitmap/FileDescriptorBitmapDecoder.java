@@ -13,7 +13,7 @@ import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import java.io.IOException;
 
 /**
- * An {@link com.bumptech.glide.load.ResourceDecoder} for decoding {@link android.graphics.Bitmap}s from
+ * An {@link ResourceDecoder} for decoding {@link android.graphics.Bitmap}s from
  * {@link android.os.ParcelFileDescriptor} data.
  */
 public class FileDescriptorBitmapDecoder implements ResourceDecoder<ParcelFileDescriptor, Bitmap> {
@@ -41,13 +41,14 @@ public class FileDescriptorBitmapDecoder implements ResourceDecoder<ParcelFileDe
     }
 
     @Override
-    public Resource<Bitmap> decode(ParcelFileDescriptor source, int width, int height) throws IOException {
+    public Resource<Bitmap> decode(ParcelFileDescriptor source, int width, int height)
+            throws IOException {
         Bitmap bitmap = bitmapDecoder.decode(source, bitmapPool, width, height, decodeFormat);
         return BitmapResource.obtain(bitmap, bitmapPool);
     }
 
     @Override
     public String getId() {
-        return "FileDescriptorBitmapDecoder.com.bumptech.glide.load.data.bitmap";
+        return "FileDescriptorBitmapDecoder.com.jet8.sdk.ui.screen.marketplace.glide.load.data.bitmap";
     }
 }

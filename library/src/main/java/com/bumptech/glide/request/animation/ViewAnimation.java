@@ -4,7 +4,7 @@ import android.view.View;
 import android.view.animation.Animation;
 
 /**
- * A {@link com.bumptech.glide.request.animation.GlideAnimation GlideAnimation} that can apply a
+ * A {@link GlideAnimation GlideAnimation} that can apply a
  * {@link android.view.animation.Animation Animation} to a {@link android.view.View View} using
  * {@link android.view.View#startAnimation(android.view.animation.Animation) View.startAnimation}.
  *
@@ -22,9 +22,11 @@ public class ViewAnimation<R> implements GlideAnimation<R> {
     }
 
     /**
-     * Always clears the current animation on the view using {@link android.view.View#clearAnimation()}, then
+     * Always clears the current animation on the view using {@link android.view.View#clearAnimation()},
+     * then
      * starts the {@link android.view.animation.Animation} given in the constructor using
-     * {@link android.view.View#startAnimation(android.view.animation.Animation)} and then returns {@code false} because
+     * {@link android.view.View#startAnimation(android.view.animation.Animation)} and then returns
+     * {@code false} because
      * the animation does not actually set the current resource on the view.
      *
      * @param current {@inheritDoc}

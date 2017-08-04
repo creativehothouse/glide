@@ -8,7 +8,9 @@ import com.bumptech.glide.load.data.DataFetcher;
 import java.io.File;
 
 /**
- * A model loader for handling certain string models. Handles paths, urls, and any uri string with a scheme handled by
+ * A model loader for handling certain string models. Handles paths, urls, and any uri string with
+ * a
+ * scheme handled by
  * {@link android.content.ContentResolver#openInputStream(Uri)}.
  *
  * @param <T> The type of data that will be loaded from the given {@link java.lang.String}.
@@ -18,6 +20,10 @@ public class StringLoader<T> implements ModelLoader<String, T> {
 
     public StringLoader(ModelLoader<Uri, T> uriLoader) {
         this.uriLoader = uriLoader;
+    }
+
+    private static Uri toFileUri(String path) {
+        return Uri.fromFile(new File(path));
     }
 
     @Override
@@ -33,12 +39,8 @@ public class StringLoader<T> implements ModelLoader<String, T> {
             if (scheme == null) {
                 uri = toFileUri(model);
             }
-        }
-
-        return uriLoader.getResourceFetcher(uri, width, height);
     }
 
-    private static Uri toFileUri(String path) {
-        return Uri.fromFile(new File(path));
+        return uriLoader.getResourceFetcher(uri, width, height);
     }
 }

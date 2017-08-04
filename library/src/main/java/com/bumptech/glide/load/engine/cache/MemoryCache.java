@@ -8,13 +8,6 @@ import com.bumptech.glide.load.engine.Resource;
  */
 public interface MemoryCache {
     /**
-     * An interface that will be called whenever a bitmap is removed from the cache.
-     */
-    interface ResourceRemovedListener {
-        void onResourceRemoved(Resource<?> removed);
-    }
-
-    /**
      * Returns the sum of the sizes of all the contents of the cache in bytes.
      */
     int getCurrentSize();
@@ -25,11 +18,14 @@ public interface MemoryCache {
     int getMaxSize();
 
     /**
-     * Adjust the maximum size of the cache by multiplying the original size of the cache by the given multiplier.
-     *
+     * Adjust the maximum size of the cache by multiplying the original size of the cache by the
+     * given
+     * multiplier.
      * <p>
-     *     If the size multiplier causes the size of the cache to be decreased, items will be evicted until the cache
-     *     is smaller than the new size.
+     * <p>
+     * If the size multiplier causes the size of the cache to be decreased, items will be evicted
+     * until the cache
+     * is smaller than the new size.
      * </p>
      *
      * @param multiplier A size multiplier >= 0.
@@ -46,7 +42,7 @@ public interface MemoryCache {
     /**
      * Add bitmap to the cache with the given key.
      *
-     * @param key The key to retrieve the bitmap.
+     * @param key      The key to retrieve the bitmap.
      * @param resource The {@link com.bumptech.glide.load.engine.EngineResource} to store.
      * @return The old value of key (null if key is not in map).
      */
@@ -67,7 +63,15 @@ public interface MemoryCache {
     /**
      * Trim the memory cache to the appropriate level. Typically called on the callback onTrimMemory.
      *
-     * @param level This integer represents a trim level as specified in {@link android.content.ComponentCallbacks2}.
+     * @param level This integer represents a trim level as specified in {@link
+     * android.content.ComponentCallbacks2}.
      */
     void trimMemory(int level);
+
+    /**
+     * An interface that will be called whenever a bitmap is removed from the cache.
+     */
+    interface ResourceRemovedListener {
+        void onResourceRemoved(Resource<?> removed);
+    }
 }

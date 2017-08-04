@@ -7,7 +7,7 @@ import com.bumptech.glide.load.resource.gif.GifDrawable;
 
 /**
  * A wrapper that contains either an {@link android.graphics.Bitmap} resource or an
- * {@link com.bumptech.glide.load.resource.gif.GifDrawable} resource.
+ * {@link GifDrawable} resource.
  */
 public class GifBitmapWrapper {
     private final Resource<GifDrawable> gifResource;
@@ -15,7 +15,8 @@ public class GifBitmapWrapper {
 
     public GifBitmapWrapper(Resource<Bitmap> bitmapResource, Resource<GifDrawable> gifResource) {
         if (bitmapResource != null && gifResource != null) {
-            throw new IllegalArgumentException("Can only contain either a bitmap resource or a gif resource, not both");
+            throw new IllegalArgumentException(
+                    "Can only contain either a bitmap resource or a gif resource, not both");
         }
         if (bitmapResource == null && gifResource == null) {
             throw new IllegalArgumentException("Must contain either a bitmap resource or a gif resource");
@@ -43,7 +44,7 @@ public class GifBitmapWrapper {
     }
 
     /**
-     * Returns the wrapped {@link com.bumptech.glide.load.resource.gif.GifDrawable} resource if it exists, or null.
+     * Returns the wrapped {@link GifDrawable} resource if it exists, or null.
      */
     public Resource<GifDrawable> getGifResource() {
         return gifResource;

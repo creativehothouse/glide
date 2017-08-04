@@ -23,6 +23,6 @@ class GifFrameResourceDecoder implements ResourceDecoder<GifDecoder, Bitmap> {
 
     @Override
     public String getId() {
-        return "GifFrameResourceDecoder.com.bumptech.glide.load.resource.gif";
+        return "GifFrameResourceDecoder.com.jet8.sdk.ui.screen.marketplace.glide.load.resource.gif";
     }
 }

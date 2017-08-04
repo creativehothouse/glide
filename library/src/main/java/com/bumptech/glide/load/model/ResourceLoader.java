@@ -9,7 +9,8 @@ import android.util.Log;
 import com.bumptech.glide.load.data.DataFetcher;
 
 /**
- * A model loader for handling Android resource files. Model must be an Android resource id in the package of the given
+ * A model loader for handling Android resource files. Model must be an Android resource id in the
+ * package of the given
  * context.
  *
  * @param <T> The type of data that will be loaded for the given android resource.
@@ -33,10 +34,13 @@ public class ResourceLoader<T> implements ModelLoader<Integer, T> {
     public DataFetcher<T> getResourceFetcher(Integer model, int width, int height) {
         Uri uri = null;
         try {
-          uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
-                  + resources.getResourcePackageName(model) + '/'
-                  + resources.getResourceTypeName(model) + '/'
-                  + resources.getResourceEntryName(model));
+            uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
+                    + "://"
+                    + resources.getResourcePackageName(model)
+                    + '/'
+                    + resources.getResourceTypeName(model)
+                    + '/'
+                    + resources.getResourceEntryName(model));
         } catch (Resources.NotFoundException e) {
             if (Log.isLoggable(TAG, Log.WARN)) {
                 Log.w(TAG, "Received invalid resource id: " + model, e);

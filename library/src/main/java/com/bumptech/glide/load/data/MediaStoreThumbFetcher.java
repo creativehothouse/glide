@@ -17,9 +17,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A DataFetcher that retrieves an {@link java.io.InputStream} for a local Uri that may or may not be for a resource
- * in the media store. If the local Uri is for a resource in the media store and the size requested is less than or
- * equal to the media store thumbnail size, preferentially attempts to fetch data for the pre-generated media store
+ * A DataFetcher that retrieves an {@link java.io.InputStream} for a local Uri that may or may not
+ * be for a resource
+ * in the media store. If the local Uri is for a resource in the media store and the size requested
+ * is less than or
+ * equal to the media store thumbnail size, preferentially attempts to fetch data for the
+ * pre-generated media store
  * thumbs using {@link android.provider.MediaStore.Images.Thumbnails} and
  * {@link android.provider.MediaStore.Video.Thumbnails}.
  */
@@ -27,7 +30,8 @@ public class MediaStoreThumbFetcher implements DataFetcher<InputStream> {
     private static final String TAG = "MediaStoreThumbFetcher";
     private static final int MINI_WIDTH = 512;
     private static final int MINI_HEIGHT = 384;
-    private static final ThumbnailStreamOpenerFactory DEFAULT_FACTORY = new ThumbnailStreamOpenerFactory();
+    private static final ThumbnailStreamOpenerFactory DEFAULT_FACTORY =
+            new ThumbnailStreamOpenerFactory();
 
     private final Context context;
     private final Uri mediaStoreUri;
@@ -37,19 +41,30 @@ public class MediaStoreThumbFetcher implements DataFetcher<InputStream> {
     private final ThumbnailStreamOpenerFactory factory;
     private InputStream inputStream;
 
-    public MediaStoreThumbFetcher(Context context, Uri mediaStoreUri, DataFetcher<InputStream> defaultFetcher,
-            int width, int height) {
+    public MediaStoreThumbFetcher(Context context, Uri mediaStoreUri,
+            DataFetcher<InputStream> defaultFetcher, int width, int height) {
         this(context, mediaStoreUri, defaultFetcher, width, height, DEFAULT_FACTORY);
     }
 
-    MediaStoreThumbFetcher(Context context, Uri mediaStoreUri, DataFetcher<InputStream> defaultFetcher, int width,
-            int height, ThumbnailStreamOpenerFactory factory) {
+    MediaStoreThumbFetcher(Context context, Uri mediaStoreUri,
+            DataFetcher<InputStream> defaultFetcher, int width, int height,
+            ThumbnailStreamOpenerFactory factory) {
         this.context = context;
         this.mediaStoreUri = mediaStoreUri;
         this.defaultFetcher = defaultFetcher;
         this.width = width;
         this.height = height;
         this.factory = factory;
+    }
+
+    private static boolean isMediaStoreUri(Uri uri) {
+        return uri != null
+                && ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())
+                && MediaStore.AUTHORITY.equals(uri.getAuthority());
+    }
+
+    private static boolean isMediaStoreVideo(Uri uri) {
+        return isMediaStoreUri(uri) && uri.getPathSegments().contains("video");
     }
 
     @Override
@@ -110,14 +125,8 @@ public class MediaStoreThumbFetcher implements DataFetcher<InputStream> {
         // Do nothing.
     }
 
-    private static boolean isMediaStoreUri(Uri uri) {
-        return uri != null
-                && ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())
-                && MediaStore.AUTHORITY.equals(uri.getAuthority());
-    }
-
-    private static boolean isMediaStoreVideo(Uri uri) {
-        return isMediaStoreUri(uri) && uri.getPathSegments().contains("video");
+    interface ThumbnailQuery {
+        Cursor queryPath(Context context, Uri uri);
     }
 
     static class FileService {
@@ -132,10 +141,6 @@ public class MediaStoreThumbFetcher implements DataFetcher<InputStream> {
         public File get(String path) {
             return new File(path);
         }
-    }
-
-    interface ThumbnailQuery {
-        Cursor queryPath(Context context, Uri uri);
     }
 
     static class ThumbnailStreamOpener {
@@ -204,47 +209,47 @@ public class MediaStoreThumbFetcher implements DataFetcher<InputStream> {
                 }
             }
             return result;
-        }
+    }
     }
 
     static class ImageThumbnailQuery implements ThumbnailQuery {
         private static final String[] PATH_PROJECTION = {
-            MediaStore.Images.Thumbnails.DATA,
+                MediaStore.Images.Thumbnails.DATA,
         };
-        private static final String PATH_SELECTION =
-            MediaStore.Images.Thumbnails.KIND + " = " + MediaStore.Images.Thumbnails.MINI_KIND
-            + " AND " + MediaStore.Images.Thumbnails.IMAGE_ID + " = ?";
+        private static final String PATH_SELECTION = MediaStore.Images.Thumbnails.KIND
+                + " = "
+                + MediaStore.Images.Thumbnails.MINI_KIND
+                + " AND "
+                + MediaStore.Images.Thumbnails.IMAGE_ID
+                + " = ?";
 
         @Override
         public Cursor queryPath(Context context, Uri uri) {
             String imageId = uri.getLastPathSegment();
-            return context.getContentResolver().query(
-                MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI,
-                PATH_PROJECTION,
-                PATH_SELECTION,
-                new String[] { imageId },
-                null /*sortOrder*/);
-        }
+            return context.getContentResolver()
+                    .query(MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI, PATH_PROJECTION, PATH_SELECTION,
+                            new String[]{imageId}, null /*sortOrder*/);
+    }
     }
 
     static class VideoThumbnailQuery implements ThumbnailQuery {
         private static final String[] PATH_PROJECTION = {
-            MediaStore.Video.Thumbnails.DATA
+                MediaStore.Video.Thumbnails.DATA
         };
-        private static final String PATH_SELECTION =
-            MediaStore.Video.Thumbnails.KIND + " = " + MediaStore.Video.Thumbnails.MINI_KIND
-            + " AND " + MediaStore.Video.Thumbnails.VIDEO_ID + " = ?";
+        private static final String PATH_SELECTION = MediaStore.Video.Thumbnails.KIND
+                + " = "
+                + MediaStore.Video.Thumbnails.MINI_KIND
+                + " AND "
+                + MediaStore.Video.Thumbnails.VIDEO_ID
+                + " = ?";
 
         @Override
         public Cursor queryPath(Context context, Uri uri) {
             String videoId = uri.getLastPathSegment();
-            return context.getContentResolver().query(
-                MediaStore.Video.Thumbnails.EXTERNAL_CONTENT_URI,
-                PATH_PROJECTION,
-                PATH_SELECTION,
-                new String[] { videoId },
-                null /*sortOrder*/);
-        }
+            return context.getContentResolver()
+                    .query(MediaStore.Video.Thumbnails.EXTERNAL_CONTENT_URI, PATH_PROJECTION, PATH_SELECTION,
+                            new String[]{videoId}, null /*sortOrder*/);
+    }
     }
 
     static class ThumbnailStreamOpenerFactory {

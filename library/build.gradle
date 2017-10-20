@@ -6,6 +6,7 @@ apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 
 dependencies {
+    compile files('libs/japng-0.5.1.jar')
     compile project(':third_party:gif_decoder')
     compile project(':third_party:disklrucache')
     compile project(':annotation')

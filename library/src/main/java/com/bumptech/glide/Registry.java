@@ -34,6 +34,7 @@ import java.util.List;
  */
 public class Registry {
   public static final String BUCKET_GIF = "Gif";
+  public static final String BUCKET_APNG = "Apng";
   public static final String BUCKET_BITMAP = "Bitmap";
   public static final String BUCKET_BITMAP_DRAWABLE = "BitmapDrawable";
   private static final String BUCKET_PREPEND_ALL = "legacy_prepend_all";

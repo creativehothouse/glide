@@ -9,7 +9,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
-import android.widget.ImageView;
+import com.bumptech.glide.R;
 import com.bumptech.glide.load.resource.apng.ApngDrawable;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class PngAnimationComposer {
 
   public static Bitmap getReferenceImage(Resources resources) {
     if (referenceImage == null) {
-      referenceImage = BitmapFactory.decodeResource(resources, com.bumptech.glide.gifdecoder.R.drawable.onepxtransparent);
+      referenceImage = BitmapFactory.decodeResource(resources, R.drawable.onepxtransparent);
     }
     return referenceImage;
   }
@@ -85,15 +85,15 @@ public class PngAnimationComposer {
   //        return animationControl.numFrames;
   //    }
 
-  public ImageView buildInto(ImageView view) {
-    if (isSingleFrame()) {
-      Argb8888Bitmap bitmap = scanlineProcessor.getBitmap(); // TODO: ok?
-      view.setImageBitmap(PngAndroid.toBitmap(bitmap)); // TODO: ok?
-    } else {
-      view.setBackgroundDrawable(assemble());
-    }
-    return view;
-  }
+  //public ImageView buildInto(ImageView view) {
+  //  if (isSingleFrame()) {
+  //    Argb8888Bitmap bitmap = scanlineProcessor.getBitmap(); // TODO: ok?
+  //    view.setImageBitmap(PngAndroid.toBitmap(bitmap)); // TODO: ok?
+  //  } else {
+  //    view.setBackgroundDrawable(assemble());
+  //  }
+  //  return view;
+  //}
 
   public ApngDrawable assemble() {
     // TODO: handle special case of one frame animation as a plain ImageView

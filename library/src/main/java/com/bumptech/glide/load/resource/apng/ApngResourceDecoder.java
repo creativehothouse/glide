@@ -27,7 +27,7 @@ public class ApngResourceDecoder implements ResourceDecoder<InputStream, ApngDra
   }
 
   @Override public boolean handles(InputStream source, Options options) throws IOException {
-    return false;
+    return true;
   }
 
   @Nullable @Override

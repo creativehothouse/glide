@@ -288,7 +288,7 @@ import java.util.Set;
             arrayPool);
     ByteBufferGifDecoder byteBufferGifDecoder =
         new ByteBufferGifDecoder(context, registry.getImageHeaderParsers(), bitmapPool, arrayPool);
-    ApngResourceDecoder apngResourceDecoder = new ApngResourceDecoder(context);
+    ApngResourceDecoder apngResourceDecoder = new ApngResourceDecoder(context, bitmapPool, arrayPool);
 
     registry.append(ByteBuffer.class, new ByteBufferEncoder())
         .append(InputStream.class, new StreamEncoder(arrayPool))

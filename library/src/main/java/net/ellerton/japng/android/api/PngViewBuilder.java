@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorInt;
+import com.bumptech.glide.load.resource.apng.ApngBitmapProvider;
 import com.bumptech.glide.load.resource.apng.ApngDrawable;
 import net.ellerton.japng.PngScanlineBuffer;
 import net.ellerton.japng.argb8888.Argb8888Bitmap;
@@ -27,16 +29,22 @@ public class PngViewBuilder extends BasicArgb8888Director<ApngDrawable> {
   PngHeader header;
   PngAnimationComposer animationComposer = null;
   PngScanlineBuffer buffer;
+  ApngBitmapProvider apngBitmapProvider;
 
-  public PngViewBuilder(Context context) {
+  @ColorInt private int[] mainScratch;
+  private Bitmap defaultBitmap;
+
+  public PngViewBuilder(Context context, ApngBitmapProvider apngBitmapProvider) {
     this.context = context;
+    this.apngBitmapProvider = apngBitmapProvider;
   }
 
   @Override public void receiveHeader(PngHeader header, PngScanlineBuffer buffer)
       throws PngException {
     this.header = header;
     this.buffer = buffer;
-    this.pngBitmap = new Argb8888Bitmap(header.width, header.height);
+    mainScratch = apngBitmapProvider.obtainIntArray(header.width * header.height);
+    this.pngBitmap = new Argb8888Bitmap(mainScratch, header.width, header.height);
     this.scanlineProcessor = Argb8888Processors.from(header, buffer, pngBitmap);
   }
 
@@ -71,7 +79,7 @@ public class PngViewBuilder extends BasicArgb8888Director<ApngDrawable> {
   @Override public void receiveAnimationControl(PngAnimationControl animationControl) {
     this.animationComposer =
         new PngAnimationComposer(context.getResources(), header, scanlineProcessor,
-            animationControl);
+            animationControl, apngBitmapProvider);
   }
 
   @Override public Argb8888ScanlineProcessor receiveFrameControl(PngFrameControl frameControl) {
@@ -113,5 +121,13 @@ public class PngViewBuilder extends BasicArgb8888Director<ApngDrawable> {
 
   @Override public ApngDrawable getResult() {
     return animationComposer.assemble();
+  }
+
+  public void clear() {
+    apngBitmapProvider.release(mainScratch);
+    if (defaultBitmap != null) {
+      apngBitmapProvider.release(defaultBitmap);
+    }
+    animationComposer.clear();
   }
 }

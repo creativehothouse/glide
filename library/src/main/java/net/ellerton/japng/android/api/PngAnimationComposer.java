@@ -9,7 +9,9 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.support.annotation.ColorInt;
 import com.bumptech.glide.R;
+import com.bumptech.glide.load.resource.apng.ApngBitmapProvider;
 import com.bumptech.glide.load.resource.apng.ApngDrawable;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,28 +36,34 @@ public class PngAnimationComposer {
    * Instead the 1x1 image (68 bytes of resources) is scaled up to the needed size.
    * Whether or not this fixes the OOM problems is TBD...
    */
-  static Bitmap referenceImage = null;
+  private static Bitmap referenceImage = null;
   private Resources resources;
   private Canvas canvas;
   private PngHeader header;
   private Bitmap canvasBitmap;
   private Argb8888ScanlineProcessor scanlineProcessor;
   private PngAnimationControl animationControl;
+  private ApngBitmapProvider apngBitmapProvider;
   private PngFrameControl currentFrame;
   private List<Frame> frames;
   private int durationScale = 1;
   private Paint srcModePaint;
 
+  @ColorInt private int[] mainScratch;
+
   public PngAnimationComposer(Resources resources, PngHeader header,
-      Argb8888ScanlineProcessor scanlineProcessor, PngAnimationControl animationControl) {
+      Argb8888ScanlineProcessor scanlineProcessor, PngAnimationControl animationControl,
+      ApngBitmapProvider apngBitmapProvider) {
     this.resources = resources;
     this.header = header;
     this.scanlineProcessor = scanlineProcessor;
     this.animationControl = animationControl;
+    this.apngBitmapProvider = apngBitmapProvider;
 
-    //this.canvasBitmap = Bitmap.createBitmap(this.header.width, this.header.height, Bitmap.Config.ARGB_8888);
-    this.canvasBitmap = Bitmap.createScaledBitmap(getReferenceImage(resources), this.header.width,
-        this.header.height, false);
+    this.canvasBitmap =
+        apngBitmapProvider.obtain(this.header.width, this.header.height, Bitmap.Config.ARGB_8888);
+    //this.canvasBitmap = Bitmap.createScaledBitmap(getReferenceImage(resources), this.header.width,
+    //    this.header.height, false);
     this.canvas = new Canvas(this.canvasBitmap);
     this.frames = new ArrayList<>(animationControl.numFrames);
     this.srcModePaint = new Paint();
@@ -125,17 +133,17 @@ public class PngAnimationComposer {
   }
 
   public void completeFrame(Argb8888Bitmap frameImage) {
-
-    Bitmap frame = PngAndroid.toBitmap(frameImage);
+    Bitmap frame = apngBitmapProvider.toBitmap(frameImage);
     boolean isFull = currentFrame.height == header.height && currentFrame.width == header.width;
     Paint paint = null;
-    BitmapDrawable d;
+    BitmapDrawable bitmapDrawable;
     Bitmap previous = null;
 
     // Capture the current bitmap region IF it needs to be reverted after rendering
     if (2 == currentFrame.disposeOp) {
-      previous = Bitmap.createBitmap(canvasBitmap, currentFrame.xOffset, currentFrame.yOffset,
-          currentFrame.width, currentFrame.height); // or could use from frames?
+      previous = apngBitmapProvider.obtain(currentFrame.width, currentFrame.height,
+          Bitmap.Config.ARGB_8888);
+      // or could use from frames?
       //System.out.println(String.format("Captured previous %d x %d", previous.getWidth(), previous.getHeight()));
     }
 
@@ -149,10 +157,12 @@ public class PngAnimationComposer {
     canvas.drawBitmap(frame, currentFrame.xOffset, currentFrame.yOffset, paint);
 
     // Extract a drawable from the canvas. Have to copy the current bitmap.
-    d = new BitmapDrawable(resources, canvasBitmap.copy(Bitmap.Config.ARGB_8888, false));
+    bitmapDrawable =
+        new BitmapDrawable(resources, canvasBitmap.copy(Bitmap.Config.ARGB_8888, false));
+    apngBitmapProvider.release(frame);
 
     // Store the drawable in the sequence of frames
-    frames.add(new Frame(currentFrame, d));
+    frames.add(new Frame(currentFrame, bitmapDrawable));
 
     // Now "dispose" of the frame in preparation for the next.
 
@@ -191,7 +201,8 @@ public class PngAnimationComposer {
           canvas.drawBitmap(previous, currentFrame.xOffset, currentFrame.yOffset, paint);
 
           //System.out.println("  Restored previous "+previous.getWidth()+" x "+previous.getHeight());
-          previous.recycle();
+
+          apngBitmapProvider.release(previous);
         } else {
           System.out.println("  Huh, no previous?");
         }
@@ -205,6 +216,10 @@ public class PngAnimationComposer {
     }
 
     currentFrame = null;
+  }
+
+  public void clear() {
+    apngBitmapProvider.release(canvasBitmap);
   }
 
   public static class Frame {

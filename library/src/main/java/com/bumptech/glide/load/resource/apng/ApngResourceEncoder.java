@@ -7,7 +7,6 @@ import com.bumptech.glide.load.EncodeStrategy;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.ResourceEncoder;
 import com.bumptech.glide.load.engine.Resource;
-import com.bumptech.glide.load.resource.gif.GifDrawable;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,7 +18,7 @@ import net.ellerton.japng.chunks.PngHeader;
 
 /**
  * An {@link ResourceEncoder} that can write
- * {@link GifDrawable} to cache.
+ * {@link ApngDrawable} to cache.
  */
 public class ApngResourceEncoder implements ResourceEncoder<ApngDrawable> {
   private static final byte[] PNG_SIGNATURE = new byte[] { -119, 80, 78, 71, 13, 10, 26, 10 };

@@ -36,7 +36,7 @@ public final class ApngBitmapProvider implements GifDecoder.BitmapProvider {
   @NonNull
   @Override
   public Bitmap obtain(int width, int height, Bitmap.Config config) {
-    return bitmapPool.getDirty(width, height, config);
+    return bitmapPool.get(width, height, config);
   }
 
   @Override

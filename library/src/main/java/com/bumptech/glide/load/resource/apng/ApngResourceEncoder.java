@@ -142,12 +142,12 @@ public class ApngResourceEncoder implements ResourceEncoder<ApngDrawable> {
     try {
       fos = new FileOutputStream(file);
       fos.write(PNG_SIGNATURE.clone());
-      fos.write(makeIHDRChunk(drawable.header).array());
-      fos.write(makeACTLChunk(drawable.numFrames, drawable.numPlays).array());
+      fos.write(makeIHDRChunk(drawable.getHeader()).array());
+      fos.write(makeACTLChunk(drawable.getNumFrames(), drawable.getNumFrames()).array());
 
-      for (int i = 0; i < drawable.numFrames; ++i) {
+      for (int i = 0; i < drawable.getNumFrames(); ++i) {
         Drawable frame = drawable.getFrame(i);
-        fos.write(makeFCTL(drawable.pngFrameControlList.get(i), i).array());
+        fos.write(makeFCTL(drawable.getPngFrameControlList().get(i), i).array());
         fos.write(makeFDAT((BitmapDrawable) frame, i).array());
       }
 

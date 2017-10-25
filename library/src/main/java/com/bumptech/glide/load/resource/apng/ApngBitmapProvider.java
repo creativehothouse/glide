@@ -3,27 +3,16 @@ package com.bumptech.glide.load.resource.apng;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.bumptech.glide.gifdecoder.GifDecoder;
 import com.bumptech.glide.load.engine.bitmap_recycle.ArrayPool;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import net.ellerton.japng.argb8888.Argb8888Bitmap;
 
 /**
- * Implements {@link GifDecoder.BitmapProvider} by wrapping Glide's
- * {@link BitmapPool}.
+ * wrapping Glide's {@link BitmapPool} and  {@link ArrayPool}.
  */
-public final class ApngBitmapProvider implements GifDecoder.BitmapProvider {
+public final class ApngBitmapProvider {
   private final BitmapPool bitmapPool;
   @Nullable private final ArrayPool arrayPool;
-
-  /**
-   * Constructs an instance without a shared byte array pool. Byte arrays will be always constructed
-   * when requested.
-   */
-  public ApngBitmapProvider(BitmapPool bitmapPool) {
-    this(bitmapPool, null /* arrayPool */);
-  }
-
   /**
    * Constructs an instance with a shared array pool. Arrays will be reused where
    * possible.
@@ -34,17 +23,14 @@ public final class ApngBitmapProvider implements GifDecoder.BitmapProvider {
   }
 
   @NonNull
-  @Override
   public Bitmap obtain(int width, int height, Bitmap.Config config) {
     return bitmapPool.get(width, height, config);
   }
 
-  @Override
   public void release(Bitmap bitmap) {
     bitmapPool.put(bitmap);
   }
 
-  @Override
   public byte[] obtainByteArray(int size) {
     if (arrayPool == null) {
       return new byte[size];
@@ -53,7 +39,6 @@ public final class ApngBitmapProvider implements GifDecoder.BitmapProvider {
   }
 
   @SuppressWarnings("PMD.UseVarargs")
-  @Override
   public void release(byte[] bytes) {
     if (arrayPool == null) {
       return;
@@ -61,7 +46,6 @@ public final class ApngBitmapProvider implements GifDecoder.BitmapProvider {
     arrayPool.put(bytes, byte[].class);
   }
 
-  @Override
   public int[] obtainIntArray(int size) {
     if (arrayPool == null) {
       return new int[size];
@@ -70,7 +54,6 @@ public final class ApngBitmapProvider implements GifDecoder.BitmapProvider {
   }
 
   @SuppressWarnings("PMD.UseVarargs")
-  @Override
   public void release(int[] array) {
     if (arrayPool == null) {
       return;

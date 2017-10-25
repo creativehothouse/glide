@@ -12,15 +12,10 @@ import net.ellerton.japng.chunks.PngHeader;
 
 public class ApngDrawable extends AnimationDrawable {
 
-  final List<PngFrameControl> pngFrameControlList = new ArrayList<>();
-  final Header header2 = new Header();
-  PngHeader header;
-  int numFrames;
-  int numPlays;
-
-  public ApngDrawable() {
-    //for decoder v2
-  }
+  private final List<PngFrameControl> pngFrameControlList = new ArrayList<>();
+  private final PngHeader header;
+  private int numFrames;
+  private int numPlays;
 
   public ApngDrawable(PngHeader header) {
     this.header = header;
@@ -38,14 +33,19 @@ public class ApngDrawable extends AnimationDrawable {
     pngFrameControlList.add(control);
   }
 
-  class Header {
-    public int width;
-    public int height;
-    public byte bitDepth;
-    public byte colourType;
-    public byte compressionMethod;
-    public byte filterMethod;
-    public byte interlaceMethod;
+  public List<PngFrameControl> getPngFrameControlList() {
+    return pngFrameControlList;
   }
 
+  public PngHeader getHeader() {
+    return header;
+  }
+
+  public int getNumFrames() {
+    return numFrames;
+  }
+
+  public int getNumPlays() {
+    return numPlays;
+  }
 }

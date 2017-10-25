@@ -71,9 +71,11 @@ public class PngViewBuilder extends BasicArgb8888Director<ApngDrawable> {
     //iv.setImageBitmap(PngAndroid.toBitmap(defaultImage));
     int offset = 0;
     int stride = defaultImage.width;
-    drawableResult = new BitmapDrawable(context.getResources(),
-        Bitmap.createBitmap(defaultImage.getPixelArray(), offset, stride, defaultImage.width,
-            defaultImage.height, Bitmap.Config.ARGB_8888));
+    defaultBitmap =
+        apngBitmapProvider.obtain(defaultImage.width, defaultImage.height, Bitmap.Config.ARGB_8888);
+    defaultBitmap.setPixels(defaultImage.getPixelArray(), offset, stride, 0, 0, defaultImage.width,
+        defaultImage.height);
+    drawableResult = new BitmapDrawable(context.getResources(), defaultBitmap);
   }
 
   @Override public void receiveAnimationControl(PngAnimationControl animationControl) {

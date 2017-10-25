@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.ColorInt;
 import com.bumptech.glide.R;
@@ -143,6 +144,11 @@ public class PngAnimationComposer {
     if (2 == currentFrame.disposeOp) {
       previous = apngBitmapProvider.obtain(currentFrame.width, currentFrame.height,
           Bitmap.Config.ARGB_8888);
+      Canvas canvas = new Canvas(previous);
+      Rect srcR = new Rect(currentFrame.xOffset, currentFrame.yOffset, currentFrame.xOffset + currentFrame.width, currentFrame.yOffset + currentFrame.height);
+      RectF dstR = new RectF(0, 0, currentFrame.width, currentFrame.height);
+      canvas.drawBitmap(canvasBitmap, srcR, dstR, new Paint());
+      canvas.setBitmap(null);
       // or could use from frames?
       //System.out.println(String.format("Captured previous %d x %d", previous.getWidth(), previous.getHeight()));
     }

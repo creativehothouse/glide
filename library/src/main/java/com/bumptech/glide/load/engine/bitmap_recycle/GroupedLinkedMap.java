@@ -6,17 +6,32 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Similar to {@link java.util.LinkedHashMap} when access ordered except that it is access ordered on groups
- * of bitmaps rather than individual objects. The idea is to be able to find the LRU bitmap size, rather than the
- * LRU bitmap object. We can then remove bitmaps from the least recently used size of bitmap when we need to
+ * Similar to {@link java.util.LinkedHashMap} when access ordered except that it is access ordered
+ * on groups
+ * of bitmaps rather than individual objects. The idea is to be able to find the LRU bitmap size,
+ * rather than the
+ * LRU bitmap object. We can then remove bitmaps from the least recently used size of bitmap when
+ * we
+ * need to
  * reduce our cache size.
- *
- * For the purposes of the LRU, we count gets for a particular size of bitmap as an access, even if no bitmaps
+ * <p>
+ * For the purposes of the LRU, we count gets for a particular size of bitmap as an access, even if
+ * no bitmaps
  * of that size are present. We do not count addition or removal of bitmaps as an access.
  */
 class GroupedLinkedMap<K extends Poolable, V> {
     private final LinkedEntry<K, V> head = new LinkedEntry<K, V>();
     private final Map<K, LinkedEntry<K, V>> keyToEntry = new HashMap<K, LinkedEntry<K, V>>();
+
+    private static <K, V> void updateEntry(LinkedEntry<K, V> entry) {
+        entry.next.prev = entry;
+        entry.prev.next = entry;
+    }
+
+    private static <K, V> void removeEntry(LinkedEntry<K, V> entry) {
+        entry.prev.next = entry.next;
+        entry.next.prev = entry.prev;
+    }
 
     public void put(K key, V value) {
         LinkedEntry<K, V> entry = keyToEntry.get(key);
@@ -101,21 +116,11 @@ class GroupedLinkedMap<K extends Poolable, V> {
         updateEntry(entry);
     }
 
-    private static <K, V> void updateEntry(LinkedEntry<K, V> entry) {
-        entry.next.prev = entry;
-        entry.prev.next = entry;
-    }
-
-    private static <K, V> void removeEntry(LinkedEntry<K, V> entry) {
-        entry.prev.next = entry.next;
-        entry.next.prev = entry.prev;
-    }
-
     private static class LinkedEntry<K, V> {
         private final K key;
-        private List<V> values;
         LinkedEntry<K, V> next;
         LinkedEntry<K, V> prev;
+        private List<V> values;
 
         // Used only for the first item in the list which we will treat specially and which will not contain a value.
         public LinkedEntry() {

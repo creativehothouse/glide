@@ -31,13 +31,19 @@ public class DiskLruCacheWrapper implements DiskCache {
     private final int maxSize;
     private DiskLruCache diskLruCache;
 
+    protected DiskLruCacheWrapper(File directory, int maxSize) {
+        this.directory = directory;
+        this.maxSize = maxSize;
+        this.safeKeyGenerator = new SafeKeyGenerator();
+    }
+
     /**
      * Get a DiskCache in the given directory and size. If a disk cache has alread been created with
      * a different directory and/or size, it will be returned instead and the new arguments
      * will be ignored.
      *
      * @param directory The directory for the disk cache
-     * @param maxSize The max size for the disk cache
+     * @param maxSize   The max size for the disk cache
      * @return The new disk cache with the given arguments, or the current cache if one already exists
      */
     public static synchronized DiskCache get(File directory, int maxSize) {
@@ -46,12 +52,6 @@ public class DiskLruCacheWrapper implements DiskCache {
             wrapper = new DiskLruCacheWrapper(directory, maxSize);
         }
         return wrapper;
-    }
-
-    protected DiskLruCacheWrapper(File directory, int maxSize) {
-        this.directory = directory;
-        this.maxSize = maxSize;
-        this.safeKeyGenerator = new SafeKeyGenerator();
     }
 
     private synchronized DiskLruCache getDiskCache() throws IOException {
@@ -128,10 +128,10 @@ public class DiskLruCacheWrapper implements DiskCache {
         try {
             getDiskCache().delete();
             resetDiskCache();
-        }  catch (IOException e) {
+        } catch (IOException e) {
             if (Log.isLoggable(TAG, Log.WARN)) {
                 Log.w(TAG, "Unable to clear disk cache", e);
             }
-        }
+    }
     }
 }

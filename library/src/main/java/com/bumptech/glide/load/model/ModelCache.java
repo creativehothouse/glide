@@ -6,8 +6,10 @@ import com.bumptech.glide.util.Util;
 import java.util.Queue;
 
 /**
- * A simple cache that can be used by {@link ModelLoader} and {@link ModelLoaderFactory} to cache some data for a given
- * model, width and height. For a loader that takes a model and returns a url, the cache could be used to safely memoize
+ * A simple cache that can be used by {@link ModelLoader} and {@link ModelLoaderFactory} to cache
+ * some data for a given
+ * model, width and height. For a loader that takes a model and returns a url, the cache could be
+ * used to safely memoize
  * url creation based on the width and height of the view.
  *
  * @param <A> Some Model type that implements {@link #equals} and {@link #hashCode}.
@@ -34,10 +36,9 @@ public class ModelCache<A, B> {
     /**
      * Get a value.
      *
-     * @param model The model.
-     * @param width The width in pixels of the view the image is being loaded into.
+     * @param model  The model.
+     * @param width  The width in pixels of the view the image is being loaded into.
      * @param height The height in pixels of the view the image is being loaded into.
-     *
      * @return The cached result, or null.
      */
     public B get(A model, int width, int height) {
@@ -50,10 +51,10 @@ public class ModelCache<A, B> {
     /**
      * Add a value.
      *
-     * @param model The model.
-     * @param width The width in pixels of the view the image is being loaded into.
+     * @param model  The model.
+     * @param width  The width in pixels of the view the image is being loaded into.
      * @param height The height in pixels of the view the image is being loaded into.
-     * @param value The value to store.
+     * @param value  The value to store.
      */
     public void put(A model, int width, int height, B value) {
         ModelKey<A> key = ModelKey.get(model, width, height);
@@ -68,9 +69,11 @@ public class ModelCache<A, B> {
         private int width;
         private A model;
 
+        private ModelKey() {
+        }
+
         static <A> ModelKey<A> get(A model, int width, int height) {
-            @SuppressWarnings("unchecked")
-            ModelKey<A> modelKey = (ModelKey<A>) KEY_QUEUE.poll();
+            @SuppressWarnings("unchecked") ModelKey<A> modelKey = (ModelKey<A>) KEY_QUEUE.poll();
             if (modelKey == null) {
                 modelKey = new ModelKey<A>();
             }
@@ -78,8 +81,6 @@ public class ModelCache<A, B> {
             modelKey.init(model, width, height);
             return modelKey;
         }
-
-        private ModelKey() {  }
 
         private void init(A model, int width, int height) {
             this.model = model;
@@ -106,6 +107,6 @@ public class ModelCache<A, B> {
             result = 31 * result + width;
             result = 31 * result + model.hashCode();
             return result;
-        }
+    }
     }
 }

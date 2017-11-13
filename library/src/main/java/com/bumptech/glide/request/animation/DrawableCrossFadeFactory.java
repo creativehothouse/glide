@@ -6,15 +6,19 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
 /**
- * A factory class that produces a new {@link com.bumptech.glide.request.animation.GlideAnimation} that varies depending
- * on whether or not the drawable was loaded from the memory cache and whether or not the drawable is the first
+ * A factory class that produces a new {@link GlideAnimation} that varies depending
+ * on whether or not the drawable was loaded from the memory cache and whether or not the drawable
+ * is the first
  * image to be set on the target.
- *
  * <p>
- *     Resources are usually loaded from the memory cache just before the user can see the view,
- *     for example when the user changes screens or scrolls back and forth in a list. In those cases the user
- *     typically does not expect to see an animation. As a result, when the resource is loaded from the memory
- *     cache this factory produces an {@link com.bumptech.glide.request.animation.NoAnimation}.
+ * <p>
+ * Resources are usually loaded from the memory cache just before the user can see the view,
+ * for example when the user changes screens or scrolls back and forth in a list. In those cases
+ * the
+ * user
+ * typically does not expect to see an animation. As a result, when the resource is loaded from the
+ * memory
+ * cache this factory produces an {@link NoAnimation}.
  * </p>
  *
  * @param <T> The type of the {@link android.graphics.drawable.Drawable} that will be animated.
@@ -55,13 +59,13 @@ public class DrawableCrossFadeFactory<T extends Drawable> implements GlideAnimat
             return getFirstResourceAnimation();
         } else {
             return getSecondResourceAnimation();
-        }
+    }
     }
 
     private GlideAnimation<T> getFirstResourceAnimation() {
         if (firstResourceAnimation == null) {
-            GlideAnimation<T> defaultAnimation = animationFactory.build(false /*isFromMemoryCache*/,
-                true /*isFirstResource*/);
+            GlideAnimation<T> defaultAnimation =
+                    animationFactory.build(false /*isFromMemoryCache*/, true /*isFirstResource*/);
             firstResourceAnimation = new DrawableCrossFadeViewAnimation<T>(defaultAnimation, duration);
         }
         return firstResourceAnimation;
@@ -69,8 +73,8 @@ public class DrawableCrossFadeFactory<T extends Drawable> implements GlideAnimat
 
     private GlideAnimation<T> getSecondResourceAnimation() {
         if (secondResourceAnimation == null) {
-            GlideAnimation<T> defaultAnimation = animationFactory.build(false /*isFromMemoryCache*/,
-                false /*isFirstResource*/);
+            GlideAnimation<T> defaultAnimation =
+                    animationFactory.build(false /*isFromMemoryCache*/, false /*isFirstResource*/);
             secondResourceAnimation = new DrawableCrossFadeViewAnimation<T>(defaultAnimation, duration);
         }
         return secondResourceAnimation;

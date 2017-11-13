@@ -13,12 +13,22 @@ import java.io.File;
 import java.io.InputStream;
 
 /**
- * A {@link ModelLoader} For translating {@link File} models for local uris into {@link InputStream} data.
+ * A {@link ModelLoader} For translating {@link File} models for local uris into {@link
+ * InputStream}
+ * data.
  */
 public class StreamFileLoader extends FileLoader<InputStream> implements StreamModelLoader<File> {
 
+    public StreamFileLoader(Context context) {
+        this(Glide.buildStreamModelLoader(Uri.class, context));
+    }
+
+    public StreamFileLoader(ModelLoader<Uri, InputStream> uriLoader) {
+        super(uriLoader);
+    }
+
     /**
-     * The default factory for {@link com.bumptech.glide.load.model.stream.StreamFileLoader}s.
+     * The default factory for {@link StreamFileLoader}s.
      */
     public static class Factory implements ModelLoaderFactory<File, InputStream> {
         @Override
@@ -31,13 +41,4 @@ public class StreamFileLoader extends FileLoader<InputStream> implements StreamM
             // Do nothing.
         }
     }
-
-    public StreamFileLoader(Context context) {
-        this(Glide.buildStreamModelLoader(Uri.class, context));
-    }
-
-    public StreamFileLoader(ModelLoader<Uri, InputStream> uriLoader) {
-        super(uriLoader);
-    }
-
 }

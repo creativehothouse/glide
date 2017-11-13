@@ -24,40 +24,19 @@ import com.bumptech.glide.util.Util;
 import java.util.Queue;
 
 /**
- * A {@link Request} that loads a {@link com.bumptech.glide.load.engine.Resource} into a given {@link Target}.
+ * A {@link Request} that loads a {@link Resource} into a given {@link Target}.
  *
  * @param <A> The type of the model that the resource will be loaded from.
  * @param <T> The type of the data that the resource will be loaded from.
  * @param <Z> The type of the resource that will be loaded.
  * @param <R> The type of the resource that will be transcoded from the loaded resource.
  */
-public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallback,
-        ResourceCallback {
+public final class GenericRequest<A, T, Z, R>
+        implements Request, SizeReadyCallback, ResourceCallback {
     private static final String TAG = "GenericRequest";
     private static final Queue<GenericRequest<?, ?, ?, ?>> REQUEST_POOL = Util.createQueue(0);
     private static final double TO_MEGABYTE = 1d / (1024d * 1024d);
-
-    private enum Status {
-        /** Created but not yet running. */
-        PENDING,
-        /** In the process of fetching media. */
-        RUNNING,
-        /** Waiting for a callback given to the Target to be called to determine target dimensions. */
-        WAITING_FOR_SIZE,
-        /** Finished loading media successfully. */
-        COMPLETE,
-        /** Failed to load media, may be restarted. */
-        FAILED,
-        /** Cancelled by the user, may not be restarted. */
-        CANCELLED,
-        /** Cleared by the user with a placeholder set, may not be restarted. */
-        CLEARED,
-        /** Temporarily paused by the system, may be restarted. */
-        PAUSED,
-    }
-
     private final String tag = String.valueOf(hashCode());
-
     private Key signature;
     private Drawable fallbackDrawable;
     private int fallbackResourceId;
@@ -79,7 +58,6 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
     private int overrideWidth;
     private int overrideHeight;
     private DiskCacheStrategy diskCacheStrategy;
-
     private Drawable placeholderDrawable;
     private Drawable errorDrawable;
     private boolean loadedFromMemoryCache;
@@ -89,63 +67,42 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
     private long startTime;
     private Status status;
 
+    private GenericRequest() {
+        // just create, instances are reused with recycle/init
+    }
+
     public static <A, T, Z, R> GenericRequest<A, T, Z, R> obtain(
-            LoadProvider<A, T, Z, R> loadProvider,
-            A model,
-            Key signature,
-            Context context,
-            Priority priority,
-            Target<R> target,
-            float sizeMultiplier,
-            Drawable placeholderDrawable,
-            int placeholderResourceId,
-            Drawable errorDrawable,
-            int errorResourceId,
-            Drawable fallbackDrawable,
-            int fallbackResourceId,
-            RequestListener<? super A, R> requestListener,
-            RequestCoordinator requestCoordinator,
-            Engine engine,
-            Transformation<Z> transformation,
-            Class<R> transcodeClass,
-            boolean isMemoryCacheable,
-            GlideAnimationFactory<R> animationFactory,
-            int overrideWidth,
-            int overrideHeight,
-            DiskCacheStrategy diskCacheStrategy) {
-        @SuppressWarnings("unchecked")
-        GenericRequest<A, T, Z, R> request = (GenericRequest<A, T, Z, R>) REQUEST_POOL.poll();
+            LoadProvider<A, T, Z, R> loadProvider, A model, Key signature, Context context,
+            Priority priority, Target<R> target, float sizeMultiplier, Drawable placeholderDrawable,
+            int placeholderResourceId, Drawable errorDrawable, int errorResourceId,
+            Drawable fallbackDrawable, int fallbackResourceId,
+            RequestListener<? super A, R> requestListener, RequestCoordinator requestCoordinator,
+            Engine engine, Transformation<Z> transformation, Class<R> transcodeClass,
+            boolean isMemoryCacheable, GlideAnimationFactory<R> animationFactory, int overrideWidth,
+            int overrideHeight, DiskCacheStrategy diskCacheStrategy) {
+        @SuppressWarnings("unchecked") GenericRequest<A, T, Z, R> request =
+                (GenericRequest<A, T, Z, R>) REQUEST_POOL.poll();
         if (request == null) {
             request = new GenericRequest<A, T, Z, R>();
         }
-        request.init(loadProvider,
-                model,
-                signature,
-                context,
-                priority,
-                target,
-                sizeMultiplier,
-                placeholderDrawable,
-                placeholderResourceId,
-                errorDrawable,
-                errorResourceId,
-                fallbackDrawable,
-                fallbackResourceId,
-                requestListener,
-                requestCoordinator,
-                engine,
-                transformation,
-                transcodeClass,
-                isMemoryCacheable,
-                animationFactory,
-                overrideWidth,
-                overrideHeight,
-                diskCacheStrategy);
+        request.init(loadProvider, model, signature, context, priority, target, sizeMultiplier,
+                placeholderDrawable, placeholderResourceId, errorDrawable, errorResourceId,
+                fallbackDrawable, fallbackResourceId, requestListener, requestCoordinator, engine,
+                transformation, transcodeClass, isMemoryCacheable, animationFactory, overrideWidth,
+                overrideHeight, diskCacheStrategy);
         return request;
     }
 
-    private GenericRequest() {
-        // just create, instances are reused with recycle/init
+    private static void check(String name, Object object, String suggestion) {
+        if (object == null) {
+            StringBuilder message = new StringBuilder(name);
+            message.append(" must not be null");
+            if (suggestion != null) {
+                message.append(", ");
+                message.append(suggestion);
+            }
+            throw new NullPointerException(message.toString());
+        }
     }
 
     @Override
@@ -166,30 +123,14 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
         REQUEST_POOL.offer(this);
     }
 
-    private void init(
-            LoadProvider<A, T, Z, R> loadProvider,
-            A model,
-            Key signature,
-            Context context,
-            Priority priority,
-            Target<R> target,
-            float sizeMultiplier,
-            Drawable placeholderDrawable,
-            int placeholderResourceId,
-            Drawable errorDrawable,
-            int errorResourceId,
-            Drawable fallbackDrawable,
-            int fallbackResourceId,
-            RequestListener<? super A, R> requestListener,
-            RequestCoordinator requestCoordinator,
-            Engine engine,
-            Transformation<Z> transformation,
-            Class<R> transcodeClass,
-            boolean isMemoryCacheable,
-            GlideAnimationFactory<R> animationFactory,
-            int overrideWidth,
-            int overrideHeight,
-            DiskCacheStrategy diskCacheStrategy) {
+    private void init(LoadProvider<A, T, Z, R> loadProvider, A model, Key signature, Context context,
+            Priority priority, Target<R> target, float sizeMultiplier, Drawable placeholderDrawable,
+            int placeholderResourceId, Drawable errorDrawable, int errorResourceId,
+            Drawable fallbackDrawable, int fallbackResourceId,
+            RequestListener<? super A, R> requestListener, RequestCoordinator requestCoordinator,
+            Engine engine, Transformation<Z> transformation, Class<R> transcodeClass,
+            boolean isMemoryCacheable, GlideAnimationFactory<R> animationFactory, int overrideWidth,
+            int overrideHeight, DiskCacheStrategy diskCacheStrategy) {
         this.loadProvider = loadProvider;
         this.model = model;
         this.signature = signature;
@@ -219,7 +160,8 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
         // simply skip our sanity checks in that unusual case.
         if (model != null) {
             check("ModelLoader", loadProvider.getModelLoader(), "try .using(ModelLoader)");
-            check("Transcoder", loadProvider.getTranscoder(), "try .as*(Class).transcode(ResourceTranscoder)");
+            check("Transcoder", loadProvider.getTranscoder(),
+                    "try .as*(Class).transcode(ResourceTranscoder)");
             check("Transformation", transformation, "try .transform(UnitTransformation.get())");
             if (diskCacheStrategy.cacheSource()) {
                 check("SourceEncoder", loadProvider.getSourceEncoder(),
@@ -239,19 +181,7 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
                 check("Encoder", loadProvider.getEncoder(),
                         "try .encode(ResourceEncoder) or .diskCacheStrategy(NONE/SOURCE)");
             }
-        }
     }
-
-    private static void check(String name, Object object, String suggestion) {
-        if (object == null) {
-            StringBuilder message = new StringBuilder(name);
-            message.append(" must not be null");
-            if (suggestion != null) {
-                message.append(", ");
-                message.append(suggestion);
-            }
-            throw new NullPointerException(message.toString());
-        }
     }
 
     /**
@@ -281,11 +211,12 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
     }
 
     /**
-     * Cancels the current load but does not release any resources held by the request and continues to display
+     * Cancels the current load but does not release any resources held by the request and continues
+     * to display
      * the loaded resource if the load completed before the call to cancel.
-     *
      * <p>
-     *     Cancelled requests can be restarted with a subsequent call to {@link #begin()}.
+     * <p>
+     * Cancelled requests can be restarted with a subsequent call to {@link #begin()}.
      * </p>
      *
      * @see #clear()
@@ -299,11 +230,12 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
     }
 
     /**
-     * Cancels the current load if it is in progress, clears any resources held onto by the request and replaces
+     * Cancels the current load if it is in progress, clears any resources held onto by the request
+     * and replaces
      * the loaded resource if the load completed with the placeholder.
-     *
      * <p>
-     *     Cleared requests can be restarted with a subsequent call to {@link #begin()}
+     * <p>
+     * Cleared requests can be restarted with a subsequent call to {@link #begin()}
      * </p>
      *
      * @see #cancel()
@@ -383,10 +315,10 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
     }
 
     private Drawable getFallbackDrawable() {
-      if (fallbackDrawable == null && fallbackResourceId > 0) {
-        fallbackDrawable = context.getResources().getDrawable(fallbackResourceId);
-      }
-      return fallbackDrawable;
+        if (fallbackDrawable == null && fallbackResourceId > 0) {
+            fallbackDrawable = context.getResources().getDrawable(fallbackResourceId);
+        }
+        return fallbackDrawable;
     }
 
     private void setErrorPlaceholder(Exception e) {
@@ -396,7 +328,7 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
 
         Drawable error = model == null ? getFallbackDrawable() : null;
         if (error == null) {
-          error = getErrorDrawable();
+            error = getErrorDrawable();
         }
         if (error == null) {
             error = getPlaceholderDrawable();
@@ -446,8 +378,9 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
             logV("finished setup for calling load in " + LogTime.getElapsedMillis(startTime));
         }
         loadedFromMemoryCache = true;
-        loadStatus = engine.load(signature, width, height, dataFetcher, loadProvider, transformation, transcoder,
-                priority, isMemoryCacheable, diskCacheStrategy, this);
+        loadStatus =
+                engine.load(signature, width, height, dataFetcher, loadProvider, transformation, transcoder,
+                        priority, isMemoryCacheable, diskCacheStrategy, this);
         loadedFromMemoryCache = resource != null;
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
             logV("finished onSizeReady in " + LogTime.getElapsedMillis(startTime));
@@ -467,9 +400,9 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
     }
 
     private void notifyLoadSuccess() {
-      if (requestCoordinator != null) {
-        requestCoordinator.onRequestSuccess(this);
-      }
+        if (requestCoordinator != null) {
+            requestCoordinator.onRequestSuccess(this);
+        }
     }
 
     /**
@@ -479,7 +412,8 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
     @Override
     public void onResourceReady(Resource<?> resource) {
         if (resource == null) {
-            onException(new Exception("Expected to receive a Resource<R> with an object of " + transcodeClass
+            onException(new Exception("Expected to receive a Resource<R> with an object of "
+                    + transcodeClass
                     + " inside, but instead got null."));
             return;
         }
@@ -487,13 +421,20 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
         Object received = resource.get();
         if (received == null || !transcodeClass.isAssignableFrom(received.getClass())) {
             releaseResource(resource);
-            onException(new Exception("Expected to receive an object of " + transcodeClass
-                    + " but instead got " + (received != null ? received.getClass() : "") + "{" + received + "}"
-                    + " inside Resource{" + resource + "}."
-                    + (received != null ? "" : " "
-                        + "To indicate failure return a null Resource object, "
-                        + "rather than a Resource object containing null data.")
-            ));
+            onException(new Exception(
+                    "Expected to receive an object of "
+                            + transcodeClass
+                            + " but instead got "
+                            + (received != null ? received.getClass() : "")
+                            + "{"
+                            + received
+                            + "}"
+                            + " inside Resource{"
+                            + resource
+                            + "}."
+                            + (received != null ? "" : " "
+                            + "To indicate failure return a null Resource object, "
+                            + "rather than a Resource object containing null data.")));
             return;
         }
 
@@ -511,7 +452,8 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
      * Internal {@link #onResourceReady(Resource)} where arguments are known to be safe.
      *
      * @param resource original {@link Resource}, never <code>null</code>
-     * @param result object returned by {@link Resource#get()}, checked for type and never <code>null</code>
+     * @param result   object returned by {@link Resource#get()}, checked for type and never
+     *                 <code>null</code>
      */
     private void onResourceReady(Resource<?> resource, R result) {
         // We must call isFirstReadyResource before setting status.
@@ -519,8 +461,8 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
         status = Status.COMPLETE;
         this.resource = resource;
 
-        if (requestListener == null || !requestListener.onResourceReady(result, model, target, loadedFromMemoryCache,
-                isFirstResource)) {
+        if (requestListener == null || !requestListener.onResourceReady(result, model, target,
+                loadedFromMemoryCache, isFirstResource)) {
             GlideAnimation<R> animation = animationFactory.build(loadedFromMemoryCache, isFirstResource);
             target.onResourceReady(result, animation);
         }
@@ -528,8 +470,12 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
         notifyLoadSuccess();
 
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
-            logV("Resource ready in " + LogTime.getElapsedMillis(startTime) + " size: "
-                    + (resource.getSize() * TO_MEGABYTE) + " fromCache: " + loadedFromMemoryCache);
+            logV("Resource ready in "
+                    + LogTime.getElapsedMillis(startTime)
+                    + " size: "
+                    + (resource.getSize() * TO_MEGABYTE)
+                    + " fromCache: "
+                    + loadedFromMemoryCache);
         }
     }
 
@@ -544,12 +490,48 @@ public final class GenericRequest<A, T, Z, R> implements Request, SizeReadyCallb
 
         status = Status.FAILED;
         //TODO: what if this is a thumbnail request?
-        if (requestListener == null || !requestListener.onException(e, model, target, isFirstReadyResource())) {
+        if (requestListener == null || !requestListener.onException(e, model, target,
+                isFirstReadyResource())) {
             setErrorPlaceholder(e);
         }
     }
 
     private void logV(String message) {
         Log.v(TAG, message + " this: " + tag);
+    }
+
+    private enum Status {
+        /**
+         * Created but not yet running.
+         */
+        PENDING,
+        /**
+         * In the process of fetching media.
+         */
+        RUNNING,
+        /**
+         * Waiting for a callback given to the Target to be called to determine target dimensions.
+         */
+        WAITING_FOR_SIZE,
+        /**
+         * Finished loading media successfully.
+         */
+        COMPLETE,
+        /**
+         * Failed to load media, may be restarted.
+         */
+        FAILED,
+        /**
+         * Cancelled by the user, may not be restarted.
+         */
+        CANCELLED,
+        /**
+         * Cleared by the user with a placeholder set, may not be restarted.
+         */
+        CLEARED,
+        /**
+         * Temporarily paused by the system, may be restarted.
+         */
+        PAUSED,
     }
 }

@@ -7,20 +7,25 @@ import com.bumptech.glide.load.engine.executor.Prioritized;
 import com.bumptech.glide.request.ResourceCallback;
 
 /**
- * A runnable class responsible for using an {@link com.bumptech.glide.load.engine.DecodeJob} to decode resources on a
+ * A runnable class responsible for using an {@link DecodeJob} to decode resources on a
  * background thread in two stages.
- *
  * <p>
- *     In the first stage, this class attempts to decode a resource
- *     from cache, first using transformed data and then using source data. If no resource can be decoded from cache,
- *     this class then requests to be posted again. During the second stage this class then attempts to use the
- *     {@link com.bumptech.glide.load.engine.DecodeJob} to decode data directly from the original source.
+ * <p>
+ * In the first stage, this class attempts to decode a resource
+ * from cache, first using transformed data and then using source data. If no resource can be
+ * decoded from cache,
+ * this class then requests to be posted again. During the second stage this class then attempts to
+ * use the
+ * {@link DecodeJob} to decode data directly from the original source.
  * </p>
- *
  * <p>
- *     Using two stages with a re-post in between allows us to run fast disk cache decodes on one thread and slow source
- *     fetches on a second pool so that loads for local data are never blocked waiting for loads for remote data to
- *     complete.
+ * <p>
+ * Using two stages with a re-post in between allows us to run fast disk cache decodes on one
+ * thread
+ * and slow source
+ * fetches on a second pool so that loads for local data are never blocked waiting for loads for
+ * remote data to
+ * complete.
  * </p>
  */
 class EngineRunnable implements Runnable, Prioritized {
@@ -34,7 +39,8 @@ class EngineRunnable implements Runnable, Prioritized {
 
     private volatile boolean isCancelled;
 
-    public EngineRunnable(EngineRunnableManager manager, DecodeJob<?, ?, ?> decodeJob, Priority priority) {
+    public EngineRunnable(EngineRunnableManager manager, DecodeJob<?, ?, ?> decodeJob,
+            Priority priority) {
         this.manager = manager;
         this.decodeJob = decodeJob;
         this.stage = Stage.CACHE;
@@ -56,11 +62,6 @@ class EngineRunnable implements Runnable, Prioritized {
         Resource<?> resource = null;
         try {
             resource = decode();
-        } catch (OutOfMemoryError e) {
-            if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "Out Of Memory Error decoding", e);
-            }
-            exception = new ErrorWrappingGlideException(e);
         } catch (Exception e) {
             if (Log.isLoggable(TAG, Log.VERBOSE)) {
                 Log.v(TAG, "Exception decoding", e);
@@ -79,7 +80,7 @@ class EngineRunnable implements Runnable, Prioritized {
             onLoadFailed(exception);
         } else {
             onLoadComplete(resource);
-        }
+    }
     }
 
     private boolean isDecodingFromCache() {
@@ -96,7 +97,7 @@ class EngineRunnable implements Runnable, Prioritized {
             manager.submitForSource(this);
         } else {
             manager.onException(e);
-        }
+    }
     }
 
     private Resource<?> decode() throws Exception {
@@ -104,7 +105,7 @@ class EngineRunnable implements Runnable, Prioritized {
             return decodeFromCache();
         } else {
             return decodeFromSource();
-        }
+    }
     }
 
     private Resource<?> decodeFromCache() throws Exception {
@@ -133,9 +134,13 @@ class EngineRunnable implements Runnable, Prioritized {
     }
 
     private enum Stage {
-        /** Attempting to decode resource from cache. */
+        /**
+         * Attempting to decode resource from cache.
+         */
         CACHE,
-        /** Attempting to decode resource from source data. */
+        /**
+         * Attempting to decode resource from source data.
+         */
         SOURCE
     }
 

@@ -6,7 +6,7 @@ import com.bumptech.glide.load.engine.Resource;
 import java.io.File;
 
 /**
- * A simple {@link com.bumptech.glide.load.ResourceDecoder} that creates resource for a given {@link java.io.File}.
+ * A simple {@link ResourceDecoder} that creates resource for a given {@link java.io.File}.
  */
 public class FileDecoder implements ResourceDecoder<File, File> {
 

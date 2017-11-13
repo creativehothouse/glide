@@ -9,7 +9,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * A class that generates and caches safe and unique string file names from {@link com.bumptech.glide.load.Key}s.
+ * A class that generates and caches safe and unique string file names from {@link Key}s.
  */
 class SafeKeyGenerator {
     private final LruCache<Key, String> loadIdToSafeHash = new LruCache<Key, String>(1000);

@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Prevents {@link InputStream InputStreams} from overflowing their buffer by reading data past their read limit.
+ * Prevents {@link InputStream InputStreams} from overflowing their buffer by reading data past
+ * their read limit.
  */
 public class MarkEnforcingInputStream extends FilterInputStream {
     private static final int UNSET = Integer.MIN_VALUE;
@@ -66,7 +67,8 @@ public class MarkEnforcingInputStream extends FilterInputStream {
 
     @Override
     public int available() throws IOException {
-        return availableBytes == UNSET ? super.available() : Math.min(availableBytes, super.available());
+        return availableBytes == UNSET ? super.available()
+                : Math.min(availableBytes, super.available());
     }
 
     private long getBytesToRead(long targetByteCount) {
@@ -76,7 +78,7 @@ public class MarkEnforcingInputStream extends FilterInputStream {
             return availableBytes;
         } else {
             return targetByteCount;
-        }
+    }
     }
 
     private void updateAvailableBytesAfterRead(long bytesRead) {

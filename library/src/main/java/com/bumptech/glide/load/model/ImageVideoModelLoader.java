@@ -11,8 +11,8 @@ import java.io.InputStream;
 /**
  * A wrapper model loader that provides both an {@link java.io.InputStream} and a
  * {@link android.os.ParcelFileDescriptor} for a given model type by wrapping an
- * {@link com.bumptech.glide.load.model.ModelLoader} for {@link java.io.InputStream}s for the given model type and an
- * {@link com.bumptech.glide.load.model.ModelLoader} for {@link android.os.ParcelFileDescriptor} for the given model
+ * {@link ModelLoader} for {@link java.io.InputStream}s for the given model type and an
+ * {@link ModelLoader} for {@link android.os.ParcelFileDescriptor} for the given model
  * type.
  *
  * @param <A> The model type.
@@ -26,7 +26,8 @@ public class ImageVideoModelLoader<A> implements ModelLoader<A, ImageVideoWrappe
     public ImageVideoModelLoader(ModelLoader<A, InputStream> streamLoader,
             ModelLoader<A, ParcelFileDescriptor> fileDescriptorLoader) {
         if (streamLoader == null && fileDescriptorLoader == null) {
-            throw new NullPointerException("At least one of streamLoader and fileDescriptorLoader must be non null");
+            throw new NullPointerException(
+                    "At least one of streamLoader and fileDescriptorLoader must be non null");
         }
         this.streamLoader = streamLoader;
         this.fileDescriptorLoader = fileDescriptorLoader;
@@ -47,7 +48,7 @@ public class ImageVideoModelLoader<A> implements ModelLoader<A, ImageVideoWrappe
             return new ImageVideoFetcher(streamFetcher, fileDescriptorFetcher);
         } else {
             return null;
-        }
+    }
     }
 
     static class ImageVideoFetcher implements DataFetcher<ImageVideoWrapper> {

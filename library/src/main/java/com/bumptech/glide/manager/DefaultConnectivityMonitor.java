@@ -12,8 +12,6 @@ class DefaultConnectivityMonitor implements ConnectivityMonitor {
     private final ConnectivityListener listener;
 
     private boolean isConnected;
-    private boolean isRegistered;
-
     private final BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -24,6 +22,7 @@ class DefaultConnectivityMonitor implements ConnectivityMonitor {
             }
         }
     };
+    private boolean isRegistered;
 
     public DefaultConnectivityMonitor(Context context, ConnectivityListener listener) {
         this.context = context.getApplicationContext();
@@ -36,7 +35,8 @@ class DefaultConnectivityMonitor implements ConnectivityMonitor {
         }
 
         isConnected = isConnected(context);
-        context.registerReceiver(connectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        context.registerReceiver(connectivityReceiver,
+                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         isRegistered = true;
     }
 

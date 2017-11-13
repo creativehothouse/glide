@@ -8,17 +8,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Maintains a map of model class to factory to retrieve a {@link ModelLoaderFactory} and/or a {@link ModelLoader}
+ * Maintains a map of model class to factory to retrieve a {@link ModelLoaderFactory} and/or a
+ * {@link ModelLoader}
  * for a given model type.
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 // this is a general class capable of handling any generic combination
 public class GenericLoaderFactory {
-    private final Map<Class/*T*/, Map<Class/*Y*/, ModelLoaderFactory/*T, Y*/>> modelClassToResourceFactories =
-            new HashMap<Class, Map<Class, ModelLoaderFactory>>();
-    private final Map<Class/*T*/, Map<Class/*Y*/, ModelLoader/*T, Y*/>> cachedModelLoaders =
-            new HashMap<Class, Map<Class, ModelLoader>>();
-
     private static final ModelLoader NULL_MODEL_LOADER = new ModelLoader() {
         @Override
         public DataFetcher getResourceFetcher(Object model, int width, int height) {
@@ -30,27 +26,33 @@ public class GenericLoaderFactory {
             return "NULL_MODEL_LOADER";
         }
     };
-
+    private final Map<Class/*T*/, Map<Class/*Y*/, ModelLoaderFactory/*T, Y*/>>
+            modelClassToResourceFactories = new HashMap<Class, Map<Class, ModelLoaderFactory>>();
+    private final Map<Class/*T*/, Map<Class/*Y*/, ModelLoader/*T, Y*/>> cachedModelLoaders =
+            new HashMap<Class, Map<Class, ModelLoader>>();
     private final Context context;
 
     public GenericLoaderFactory(Context context) {
-       this.context = context.getApplicationContext();
+        this.context = context.getApplicationContext();
     }
 
     /**
-     * Removes and returns the registered {@link ModelLoaderFactory} for the given model and resource classes. Returns
+     * Removes and returns the registered {@link ModelLoaderFactory} for the given model and resource
+     * classes. Returns
      * null if no such factory is registered. Clears all cached model loaders.
      *
-     * @param modelClass The model class.
+     * @param modelClass    The model class.
      * @param resourceClass The resource class.
-     * @param <T> The type of the model the class.
-     * @param <Y> The type of the resource class.
+     * @param <T>           The type of the model the class.
+     * @param <Y>           The type of the resource class.
      */
-    public synchronized <T, Y> ModelLoaderFactory<T, Y> unregister(Class<T> modelClass, Class<Y> resourceClass) {
+    public synchronized <T, Y> ModelLoaderFactory<T, Y> unregister(Class<T> modelClass,
+            Class<Y> resourceClass) {
         cachedModelLoaders.clear();
 
         ModelLoaderFactory/*T, Y*/ result = null;
-        Map<Class/*Y*/, ModelLoaderFactory/*T, Y*/> resourceToFactories = modelClassToResourceFactories.get(modelClass);
+        Map<Class/*Y*/, ModelLoaderFactory/*T, Y*/> resourceToFactories =
+                modelClassToResourceFactories.get(modelClass);
         if (resourceToFactories != null) {
             result = resourceToFactories.remove(resourceClass);
         }
@@ -58,21 +60,25 @@ public class GenericLoaderFactory {
     }
 
     /**
-     * Registers the given {@link ModelLoaderFactory} for the given model and resource classes and returns the previous
-     * factory registered for the given model and resource classes or null if no such factory existed. Clears all cached
+     * Registers the given {@link ModelLoaderFactory} for the given model and resource classes and
+     * returns the previous
+     * factory registered for the given model and resource classes or null if no such factory
+     * existed.
+     * Clears all cached
      * model loaders.
      *
-     * @param modelClass The model class.
+     * @param modelClass    The model class.
      * @param resourceClass The resource class.
-     * @param factory The factory to register.
-     * @param <T> The type of the model.
-     * @param <Y> The type of the resource.
+     * @param factory       The factory to register.
+     * @param <T>           The type of the model.
+     * @param <Y>           The type of the resource.
      */
-    public synchronized <T, Y> ModelLoaderFactory<T, Y> register(Class<T> modelClass, Class<Y> resourceClass,
-            ModelLoaderFactory<T, Y> factory) {
+    public synchronized <T, Y> ModelLoaderFactory<T, Y> register(Class<T> modelClass,
+            Class<Y> resourceClass, ModelLoaderFactory<T, Y> factory) {
         cachedModelLoaders.clear();
 
-        Map<Class/*Y*/, ModelLoaderFactory/*T, Y*/> resourceToFactories = modelClassToResourceFactories.get(modelClass);
+        Map<Class/*Y*/, ModelLoaderFactory/*T, Y*/> resourceToFactories =
+                modelClassToResourceFactories.get(modelClass);
         if (resourceToFactories == null) {
             resourceToFactories = new HashMap<Class/*Y*/, ModelLoaderFactory/*T, Y*/>();
             modelClassToResourceFactories.put(modelClass, resourceToFactories);
@@ -95,34 +101,40 @@ public class GenericLoaderFactory {
     }
 
     /**
-     * Returns a {@link ModelLoader} for the given model and resource classes by either returning a cached
-     * {@link ModelLoader} or building a new a new {@link ModelLoader} using registered {@link ModelLoaderFactory}s.
+     * Returns a {@link ModelLoader} for the given model and resource classes by either returning a
+     * cached
+     * {@link ModelLoader} or building a new a new {@link ModelLoader} using registered {@link
+     * ModelLoaderFactory}s.
      * Returns null if no {@link ModelLoaderFactory} is registered for the given classes.
      *
-     * @deprecated Use {@link #buildModelLoader(Class, Class)} instead. Scheduled to be removed in Glide 4.0.
-     * @param modelClass The model class.
+     * @param modelClass    The model class.
      * @param resourceClass The resource class.
-     * @param context Unused
-     * @param <T> The type of the model.
-     * @param <Y> The type of the resource.
+     * @param context       Unused
+     * @param <T>           The type of the model.
+     * @param <Y>           The type of the resource.
+     * @deprecated Use {@link #buildModelLoader(Class, Class)} instead. Scheduled to be removed in
+     * Glide 4.0.
      */
     @Deprecated
-    public synchronized <T, Y> ModelLoader<T, Y> buildModelLoader(Class<T> modelClass, Class<Y> resourceClass,
-            Context context) {
+    public synchronized <T, Y> ModelLoader<T, Y> buildModelLoader(Class<T> modelClass,
+            Class<Y> resourceClass, Context context) {
         return buildModelLoader(modelClass, resourceClass);
     }
 
     /**
-     * Returns a {@link ModelLoader} for the given model and resource classes by either returning a cached
-     * {@link ModelLoader} or building a new a new {@link ModelLoader} using registered {@link ModelLoaderFactory}s.
+     * Returns a {@link ModelLoader} for the given model and resource classes by either returning a
+     * cached
+     * {@link ModelLoader} or building a new a new {@link ModelLoader} using registered {@link
+     * ModelLoaderFactory}s.
      * Returns null if no {@link ModelLoaderFactory} is registered for the given classes.
      *
-     * @param modelClass The model class.
+     * @param modelClass    The model class.
      * @param resourceClass The resource class.
-     * @param <T> The type of the model.
-     * @param <Y> The type of the resource.
+     * @param <T>           The type of the model.
+     * @param <Y>           The type of the resource.
      */
-    public synchronized <T, Y> ModelLoader<T, Y> buildModelLoader(Class<T> modelClass, Class<Y> resourceClass) {
+    public synchronized <T, Y> ModelLoader<T, Y> buildModelLoader(Class<T> modelClass,
+            Class<Y> resourceClass) {
         ModelLoader<T, Y> result = getCachedLoader(modelClass, resourceClass);
         if (result != null) {
             // We've already tried to create a model loader and can't with the currently registered set of factories,
@@ -150,7 +162,8 @@ public class GenericLoaderFactory {
         cacheModelLoader(modelClass, resourceClass, NULL_MODEL_LOADER);
     }
 
-    private <T, Y> void cacheModelLoader(Class<T> modelClass, Class<Y> resourceClass, ModelLoader<T, Y> modelLoader) {
+    private <T, Y> void cacheModelLoader(Class<T> modelClass, Class<Y> resourceClass,
+            ModelLoader<T, Y> modelLoader) {
         Map<Class/*Y*/, ModelLoader/*T, Y*/> resourceToLoaders = cachedModelLoaders.get(modelClass);
         if (resourceToLoaders == null) {
             resourceToLoaders = new HashMap<Class/*Y*/, ModelLoader/*T, Y*/>();
@@ -170,7 +183,8 @@ public class GenericLoaderFactory {
     }
 
     private <T, Y> ModelLoaderFactory<T, Y> getFactory(Class<T> modelClass, Class<Y> resourceClass) {
-        Map<Class/*Y*/, ModelLoaderFactory/*T, Y*/> resourceToFactories = modelClassToResourceFactories.get(modelClass);
+        Map<Class/*Y*/, ModelLoaderFactory/*T, Y*/> resourceToFactories =
+                modelClassToResourceFactories.get(modelClass);
         ModelLoaderFactory/*T, Y*/ result = null;
         if (resourceToFactories != null) {
             result = resourceToFactories.get(resourceClass);
@@ -190,11 +204,11 @@ public class GenericLoaderFactory {
                         result = currentResourceToFactories.get(resourceClass);
                         if (result != null) {
                             break;
-                        }
-                    }
-                }
             }
+                    }
         }
+            }
+    }
 
         return result;
     }

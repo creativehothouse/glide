@@ -14,7 +14,7 @@ import android.view.Gravity;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 
 /**
- * A static {@link com.bumptech.glide.load.resource.drawable.GlideDrawable} for displaying a single image.
+ * A static {@link GlideDrawable} for displaying a single image.
  */
 public class GlideBitmapDrawable extends GlideDrawable {
     private final Rect destRect = new Rect();
@@ -107,7 +107,7 @@ public class GlideBitmapDrawable extends GlideDrawable {
         if (currentAlpha != alpha) {
             state.setAlpha(alpha);
             invalidateSelf();
-        }
+    }
     }
 
     @Override
@@ -119,8 +119,8 @@ public class GlideBitmapDrawable extends GlideDrawable {
     @Override
     public int getOpacity() {
         Bitmap bm = state.bitmap;
-        return bm == null || bm.hasAlpha() || state.paint.getAlpha() < 255
-                ? PixelFormat.TRANSLUCENT : PixelFormat.OPAQUE;
+        return bm == null || bm.hasAlpha() || state.paint.getAlpha() < 255 ? PixelFormat.TRANSLUCENT
+                : PixelFormat.OPAQUE;
     }
 
     @Override
@@ -149,7 +149,6 @@ public class GlideBitmapDrawable extends GlideDrawable {
         public BitmapState(Bitmap bitmap) {
             this.bitmap = bitmap;
         }
-
 
         BitmapState(BitmapState other) {
             this(other.bitmap);

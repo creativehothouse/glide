@@ -20,8 +20,8 @@ import java.io.InputStream;
 import java.util.Queue;
 
 /**
- * An {@link com.bumptech.glide.load.ResourceDecoder} that decodes
- * {@link com.bumptech.glide.load.resource.gif.GifDrawable} from {@link java.io.InputStream} data.
+ * An {@link ResourceDecoder} that decodes
+ * {@link GifDrawable} from {@link java.io.InputStream} data.
  */
 public class GifResourceDecoder implements ResourceDecoder<InputStream, GifDrawable> {
     private static final String TAG = "GifResourceDecoder";
@@ -45,55 +45,11 @@ public class GifResourceDecoder implements ResourceDecoder<InputStream, GifDrawa
     // Visible for testing.
     GifResourceDecoder(Context context, BitmapPool bitmapPool, GifHeaderParserPool parserPool,
             GifDecoderPool decoderPool) {
-        this.context = context.getApplicationContext();
+        this.context = context;
         this.bitmapPool = bitmapPool;
         this.decoderPool = decoderPool;
         this.provider = new GifBitmapProvider(bitmapPool);
         this.parserPool = parserPool;
-    }
-
-    @Override
-    public GifDrawableResource decode(InputStream source, int width, int height) {
-        byte[] data = inputStreamToBytes(source);
-        final GifHeaderParser parser = parserPool.obtain(data);
-        final GifDecoder decoder = decoderPool.obtain(provider);
-        try {
-            return decode(data, width, height, parser, decoder);
-        } finally {
-            parserPool.release(parser);
-            decoderPool.release(decoder);
-        }
-    }
-
-    private GifDrawableResource decode(byte[] data, int width, int height, GifHeaderParser parser, GifDecoder decoder) {
-        final GifHeader header = parser.parseHeader();
-        if (header.getNumFrames() <= 0 || header.getStatus() != GifDecoder.STATUS_OK) {
-            // If we couldn't decode the GIF, we will end up with a frame count of 0.
-            return null;
-        }
-
-        Bitmap firstFrame = decodeFirstFrame(decoder, header, data);
-        if (firstFrame == null) {
-            return null;
-        }
-
-        Transformation<Bitmap> unitTransformation = UnitTransformation.get();
-
-        GifDrawable gifDrawable = new GifDrawable(context, provider, bitmapPool, unitTransformation, width, height,
-                header, data, firstFrame);
-
-        return new GifDrawableResource(gifDrawable);
-    }
-
-    private Bitmap decodeFirstFrame(GifDecoder decoder, GifHeader header, byte[] data) {
-        decoder.setData(header, data);
-        decoder.advance();
-        return decoder.getNextFrame();
-    }
-
-    @Override
-    public String getId() {
-        return "";
     }
 
     private static byte[] inputStreamToBytes(InputStream is) {
@@ -113,6 +69,52 @@ public class GifResourceDecoder implements ResourceDecoder<InputStream, GifDrawa
         return buffer.toByteArray();
     }
 
+    @Override
+    public GifDrawableResource decode(InputStream source, int width, int height) {
+        byte[] data = inputStreamToBytes(source);
+        final GifHeaderParser parser = parserPool.obtain(data);
+        final GifDecoder decoder = decoderPool.obtain(provider);
+        try {
+            return decode(data, width, height, parser, decoder);
+        } finally {
+            parserPool.release(parser);
+            decoderPool.release(decoder);
+    }
+    }
+
+    private GifDrawableResource decode(byte[] data, int width, int height, GifHeaderParser parser,
+            GifDecoder decoder) {
+        final GifHeader header = parser.parseHeader();
+        if (header.getNumFrames() <= 0 || header.getStatus() != GifDecoder.STATUS_OK) {
+            // If we couldn't decode the GIF, we will end up with a frame count of 0.
+            return null;
+        }
+
+        Bitmap firstFrame = decodeFirstFrame(decoder, header, data);
+        if (firstFrame == null) {
+            return null;
+        }
+
+        Transformation<Bitmap> unitTransformation = UnitTransformation.get();
+
+        GifDrawable gifDrawable =
+                new GifDrawable(context, provider, bitmapPool, unitTransformation, width, height, header,
+                        data, firstFrame);
+
+        return new GifDrawableResource(gifDrawable);
+    }
+
+    private Bitmap decodeFirstFrame(GifDecoder decoder, GifHeader header, byte[] data) {
+        decoder.setData(header, data);
+        decoder.advance();
+        return decoder.getNextFrame();
+    }
+
+    @Override
+    public String getId() {
+        return "";
+    }
+
     // Visible for testing.
     static class GifDecoderPool {
         private final Queue<GifDecoder> pool = Util.createQueue(0);
@@ -128,7 +130,7 @@ public class GifResourceDecoder implements ResourceDecoder<InputStream, GifDrawa
         public synchronized void release(GifDecoder decoder) {
             decoder.clear();
             pool.offer(decoder);
-        }
+    }
     }
 
     // Visible for testing.

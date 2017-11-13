@@ -3,7 +3,6 @@ package com.bumptech.glide.manager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 
 import com.bumptech.glide.RequestManager;
 
@@ -13,23 +12,20 @@ import java.util.Set;
 
 /**
  * A view-less {@link android.support.v4.app.Fragment} used to safely store an
- * {@link com.bumptech.glide.RequestManager} that can be used to start, stop and manage Glide requests started for
+ * {@link RequestManager} that can be used to start, stop and manage Glide requests started for
  * targets within the fragment or activity this fragment is a child of.
  *
- * @see com.bumptech.glide.manager.RequestManagerFragment
- * @see com.bumptech.glide.manager.RequestManagerRetriever
- * @see com.bumptech.glide.RequestManager
+ * @see RequestManagerFragment
+ * @see RequestManagerRetriever
+ * @see RequestManager
  */
 public class SupportRequestManagerFragment extends Fragment {
-
-    private static final String TAG = "SupportRMFragment";
-
-    private RequestManager requestManager;
     private final ActivityFragmentLifecycle lifecycle;
     private final RequestManagerTreeNode requestManagerTreeNode =
             new SupportFragmentRequestManagerTreeNode();
     private final HashSet<SupportRequestManagerFragment> childRequestManagerFragments =
-        new HashSet<SupportRequestManagerFragment>();
+            new HashSet<SupportRequestManagerFragment>();
+    private RequestManager requestManager;
     private SupportRequestManagerFragment rootRequestManagerFragment;
 
     public SupportRequestManagerFragment() {
@@ -38,17 +34,9 @@ public class SupportRequestManagerFragment extends Fragment {
 
     // For testing only.
     @SuppressLint("ValidFragment")
-    public SupportRequestManagerFragment(ActivityFragmentLifecycle lifecycle) {
+    public SupportRequestManagerFragment(
+            ActivityFragmentLifecycle lifecycle) {
         this.lifecycle = lifecycle;
-    }
-
-    /**
-     * Sets the current {@link com.bumptech.glide.RequestManager}.
-     *
-     * @param requestManager The manager to set.
-     */
-    public void setRequestManager(RequestManager requestManager) {
-        this.requestManager = requestManager;
     }
 
     ActivityFragmentLifecycle getLifecycle() {
@@ -56,14 +44,25 @@ public class SupportRequestManagerFragment extends Fragment {
     }
 
     /**
-     * Returns the current {@link com.bumptech.glide.RequestManager} or null if none is set.
+     * Returns the current {@link RequestManager} or null if none is set.
      */
     public RequestManager getRequestManager() {
         return requestManager;
     }
 
     /**
-     * Returns the {@link RequestManagerTreeNode} that provides tree traversal methods relative to the associated
+     * Sets the current {@link RequestManager}.
+     *
+     * @param requestManager The manager to set.
+     */
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
+
+    /**
+     * Returns the {@link RequestManagerTreeNode} that provides tree traversal methods relative to
+     * the
+     * associated
      * {@link RequestManager}.
      */
     public RequestManagerTreeNode getRequestManagerTreeNode() {
@@ -79,7 +78,8 @@ public class SupportRequestManagerFragment extends Fragment {
     }
 
     /**
-     * Returns the set of fragments that this RequestManagerFragment's parent is a parent to. (i.e. our parent is
+     * Returns the set of fragments that this RequestManagerFragment's parent is a parent to. (i.e.
+     * our parent is
      * the fragment that we are annotating).
      */
     public Set<SupportRequestManagerFragment> getDescendantRequestManagerFragments() {
@@ -89,9 +89,8 @@ public class SupportRequestManagerFragment extends Fragment {
             return Collections.unmodifiableSet(childRequestManagerFragments);
         } else {
             HashSet<SupportRequestManagerFragment> descendants =
-                new HashSet<SupportRequestManagerFragment>();
-            for (SupportRequestManagerFragment fragment
-                : rootRequestManagerFragment.getDescendantRequestManagerFragments()) {
+                    new HashSet<SupportRequestManagerFragment>();
+            for (SupportRequestManagerFragment fragment : rootRequestManagerFragment.getDescendantRequestManagerFragments()) {
                 if (isDescendant(fragment.getParentFragment())) {
                     descendants.add(fragment);
                 }
@@ -117,18 +116,10 @@ public class SupportRequestManagerFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            rootRequestManagerFragment = RequestManagerRetriever.get()
-                    .getSupportRequestManagerFragment(getActivity().getSupportFragmentManager());
-            if (rootRequestManagerFragment != this) {
-                rootRequestManagerFragment.addChildRequestManagerFragment(this);
-            }
-        } catch (IllegalStateException e) {
-            // OnAttach can be called after the activity is destroyed, see #497.
-            if (Log.isLoggable(TAG, Log.WARN)) {
-                Log.w(TAG, "Unable to register fragment with root", e);
-
-            }
+        rootRequestManagerFragment = RequestManagerRetriever.get()
+                .getSupportRequestManagerFragment(getActivity().getSupportFragmentManager());
+        if (rootRequestManagerFragment != this) {
+            rootRequestManagerFragment.addChildRequestManagerFragment(this);
         }
     }
 
@@ -172,7 +163,8 @@ public class SupportRequestManagerFragment extends Fragment {
     private class SupportFragmentRequestManagerTreeNode implements RequestManagerTreeNode {
         @Override
         public Set<RequestManager> getDescendants() {
-            Set<SupportRequestManagerFragment> descendantFragments = getDescendantRequestManagerFragments();
+            Set<SupportRequestManagerFragment> descendantFragments =
+                    getDescendantRequestManagerFragments();
             HashSet<RequestManager> descendants = new HashSet<RequestManager>(descendantFragments.size());
             for (SupportRequestManagerFragment fragment : descendantFragments) {
                 if (fragment.getRequestManager() != null) {
@@ -180,6 +172,6 @@ public class SupportRequestManagerFragment extends Fragment {
                 }
             }
             return descendants;
-        }
+    }
     }
 }

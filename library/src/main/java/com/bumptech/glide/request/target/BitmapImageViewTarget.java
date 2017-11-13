@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.widget.ImageView;
 
 /**
- * A {@link com.bumptech.glide.request.target.Target} that can display an {@link android.graphics.Bitmap} in an
+ * A {@link Target} that can display an {@link android.graphics.Bitmap} in an
  * {@link android.widget.ImageView}.
  *
  * @see GlideDrawableImageViewTarget

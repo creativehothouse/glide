@@ -4,14 +4,18 @@ import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 
 /**
- * A base class for drawables that are either static equivalents of {@link android.graphics.drawable.BitmapDrawable} or
+ * A base class for drawables that are either static equivalents of {@link
+ * android.graphics.drawable.BitmapDrawable} or
  * that contain an animation.
  */
 public abstract class GlideDrawable extends Drawable implements Animatable {
-    /** A constant indicating that an animated drawable should loop continuously. */
+    /**
+     * A constant indicating that an animated drawable should loop continuously.
+     */
     public static final int LOOP_FOREVER = -1;
     /**
-     * A constant indicating that an animated drawable should loop for its default number of times. For animated GIFs,
+     * A constant indicating that an animated drawable should loop for its default number of times.
+     * For animated GIFs,
      * this constant indicates the GIF should use the netscape loop count if present.
      */
     public static final int LOOP_INTRINSIC = 0;

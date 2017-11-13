@@ -20,7 +20,8 @@ import java.util.Map;
 public class HttpUrlFetcher implements DataFetcher<InputStream> {
     private static final String TAG = "HttpUrlFetcher";
     private static final int MAXIMUM_REDIRECTS = 5;
-    private static final HttpUrlConnectionFactory DEFAULT_CONNECTION_FACTORY = new DefaultHttpUrlConnectionFactory();
+    private static final HttpUrlConnectionFactory DEFAULT_CONNECTION_FACTORY =
+            new DefaultHttpUrlConnectionFactory();
 
     private final GlideUrl glideUrl;
     private final HttpUrlConnectionFactory connectionFactory;
@@ -41,11 +42,12 @@ public class HttpUrlFetcher implements DataFetcher<InputStream> {
 
     @Override
     public InputStream loadData(Priority priority) throws Exception {
-        return loadDataWithRedirects(glideUrl.toURL(), 0 /*redirects*/, null /*lastUrl*/, glideUrl.getHeaders());
+        return loadDataWithRedirects(glideUrl.toURL(), 0 /*redirects*/, null /*lastUrl*/,
+                glideUrl.getHeaders());
     }
 
-    private InputStream loadDataWithRedirects(URL url, int redirects, URL lastUrl, Map<String, String> headers)
-            throws IOException {
+    private InputStream loadDataWithRedirects(URL url, int redirects, URL lastUrl,
+            Map<String, String> headers) throws IOException {
         if (redirects >= MAXIMUM_REDIRECTS) {
             throw new IOException("Too many (> " + MAXIMUM_REDIRECTS + ") redirects!");
         } else {
@@ -61,7 +63,7 @@ public class HttpUrlFetcher implements DataFetcher<InputStream> {
         }
         urlConnection = connectionFactory.build(url);
         for (Map.Entry<String, String> headerEntry : headers.entrySet()) {
-          urlConnection.addRequestProperty(headerEntry.getKey(), headerEntry.getValue());
+            urlConnection.addRequestProperty(headerEntry.getKey(), headerEntry.getValue());
         }
         urlConnection.setConnectTimeout(2500);
         urlConnection.setReadTimeout(2500);
@@ -87,8 +89,9 @@ public class HttpUrlFetcher implements DataFetcher<InputStream> {
             if (statusCode == -1) {
                 throw new IOException("Unable to retrieve response code from HttpUrlConnection.");
             }
-            throw new IOException("Request failed " + statusCode + ": " + urlConnection.getResponseMessage());
-        }
+            throw new IOException(
+                    "Request failed " + statusCode + ": " + urlConnection.getResponseMessage());
+    }
     }
 
     private InputStream getStreamForSuccessfulRequest(HttpURLConnection urlConnection)

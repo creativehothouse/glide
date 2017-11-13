@@ -14,7 +14,8 @@ public class StreamAssetPathFetcher extends AssetPathFetcher<InputStream> {
     }
 
     @Override
-    protected InputStream loadResource(AssetManager assetManager, String path) throws IOException {
+    protected InputStream loadResource(AssetManager assetManager, String path)
+            throws IOException {
         return assetManager.open(path);
     }
 

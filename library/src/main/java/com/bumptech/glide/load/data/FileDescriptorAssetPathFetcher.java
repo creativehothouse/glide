@@ -14,7 +14,8 @@ public class FileDescriptorAssetPathFetcher extends AssetPathFetcher<ParcelFileD
     }
 
     @Override
-    protected ParcelFileDescriptor loadResource(AssetManager assetManager, String path) throws IOException {
+    protected ParcelFileDescriptor loadResource(AssetManager assetManager, String path)
+            throws IOException {
         return assetManager.openFd(path).getParcelFileDescriptor();
     }
 

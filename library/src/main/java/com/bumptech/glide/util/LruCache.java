@@ -4,22 +4,26 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * A general purpose size limited cache that evicts items using an LRU algorithm. By default every item is assumed to
- * have a size of one. Subclasses can override {@link #getSize(Object)}} to change the size on a per item basis.
+ * A general purpose size limited cache that evicts items using an LRU algorithm. By default every
+ * item is assumed to
+ * have a size of one. Subclasses can override {@link #getSize(Object)}} to change the size on a
+ * per
+ * item basis.
  *
  * @param <T> The type of the keys.
  * @param <Y> The type of the values.
  */
 public class LruCache<T, Y> {
     private final LinkedHashMap<T, Y> cache = new LinkedHashMap<T, Y>(100, 0.75f, true);
-    private int maxSize;
     private final int initialMaxSize;
+    private int maxSize;
     private int currentSize = 0;
 
     /**
      * Constructor for LruCache.
      *
-     * @param size The maximum size of the cache, the units must match the units used in {@link #getSize(Object)}.
+     * @param size The maximum size of the cache, the units must match the units used in {@link
+     *             #getSize(Object)}.
      */
     public LruCache(int size) {
         this.initialMaxSize = size;
@@ -27,8 +31,11 @@ public class LruCache<T, Y> {
     }
 
     /**
-     * Sets a size multiplier that will be applied to the size provided in the constructor to set the new size of the
-     * cache. If the new size is less than the current size, entries will be evicted until the current size is less
+     * Sets a size multiplier that will be applied to the size provided in the constructor to set the
+     * new size of the
+     * cache. If the new size is less than the current size, entries will be evicted until the
+     * current
+     * size is less
      * than or equal to the new size.
      *
      * @param multiplier The multiplier to apply.
@@ -42,8 +49,10 @@ public class LruCache<T, Y> {
     }
 
     /**
-     * Returns the size of a given item, defaulting to one. The units must match those used in the size passed in to the
-     * constructor. Subclasses can override this method to return sizes in various units, usually bytes.
+     * Returns the size of a given item, defaulting to one. The units must match those used in the
+     * size passed in to the
+     * constructor. Subclasses can override this method to return sizes in various units, usually
+     * bytes.
      *
      * @param item The item to get the size of.
      */
@@ -54,7 +63,7 @@ public class LruCache<T, Y> {
     /**
      * A callback called whenever an item is evicted from the cache. Subclasses can override.
      *
-     * @param key The key of the evicted item.
+     * @param key  The key of the evicted item.
      * @param item The evicted item.
      */
     protected void onItemEvicted(T key, Y item) {
@@ -95,15 +104,18 @@ public class LruCache<T, Y> {
     }
 
     /**
-     * Adds the given item to the cache with the given key and returns any previous entry for the given key that may
+     * Adds the given item to the cache with the given key and returns any previous entry for the
+     * given key that may
      * have already been in the cache.
-     *
      * <p>
-     *     If the size of the item is larger than the total cache size, the item will not be added to the cache and
-     *     instead {@link #onItemEvicted(Object, Object)} will be called synchronously with the given key and item.
+     * <p>
+     * If the size of the item is larger than the total cache size, the item will not be added to the
+     * cache and
+     * instead {@link #onItemEvicted(Object, Object)} will be called synchronously with the given key
+     * and item.
      * </p>
      *
-     * @param key The key to add the item at.
+     * @param key  The key to add the item at.
      * @param item The item to add.
      */
     public Y put(T key, Y item) {
@@ -147,7 +159,8 @@ public class LruCache<T, Y> {
     }
 
     /**
-     * Removes the least recently used items from the cache until the current size is less than the given size.
+     * Removes the least recently used items from the cache until the current size is less than the
+     * given size.
      *
      * @param size The size the cache should be less than.
      */
@@ -160,7 +173,7 @@ public class LruCache<T, Y> {
             final T key = last.getKey();
             cache.remove(key);
             onItemEvicted(key, toRemove);
-        }
+    }
     }
 
     private void evict() {

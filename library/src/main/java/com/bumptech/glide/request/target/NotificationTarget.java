@@ -1,6 +1,5 @@
 package com.bumptech.glide.request.target;
 
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -10,11 +9,13 @@ import android.widget.RemoteViews;
 import com.bumptech.glide.request.animation.GlideAnimation;
 
 /**
- * This class is used to display downloaded Bitmap inside an ImageView of a Notification through RemoteViews.
- *
+ * This class is used to display downloaded Bitmap inside an ImageView of a Notification through
+ * RemoteViews.
  * <p>
- *     Note - For cancellation to work correctly, you must pass in the same instance of this class for every subsequent
- *     load.
+ * <p>
+ * Note - For cancellation to work correctly, you must pass in the same instance of this class for
+ * every subsequent
+ * load.
  * </p>
  */
 public class NotificationTarget extends SimpleTarget<Bitmap> {
@@ -26,36 +27,38 @@ public class NotificationTarget extends SimpleTarget<Bitmap> {
     private final int viewId;
 
     /**
-     * Constructor using a Notification object and a notificationId to get a handle on the Notification in order to
+     * Constructor using a Notification object and a notificationId to get a handle on the
+     * Notification in order to
      * update it that uses {@link #SIZE_ORIGINAL} as the target width and height.
      *
-     * @param context     Context to use in the AppWidgetManager initialization.
-     * @param remoteViews RemoteViews object which contains the ImageView that will load the bitmap.
-     * @param viewId      The id of the ImageView view that will load the image.
-     * @param notification The Notification object that we want to update.
+     * @param context        Context to use in the AppWidgetManager initialization.
+     * @param remoteViews    RemoteViews object which contains the ImageView that will load the bitmap.
+     * @param viewId         The id of the ImageView view that will load the image.
+     * @param notification   The Notification object that we want to update.
      * @param notificationId The notificationId of the Notification that we want to load the Bitmap.
      */
-    public NotificationTarget(Context context, RemoteViews remoteViews, int viewId, Notification notification,
-            int  notificationId) {
+    public NotificationTarget(Context context, RemoteViews remoteViews, int viewId,
+            Notification notification, int notificationId) {
         this(context, remoteViews, viewId, SIZE_ORIGINAL, SIZE_ORIGINAL, notification, notificationId);
     }
 
     /**
-     * Constructor using a Notification object and a notificationId to get a handle on the Notification in order to
+     * Constructor using a Notification object and a notificationId to get a handle on the
+     * Notification in order to
      * update it.
      *
-     * @param context     Context to use in the AppWidgetManager initialization.
-     * @param remoteViews RemoteViews object which contains the ImageView that will load the bitmap.
-     * @param viewId      The id of the ImageView view that will load the image.
-     * @param width       Desired width of the bitmap that will be loaded.(Need to be manually set
-     *                    because of RemoteViews limitations.)
-     * @param height      Desired height of the bitmap that will be loaded. (Need to be manually set
-     *                    because of RemoteViews limitations.)
-     * @param notification The Notification object that we want to update.
+     * @param context        Context to use in the AppWidgetManager initialization.
+     * @param remoteViews    RemoteViews object which contains the ImageView that will load the bitmap.
+     * @param viewId         The id of the ImageView view that will load the image.
+     * @param width          Desired width of the bitmap that will be loaded.(Need to be manually set
+     *                       because of RemoteViews limitations.)
+     * @param height         Desired height of the bitmap that will be loaded. (Need to be manually set
+     *                       because of RemoteViews limitations.)
+     * @param notification   The Notification object that we want to update.
      * @param notificationId The notificationId of the Notification that we want to load the Bitmap.
      */
-    public NotificationTarget(Context context, RemoteViews remoteViews, int viewId, int width, int height,
-            Notification notification, int notificationId) {
+    public NotificationTarget(Context context, RemoteViews remoteViews, int viewId, int width,
+            int height, Notification notification, int notificationId) {
         super(width, height);
         if (context == null) {
             throw new NullPointerException("Context must not be null!");
@@ -77,8 +80,8 @@ public class NotificationTarget extends SimpleTarget<Bitmap> {
      * Updates the Notification after the Bitmap resource is loaded.
      */
     private void update() {
-        NotificationManager manager = (NotificationManager)
-                this.context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager manager =
+                (NotificationManager) this.context.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(this.notificationId, this.notification);
     }
 

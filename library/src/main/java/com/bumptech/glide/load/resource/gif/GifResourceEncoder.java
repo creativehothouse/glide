@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * An {@link com.bumptech.glide.load.ResourceEncoder} that can write
- * {@link com.bumptech.glide.load.resource.gif.GifDrawable} to cache.
+ * An {@link ResourceEncoder} that can write
+ * {@link GifDrawable} to cache.
  */
 public class GifResourceEncoder implements ResourceEncoder<GifDrawable> {
     private static final Factory FACTORY = new Factory();
@@ -59,7 +59,8 @@ public class GifResourceEncoder implements ResourceEncoder<GifDrawable> {
 
         for (int i = 0; i < decoder.getFrameCount(); i++) {
             Bitmap currentFrame = decoder.getNextFrame();
-            Resource<Bitmap> transformedResource = getTransformedFrame(currentFrame, transformation, drawable);
+            Resource<Bitmap> transformedResource =
+                    getTransformedFrame(currentFrame, transformation, drawable);
             try {
                 if (!encoder.addFrame(transformedResource.get())) {
                     return false;
@@ -77,8 +78,13 @@ public class GifResourceEncoder implements ResourceEncoder<GifDrawable> {
         boolean result = encoder.finish();
 
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
-            Log.v(TAG, "Encoded gif with " + decoder.getFrameCount() + " frames and " + drawable.getData().length
-                    + " bytes in " + LogTime.getElapsedMillis(startTime) + " ms");
+            Log.v(TAG, "Encoded gif with "
+                    + decoder.getFrameCount()
+                    + " frames and "
+                    + drawable.getData().length
+                    + " bytes in "
+                    + LogTime.getElapsedMillis(startTime)
+                    + " ms");
         }
 
         return result;
@@ -109,12 +115,13 @@ public class GifResourceEncoder implements ResourceEncoder<GifDrawable> {
         return decoder;
     }
 
-    private Resource<Bitmap> getTransformedFrame(Bitmap currentFrame, Transformation<Bitmap> transformation,
-            GifDrawable drawable) {
+    private Resource<Bitmap> getTransformedFrame(Bitmap currentFrame,
+            Transformation<Bitmap> transformation, GifDrawable drawable) {
         // TODO: what if current frame is null?
         Resource<Bitmap> bitmapResource = factory.buildFrameResource(currentFrame, bitmapPool);
-        Resource<Bitmap> transformedResource = transformation.transform(bitmapResource,
-                drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        Resource<Bitmap> transformedResource =
+                transformation.transform(bitmapResource, drawable.getIntrinsicWidth(),
+                        drawable.getIntrinsicHeight());
         if (!bitmapResource.equals(transformedResource)) {
             bitmapResource.recycle();
         }

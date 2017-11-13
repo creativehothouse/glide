@@ -11,6 +11,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.Request;
 
 import java.lang.ref.WeakReference;
@@ -18,20 +19,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A base {@link Target} for loading {@link android.graphics.Bitmap}s into {@link View}s that provides default
+ * A base {@link Target} for loading {@link android.graphics.Bitmap}s into {@link View}s that
+ * provides default
  * implementations for most most methods and can determine the size of views using a
  * {@link android.view.ViewTreeObserver.OnDrawListener}.
- *
  * <p>
- *     To detect {@link View} reuse in {@link android.widget.ListView} or any {@link android.view.ViewGroup} that reuses
- *     views, this class uses the {@link View#setTag(Object)} method to store some metadata so that if a view is reused,
- *     any previous loads or resources from previous loads can be cancelled or reused.
+ * <p>
+ * To detect {@link View} reuse in {@link android.widget.ListView} or any {@link
+ * android.view.ViewGroup} that reuses
+ * views, this class uses the {@link View#setTag(Object)} method to store some metadata so that if
+ * a
+ * view is reused,
+ * any previous loads or resources from previous loads can be cancelled or reused.
  * </p>
- *
  * <p>
- *     Any calls to {@link View#setTag(Object)}} on a View given to this class will result in excessive allocations and
- *     and/or {@link IllegalArgumentException}s. If you must call {@link View#setTag(Object)} on a view, consider
- *     using {@link BaseTarget} or {@link SimpleTarget} instead.
+ * <p>
+ * Any calls to {@link View#setTag(Object)}} on a View given to this class will result in excessive
+ * allocations and
+ * and/or {@link IllegalArgumentException}s. If you must call {@link View#setTag(Object)} on a
+ * view,
+ * consider
+ * using {@link BaseTarget} or {@link SimpleTarget} instead.
  * </p>
  *
  * @param <T> The specific subclass of view wrapped by this target.
@@ -45,20 +53,28 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
     protected final T view;
     private final SizeDeterminer sizeDeterminer;
 
+    public ViewTarget(T view) {
+        if (view == null) {
+            throw new NullPointerException("View must not be null!");
+        }
+        this.view = view;
+        sizeDeterminer = new SizeDeterminer(view);
+    }
+
     /**
      * Sets the android resource id to use in conjunction with {@link View#setTag(int, Object)}
      * to store temporary state allowing loads to be automatically cancelled and resources re-used
      * in scrolling lists.
-     *
      * <p>
-     *   If no tag id is set, Glide will use {@link View#setTag(Object)}.
+     * <p>
+     * If no tag id is set, Glide will use {@link View#setTag(Object)}.
      * </p>
-     *
      * <p>
-     *   Warning: prior to Android 4.0 tags were stored in a static map. Using this method prior
-     *   to Android 4.0 may cause memory leaks and isn't recommended. If you do use this method
-     *   on older versions, be sure to call {@link com.bumptech.glide.Glide#clear(View)} on any view
-     *   you start a load into to ensure that the static state is removed.
+     * <p>
+     * Warning: prior to Android 4.0 tags were stored in a static map. Using this method prior
+     * to Android 4.0 may cause memory leaks and isn't recommended. If you do use this method
+     * on older versions, be sure to call {@link Glide#clear(View)} on any view
+     * you start a load into to ensure that the static state is removed.
      * </p>
      *
      * @param tagId The android resource to use.
@@ -66,17 +82,9 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
     public static void setTagId(int tagId) {
         if (ViewTarget.tagId != null || isTagUsedAtLeastOnce) {
             throw new IllegalArgumentException("You cannot set the tag id more than once or change"
-                + " the tag id after the first request has been made");
+                    + " the tag id after the first request has been made");
         }
         ViewTarget.tagId = tagId;
-    }
-
-    public ViewTarget(T view) {
-        if (view == null) {
-            throw new NullPointerException("View must not be null!");
-        }
-        this.view = view;
-        sizeDeterminer = new SizeDeterminer(view);
     }
 
     /**
@@ -90,7 +98,8 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
      * Determines the size of the view by first checking {@link android.view.View#getWidth()} and
      * {@link android.view.View#getHeight()}. If one or both are zero, it then checks the view's
      * {@link LayoutParams}. If one or both of the params width and height are less than or
-     * equal to zero, it then adds an {@link android.view.ViewTreeObserver.OnPreDrawListener} which waits until the view
+     * equal to zero, it then adds an {@link android.view.ViewTreeObserver.OnPreDrawListener} which
+     * waits until the view
      * has been measured before calling the callback with the view's drawn width and height.
      *
      * @param cb {@inheritDoc}
@@ -98,6 +107,38 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
     @Override
     public void getSize(SizeReadyCallback cb) {
         sizeDeterminer.getSize(cb);
+    }
+
+    /**
+     * Returns any stored request using {@link android.view.View#getTag()}.
+     * <p>
+     * <p>
+     * For Glide to function correctly, Glide must be the only thing that calls {@link
+     * View#setTag(Object)}. If the
+     * tag is cleared or set to another object type, Glide will not be able to retrieve and cancel
+     * previous loads
+     * which will not only prevent Glide from reusing resource, but will also result in incorrect
+     * images being
+     * loaded and lots of flashing of images in lists. As a result, this will throw an
+     * {@link java.lang.IllegalArgumentException} if {@link android.view.View#getTag()}} returns a
+     * non
+     * null object
+     * that is not an {@link Request}.
+     * </p>
+     */
+    @Override
+    public Request getRequest() {
+        Object tag = getTag();
+        Request request = null;
+        if (tag != null) {
+            if (tag instanceof Request) {
+                request = (Request) tag;
+            } else {
+                throw new IllegalArgumentException(
+                        "You must not call setTag() on a view Glide is targeting");
+            }
+        }
+        return request;
     }
 
     /**
@@ -110,30 +151,12 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
         setTag(request);
     }
 
-    /**
-     * Returns any stored request using {@link android.view.View#getTag()}.
-     *
-     * <p>
-     *     For Glide to function correctly, Glide must be the only thing that calls {@link View#setTag(Object)}. If the
-     *     tag is cleared or set to another object type, Glide will not be able to retrieve and cancel previous loads
-     *     which will not only prevent Glide from reusing resource, but will also result in incorrect images being
-     *     loaded and lots of flashing of images in lists. As a result, this will throw an
-     *     {@link java.lang.IllegalArgumentException} if {@link android.view.View#getTag()}} returns a non null object
-     *     that is not an {@link com.bumptech.glide.request.Request}.
-     * </p>
-     */
-    @Override
-    public Request getRequest() {
-        Object tag = getTag();
-        Request request = null;
-        if (tag != null) {
-            if (tag instanceof Request) {
-                request = (Request) tag;
-            } else {
-                throw new IllegalArgumentException("You must not call setTag() on a view Glide is targeting");
-            }
+    private Object getTag() {
+        if (tagId == null) {
+            return view.getTag();
+        } else {
+            return view.getTag(tagId);
         }
-        return request;
     }
 
     private void setTag(Object tag) {
@@ -142,14 +165,6 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
             view.setTag(tag);
         } else {
             view.setTag(tagId, tag);
-        }
-    }
-
-    private Object getTag() {
-        if (tagId == null) {
-            return view.getTag();
-        } else {
-            return view.getTag(tagId);
         }
     }
 
@@ -260,7 +275,8 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
             if (displayDimens != null) {
                 return displayDimens;
             }
-            WindowManager windowManager = (WindowManager) view.getContext().getSystemService(Context.WINDOW_SERVICE);
+            WindowManager windowManager =
+                    (WindowManager) view.getContext().getSystemService(Context.WINDOW_SERVICE);
             Display display = windowManager.getDefaultDisplay();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
                 displayDimens = new Point();
@@ -275,7 +291,8 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
             return size > 0 || size == LayoutParams.WRAP_CONTENT;
         }
 
-        private static class SizeDeterminerLayoutListener implements ViewTreeObserver.OnPreDrawListener {
+        private static class SizeDeterminerLayoutListener
+                implements ViewTreeObserver.OnPreDrawListener {
             private final WeakReference<SizeDeterminer> sizeDeterminerRef;
 
             public SizeDeterminerLayoutListener(SizeDeterminer sizeDeterminer) {
@@ -290,9 +307,9 @@ public abstract class ViewTarget<T extends View, Z> extends BaseTarget<Z> {
                 SizeDeterminer sizeDeterminer = sizeDeterminerRef.get();
                 if (sizeDeterminer != null) {
                     sizeDeterminer.checkCurrentDimens();
-                }
+        }
                 return true;
             }
-        }
+    }
     }
 }

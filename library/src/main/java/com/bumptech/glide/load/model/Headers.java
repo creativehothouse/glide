@@ -29,5 +29,4 @@ public interface Headers {
     Headers DEFAULT = new LazyHeaders.Builder().build();
 
     Map<String, String> getHeaders();
-
 }

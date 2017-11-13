@@ -31,7 +31,8 @@ public class ImageVideoBitmapDecoder implements ResourceDecoder<ImageVideoWrappe
     @SuppressWarnings("resource")
     // @see ResourceDecoder.decode
     @Override
-    public Resource<Bitmap> decode(ImageVideoWrapper source, int width, int height) throws IOException {
+    public Resource<Bitmap> decode(ImageVideoWrapper source, int width, int height)
+            throws IOException {
         Resource<Bitmap> result = null;
         InputStream is = source.getStream();
         if (is != null) {
@@ -40,7 +41,7 @@ public class ImageVideoBitmapDecoder implements ResourceDecoder<ImageVideoWrappe
             } catch (IOException e) {
                 if (Log.isLoggable(TAG, Log.VERBOSE)) {
                     Log.v(TAG, "Failed to load image from stream, trying FileDescriptor", e);
-                }
+        }
             }
         }
 
@@ -55,6 +56,6 @@ public class ImageVideoBitmapDecoder implements ResourceDecoder<ImageVideoWrappe
 
     @Override
     public String getId() {
-        return "ImageVideoBitmapDecoder.com.bumptech.glide.load.resource.bitmap";
+        return "ImageVideoBitmapDecoder.com.jet8.sdk.ui.screen.marketplace.glide.load.resource.bitmap";
     }
 }

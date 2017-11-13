@@ -38,14 +38,13 @@ public class StringSignature implements Key {
     }
 
     @Override
-    public void updateDiskCacheKey(MessageDigest messageDigest) throws UnsupportedEncodingException {
+    public void updateDiskCacheKey(MessageDigest messageDigest)
+            throws UnsupportedEncodingException {
         messageDigest.update(signature.getBytes(STRING_CHARSET_NAME));
     }
 
     @Override
     public String toString() {
-        return "StringSignature{"
-            + "signature='" + signature + '\''
-            + '}';
+        return "StringSignature{" + "signature='" + signature + '\'' + '}';
     }
 }

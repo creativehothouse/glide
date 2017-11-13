@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.InputStream;
 
 /**
- * An {@link com.bumptech.glide.provider.DataLoadProvider} that provides encoders and decoders for for obtaining a
+ * An {@link DataLoadProvider} that provides encoders and decoders for for obtaining a
  * cache file from {@link java.io.InputStream} data.
  */
 public class StreamFileDataLoadProvider implements DataLoadProvider<InputStream, File> {

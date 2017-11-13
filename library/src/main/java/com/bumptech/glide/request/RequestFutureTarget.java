@@ -3,6 +3,7 @@ package com.bumptech.glide.request;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.util.Util;
@@ -13,15 +14,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * A {@link java.util.concurrent.Future} implementation for Glide that can be used to load resources in a blocking
+ * A {@link java.util.concurrent.Future} implementation for Glide that can be used to load
+ * resources
+ * in a blocking
  * manner on background threads.
- *
  * <p>
- *     Note - Unlike most targets, RequestFutureTargets can be used once and only once. Attempting to reuse a
- *     RequestFutureTarget will probably result in undesirable behavior or exceptions. Instead of reusing
- *     objects of this class, the pattern should be:
- *
- *     <pre>
+ * <p>
+ * Note - Unlike most targets, RequestFutureTargets can be used once and only once. Attempting to
+ * reuse a
+ * RequestFutureTarget will probably result in undesirable behavior or exceptions. Instead of
+ * reusing
+ * objects of this class, the pattern should be:
+ * <p>
+ * <pre>
  *     {@code
  *      RequestFutureTarget target = Glide.load("")...
  *     Object resource = target.get();
@@ -29,7 +34,7 @@ import java.util.concurrent.TimeoutException;
  *     Glide.clear(target);
  *     }
  *     </pre>
- *     The {@link com.bumptech.glide.Glide#clear(FutureTarget)} call will make sure any resources used are recycled.
+ * The {@link Glide#clear(FutureTarget)} call will make sure any resources used are recycled.
  * </p>
  *
  * @param <T> The type of the data to load.
@@ -59,7 +64,8 @@ public class RequestFutureTarget<T, R> implements FutureTarget<R>, Runnable {
         this(mainHandler, width, height, true, DEFAULT_WAITER);
     }
 
-    RequestFutureTarget(Handler mainHandler, int width, int height, boolean assertBackgroundThread, Waiter waiter) {
+    RequestFutureTarget(Handler mainHandler, int width, int height, boolean assertBackgroundThread,
+            Waiter waiter) {
         this.mainHandler = mainHandler;
         this.width = width;
         this.height = height;
@@ -104,7 +110,8 @@ public class RequestFutureTarget<T, R> implements FutureTarget<R>, Runnable {
     }
 
     @Override
-    public R get(long time, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
+    public R get(long time, TimeUnit timeUnit)
+            throws InterruptedException, ExecutionException, TimeoutException {
         return doGet(timeUnit.toMillis(time));
     }
 
@@ -117,13 +124,13 @@ public class RequestFutureTarget<T, R> implements FutureTarget<R>, Runnable {
     }
 
     @Override
-    public void setRequest(Request request) {
-        this.request = request;
+    public Request getRequest() {
+        return request;
     }
 
     @Override
-    public Request getRequest() {
-        return request;
+    public void setRequest(Request request) {
+        this.request = request;
     }
 
     /**
@@ -147,7 +154,7 @@ public class RequestFutureTarget<T, R> implements FutureTarget<R>, Runnable {
      */
     @Override
     public synchronized void onLoadFailed(Exception e, Drawable errorDrawable) {
-         // We might get a null exception.
+        // We might get a null exception.
         exceptionReceived = true;
         this.exception = e;
         waiter.notifyAll(this);
@@ -157,14 +164,16 @@ public class RequestFutureTarget<T, R> implements FutureTarget<R>, Runnable {
      * A callback that should never be invoked directly.
      */
     @Override
-    public synchronized void onResourceReady(R resource, GlideAnimation<? super R> glideAnimation) {
+    public synchronized void onResourceReady(R resource,
+            GlideAnimation<? super R> glideAnimation) {
         // We might get a null result.
         resultReceived = true;
         this.resource = resource;
         waiter.notifyAll(this);
     }
 
-    private synchronized R doGet(Long timeoutMillis) throws ExecutionException, InterruptedException, TimeoutException {
+    private synchronized R doGet(Long timeoutMillis)
+            throws ExecutionException, InterruptedException, TimeoutException {
         if (assertBackgroundThread) {
             Util.assertBackgroundThread();
         }
@@ -208,7 +217,8 @@ public class RequestFutureTarget<T, R> implements FutureTarget<R>, Runnable {
     }
 
     /**
-     * Can be safely called from either the main thread or a background thread to cleanup the resources used by this
+     * Can be safely called from either the main thread or a background thread to cleanup the
+     * resources used by this
      * target.
      */
     @Override
@@ -240,6 +250,6 @@ public class RequestFutureTarget<T, R> implements FutureTarget<R>, Runnable {
 
         public void notifyAll(Object toNotify) {
             toNotify.notifyAll();
-        }
+    }
     }
 }

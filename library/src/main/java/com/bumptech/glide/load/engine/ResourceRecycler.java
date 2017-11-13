@@ -10,8 +10,9 @@ import com.bumptech.glide.util.Util;
  * A class that can safely recycle recursive resources.
  */
 class ResourceRecycler {
+    private final Handler handler =
+            new Handler(Looper.getMainLooper(), new ResourceRecyclerCallback());
     private boolean isRecycling;
-    private final Handler handler = new Handler(Looper.getMainLooper(), new ResourceRecyclerCallback());
 
     public void recycle(Resource<?> resource) {
         Util.assertMainThread();
@@ -24,7 +25,7 @@ class ResourceRecycler {
             isRecycling = true;
             resource.recycle();
             isRecycling = false;
-        }
+    }
     }
 
     private static class ResourceRecyclerCallback implements Handler.Callback {

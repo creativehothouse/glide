@@ -1,7 +1,5 @@
 package com.bumptech.glide.gifdecoder;
 
-import static com.bumptech.glide.gifdecoder.GifDecoder.STATUS_FORMAT_ERROR;
-
 import android.util.Log;
 
 import java.nio.BufferUnderflowException;
@@ -10,7 +8,7 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 
 /**
- * A class responsible for creating {@link com.bumptech.glide.gifdecoder.GifHeader}s from data representing animated
+ * A class responsible for creating {@link GifHeader}s from data representing animated
  * gifs.
  */
 public class GifHeaderParser {
@@ -66,7 +64,7 @@ public class GifHeaderParser {
         if (!err()) {
             readContents();
             if (header.frameCount < 0) {
-                header.status = STATUS_FORMAT_ERROR;
+                header.status = GifDecoder.STATUS_FORMAT_ERROR;
             }
         }
 
@@ -136,7 +134,7 @@ public class GifHeaderParser {
                 // Bad byte, but keep going and see what happens break;
                 case 0x00:
                 default:
-                    header.status = STATUS_FORMAT_ERROR;
+                    header.status = GifDecoder.STATUS_FORMAT_ERROR;
             }
         }
     }
@@ -209,6 +207,7 @@ public class GifHeaderParser {
         // Add image to frame.
         header.frames.add(header.currentFrame);
     }
+
     /**
      * Reads Netscape extension to obtain iteration count.
      */
@@ -224,7 +223,6 @@ public class GifHeaderParser {
         } while ((blockSize > 0) && !err());
     }
 
-
     /**
      * Reads GIF file header information.
      */
@@ -234,7 +232,7 @@ public class GifHeaderParser {
             id += (char) read();
         }
         if (!id.startsWith("GIF")) {
-            header.status = STATUS_FORMAT_ERROR;
+            header.status = GifDecoder.STATUS_FORMAT_ERROR;
             return;
         }
         readLSD();
@@ -243,6 +241,7 @@ public class GifHeaderParser {
             header.bgColor = header.gct[header.bgIndex];
         }
     }
+
     /**
      * Reads Logical Screen Descriptor.
      */
@@ -293,7 +292,7 @@ public class GifHeaderParser {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "Format Error Reading Color Table", e);
             }
-            header.status = STATUS_FORMAT_ERROR;
+            header.status = GifDecoder.STATUS_FORMAT_ERROR;
         }
 
         return tab;
@@ -339,9 +338,10 @@ public class GifHeaderParser {
                 }
             } catch (Exception e) {
                 if (Log.isLoggable(TAG, Log.DEBUG)) {
-                    Log.d(TAG, "Error Reading Block n: " + n + " count: " + count + " blockSize: " + blockSize, e);
+                    Log.d(TAG,
+                            "Error Reading Block n: " + n + " count: " + count + " blockSize: " + blockSize, e);
                 }
-                header.status = STATUS_FORMAT_ERROR;
+                header.status = GifDecoder.STATUS_FORMAT_ERROR;
             }
         }
         return n;
@@ -355,7 +355,7 @@ public class GifHeaderParser {
         try {
             curByte = rawData.get() & 0xFF;
         } catch (Exception e) {
-            header.status = STATUS_FORMAT_ERROR;
+            header.status = GifDecoder.STATUS_FORMAT_ERROR;
         }
         return curByte;
     }

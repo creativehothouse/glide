@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.InputStream;
 
 /**
- * A {@link com.bumptech.glide.provider.DataLoadProvider} for loading either an {@link java.io.InputStream} or an
+ * A {@link DataLoadProvider} for loading either an {@link java.io.InputStream} or an
  * {@link android.os.ParcelFileDescriptor} as an {@link android.graphics.Bitmap}.
  */
 public class ImageVideoDataLoadProvider implements DataLoadProvider<ImageVideoWrapper, Bitmap> {

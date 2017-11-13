@@ -1,0 +1,54 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+version = '0.5.1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+    //compile 'com.google.guava:guava:18.0'
+    ////compile group: 'commons-io', name: 'commons-io', version: '2.4'
+    //testCompile group: 'junit', name: 'junit', version: '4.+'
+    //testCompile group: 'commons-cli', name: 'commons-cli', version: '1.2'
+    testCompile 'junit:junit:4.12'
+}
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+//version = '0.1'
+jar {
+    baseName = 'japng'
+    manifest {
+        attributes 'Implementation-Title': 'japng',
+                'Implementation-Version': version,
+                'Implementation-Vendor': 'https://github.com/aellerton/'
+        attributes provider: 'gradle'
+        // 'A Java-only library for reading and processing PNG and APNG files.'
+    }
+}
+
+uploadArchives {
+    repositories {
+        flatDir {
+            dirs 'repos'
+        }
+    }
+}
+
+task dist(type: Zip) {
+    dependsOn jar
+    from 'src/dist'
+    into('libs') {
+        //from spiJar.archivePath
+        from configurations.runtime
+    }
+}
+
+artifacts {
+    archives dist
+}
+

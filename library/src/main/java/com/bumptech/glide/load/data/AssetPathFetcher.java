@@ -8,7 +8,8 @@ import com.bumptech.glide.Priority;
 import java.io.IOException;
 
 /**
- * An abstract class for obtaining data for an asset path using an {@link android.content.res.AssetManager}.
+ * An abstract class for obtaining data for an asset path using an {@link
+ * android.content.res.AssetManager}.
  *
  * @param <T> The type of data obtained from the asset path (InputStream, FileDescriptor etc).
  */
@@ -40,8 +41,7 @@ public abstract class AssetPathFetcher<T> implements DataFetcher<T> {
             if (Log.isLoggable(TAG, Log.VERBOSE)) {
                 Log.v(TAG, "Failed to close data", e);
             }
-        }
-
+    }
     }
 
     @Override
@@ -55,11 +55,12 @@ public abstract class AssetPathFetcher<T> implements DataFetcher<T> {
     }
 
     /**
-     * Opens the given asset path with the given {@link android.content.res.AssetManager} and returns the conrete data
+     * Opens the given asset path with the given {@link android.content.res.AssetManager} and returns
+     * the conrete data
      * type returned by the AssetManager.
      *
      * @param assetManager An AssetManager to use to open the given path.
-     * @param path A string path pointing to a resource in assets to open.
+     * @param path         A string path pointing to a resource in assets to open.
      */
     protected abstract T loadResource(AssetManager assetManager, String path) throws IOException;
 

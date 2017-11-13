@@ -19,12 +19,14 @@ public class RequestTracker {
     // this context for view targets. Despite the side affects, WeakReferences are still essentially required. A user
     // can always make repeated requests into targets other than views, or use an activity manager in a fragment pager
     // where holding strong references would steadily leak bitmaps and/or views.
-    private final Set<Request> requests = Collections.newSetFromMap(new WeakHashMap<Request, Boolean>());
+    private final Set<Request> requests =
+            Collections.newSetFromMap(new WeakHashMap<Request, Boolean>());
     // A set of requests that have not completed and are queued to be run again. We use this list to maintain hard
     // references to these requests to ensure that they are not garbage collected before they start running or
     // while they are paused. See #346.
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private final List<Request> pendingRequests = new ArrayList<Request>();
+    private final List<Request>
+            pendingRequests = new ArrayList<Request>();
 
     private boolean isPaused;
 
@@ -108,8 +110,8 @@ public class RequestTracker {
                     request.begin();
                 } else {
                     pendingRequests.add(request);
-                }
-            }
         }
+            }
+    }
     }
 }

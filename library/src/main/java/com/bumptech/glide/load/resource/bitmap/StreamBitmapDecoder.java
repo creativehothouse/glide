@@ -12,12 +12,13 @@ import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import java.io.InputStream;
 
 /**
- * An {@link com.bumptech.glide.load.ResourceDecoder} that uses an
- * {@link com.bumptech.glide.load.resource.bitmap.Downsampler} to decode an {@link android.graphics.Bitmap} from an
+ * An {@link ResourceDecoder} that uses an
+ * {@link Downsampler} to decode an {@link android.graphics.Bitmap} from an
  * {@link java.io.InputStream}.
  */
 public class StreamBitmapDecoder implements ResourceDecoder<InputStream, Bitmap> {
-    private static final String ID = "StreamBitmapDecoder.com.bumptech.glide.load.resource.bitmap";
+    private static final String ID =
+            "StreamBitmapDecoder.com.jet8.sdk.ui.screen.marketplace.glide.load.resource.bitmap";
     private final Downsampler downsampler;
     private BitmapPool bitmapPool;
     private DecodeFormat decodeFormat;
@@ -39,7 +40,8 @@ public class StreamBitmapDecoder implements ResourceDecoder<InputStream, Bitmap>
         this(Downsampler.AT_LEAST, bitmapPool, decodeFormat);
     }
 
-    public StreamBitmapDecoder(Downsampler downsampler, BitmapPool bitmapPool, DecodeFormat decodeFormat) {
+    public StreamBitmapDecoder(Downsampler downsampler, BitmapPool bitmapPool,
+            DecodeFormat decodeFormat) {
         this.downsampler = downsampler;
         this.bitmapPool = bitmapPool;
         this.decodeFormat = decodeFormat;
@@ -54,11 +56,10 @@ public class StreamBitmapDecoder implements ResourceDecoder<InputStream, Bitmap>
     @Override
     public String getId() {
         if (id == null) {
-            id = new StringBuilder()
-                .append(ID)
-                .append(downsampler.getId())
-                .append(decodeFormat.name())
-                .toString();
+            id = new StringBuilder().append(ID)
+                    .append(downsampler.getId())
+                    .append(decodeFormat.name())
+                    .toString();
         }
         return id;
     }

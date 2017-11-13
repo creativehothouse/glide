@@ -2,8 +2,10 @@ package com.bumptech.glide.load.engine.prefill;
 
 import android.graphics.Bitmap;
 
+import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
+
 /**
- * A container for a set of options used to pre-fill a {@link com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool}
+ * A container for a set of options used to pre-fill a {@link BitmapPool}
  * with {@link Bitmap Bitmaps} of a single size and configuration.
  */
 public final class PreFillType {
@@ -17,14 +19,16 @@ public final class PreFillType {
     /**
      * Constructor for a single type of {@link android.graphics.Bitmap}.
      *
-     * @param width The width in pixels of the {@link android.graphics.Bitmap Bitmaps} to
-     *              pre-fill.
+     * @param width  The width in pixels of the {@link android.graphics.Bitmap Bitmaps} to
+     *               pre-fill.
      * @param height The height in pixels of the {@link android.graphics.Bitmap Bitmaps} to
      *               pre-fill.
-     * @param config The {@link android.graphics.Bitmap.Config} of the {@link android.graphics.Bitmap Bitmaps} to
+     * @param config The {@link android.graphics.Bitmap.Config} of the {@link android.graphics.Bitmap
+     *               Bitmaps} to
      *               pre-fill.
      * @param weight An integer indicating how to balance pre-filling this size and configuration of
-     * {@link android.graphics.Bitmap} against any other sizes/configurations that may be being pre-filled.
+     *               {@link android.graphics.Bitmap} against any other sizes/configurations that may be being
+     *               pre-filled.
      */
     PreFillType(int width, int height, Bitmap.Config config, int weight) {
         if (config == null) {
@@ -52,7 +56,8 @@ public final class PreFillType {
     }
 
     /**
-     * Returns the {@link android.graphics.Bitmap.Config} of the {@link android.graphics.Bitmap Bitmaps}.
+     * Returns the {@link android.graphics.Bitmap.Config} of the {@link android.graphics.Bitmap
+     * Bitmaps}.
      */
     Bitmap.Config getConfig() {
         return config;
@@ -89,15 +94,19 @@ public final class PreFillType {
     @Override
     public String toString() {
         return "PreFillSize{"
-                + "width=" + width
-                + ", height=" + height
-                + ", config=" + config
-                + ", weight=" + weight
+                + "width="
+                + width
+                + ", height="
+                + height
+                + ", config="
+                + config
+                + ", weight="
+                + weight
                 + '}';
     }
 
     /**
-     * Builder for {@link PreFillType}.
+     * MarketplaceBuilder for {@link PreFillType}.
      */
     public static class Builder {
         private final int width;
@@ -107,7 +116,9 @@ public final class PreFillType {
         private int weight = 1;
 
         /**
-         * Constructor for a builder that uses the given size as the width and height of the Bitmaps to prefill.
+         * Constructor for a builder that uses the given size as the width and height of the Bitmaps to
+         * prefill.
+         *
          * @param size The width and height in pixels of the Bitmaps to prefill.
          */
         public Builder(int size) {
@@ -115,7 +126,9 @@ public final class PreFillType {
         }
 
         /**
-         * Constructor for a builder that uses the given dimensions as the dimensions of the Bitmaps to prefill.
+         * Constructor for a builder that uses the given dimensions as the dimensions of the Bitmaps to
+         * prefill.
+         *
          * @param width The width in pixels of the Bitmaps to prefill.
          * @param height The height in pixels of the Bitmaps to prefill.
          */
@@ -131,7 +144,15 @@ public final class PreFillType {
         }
 
         /**
+         * Returns the current {@link android.graphics.Bitmap.Config}.
+         */
+        Bitmap.Config getConfig() {
+            return config;
+        }
+
+        /**
          * Sets the {@link android.graphics.Bitmap.Config} for the Bitmaps to pre-fill.
+         *
          * @param config The config to use, or null to use Glide's default.
          * @return This builder.
          */
@@ -141,17 +162,15 @@ public final class PreFillType {
         }
 
         /**
-         * Returns the current {@link android.graphics.Bitmap.Config}.
-         */
-        Bitmap.Config getConfig() {
-            return config;
-        }
-
-        /**
-         * Sets the weight to use to balance how many Bitmaps of this type are prefilled relative to the other requested
+         * Sets the weight to use to balance how many Bitmaps of this type are prefilled relative to
+         * the
+         * other requested
          * types.
-         * @param weight An integer indicating how to balance pre-filling this size and configuration of
-         * {@link android.graphics.Bitmap} against any other sizes/configurations that may be being pre-filled.
+         *
+         * @param weight An integer indicating how to balance pre-filling this size and configuration
+         * of
+         * {@link android.graphics.Bitmap} against any other sizes/configurations that may be being
+         * pre-filled.
          * @return This builder.
          */
         public Builder setWeight(int weight) {
@@ -167,6 +186,6 @@ public final class PreFillType {
          */
         PreFillType build() {
             return new PreFillType(width, height, config, weight);
-        }
+    }
     }
 }

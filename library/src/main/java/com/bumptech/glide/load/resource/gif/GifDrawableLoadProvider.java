@@ -14,8 +14,8 @@ import java.io.File;
 import java.io.InputStream;
 
 /**
- * An {@link com.bumptech.glide.provider.DataLoadProvider} that loads an {@link java.io.InputStream} into
- * {@link com.bumptech.glide.load.resource.gif.GifDrawable} that can be used to display an animated GIF.
+ * An {@link DataLoadProvider} that loads an {@link java.io.InputStream} into
+ * {@link GifDrawable} that can be used to display an animated GIF.
  */
 public class GifDrawableLoadProvider implements DataLoadProvider<InputStream, GifDrawable> {
     private final GifResourceDecoder decoder;

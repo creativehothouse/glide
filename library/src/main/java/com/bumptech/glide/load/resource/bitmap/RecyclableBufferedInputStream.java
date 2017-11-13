@@ -30,9 +30,9 @@ import java.io.InputStream;
  * drawback is that some extra space is required to hold the buffer and that
  * copying takes place when filling that buffer, but this is usually outweighed
  * by the performance benefits.
- *
+ * <p>
  * <p>A typical application pattern for the class looks like this:</p>
- *
+ * <p>
  * <pre>
  * BufferedInputStream buf = new BufferedInputStream(new FileInputStream("file.java"));
  * </pre>
@@ -74,6 +74,10 @@ public class RecyclableBufferedInputStream extends FilterInputStream {
         buf = buffer;
     }
 
+    private static IOException streamClosed() throws IOException {
+        throw new IOException("BufferedInputStream is closed");
+    }
+
     /**
      * Returns an estimated number of bytes that can be read or skipped without blocking for more
      * input. This method returns the number of bytes available in the buffer
@@ -93,14 +97,10 @@ public class RecyclableBufferedInputStream extends FilterInputStream {
         return count - pos + localIn.available();
     }
 
-    private static IOException streamClosed() throws IOException {
-        throw new IOException("BufferedInputStream is closed");
-    }
-
     /**
      * Reduces the mark limit to match the current buffer length to prevent the buffer from
      * continuing to increase in size.
-     *
+     * <p>
      * <p>Subsequent calls to {@link #mark(int)} will be obeyed and may cause the buffer size
      * to increase.
      */
@@ -112,8 +112,7 @@ public class RecyclableBufferedInputStream extends FilterInputStream {
      * Closes this stream. The source stream is closed and any resources
      * associated with it are released.
      *
-     * @throws IOException
-     *             if an error occurs while closing this stream.
+     * @throws IOException if an error occurs while closing this stream.
      */
     @Override
     public void close() throws IOException {
@@ -125,8 +124,7 @@ public class RecyclableBufferedInputStream extends FilterInputStream {
         }
     }
 
-    private int fillbuf(InputStream localIn, byte[] localBuf)
-            throws IOException {
+    private int fillbuf(InputStream localIn, byte[] localBuf) throws IOException {
         if (markpos == -1 || pos - markpos >= marklimit) {
             // Mark position not set or exceeded readlimit
             int result = localIn.read(localBuf);
@@ -157,8 +155,7 @@ public class RecyclableBufferedInputStream extends FilterInputStream {
             // FIXME: what if buf was null?
             localBuf = buf = newbuf;
         } else if (markpos > 0) {
-            System.arraycopy(localBuf, markpos, localBuf, 0, localBuf.length
-                    - markpos);
+            System.arraycopy(localBuf, markpos, localBuf, 0, localBuf.length - markpos);
         }
         // Set the new position and mark position
         pos -= markpos;
@@ -176,9 +173,8 @@ public class RecyclableBufferedInputStream extends FilterInputStream {
      * buffer may be increased in size to allow {@code readlimit} number of
      * bytes to be supported.
      *
-     * @param readlimit
-     *            the number of bytes that can be read before the mark is
-     *            invalidated.
+     * @param readlimit the number of bytes that can be read before the mark is
+     *                  invalidated.
      * @see #reset()
      */
     @Override
@@ -211,9 +207,8 @@ public class RecyclableBufferedInputStream extends FilterInputStream {
      * it is filled from the source stream and the first byte is returned.
      *
      * @return the byte read or -1 if the end of the source stream has been
-     *         reached.
-     * @throws IOException
-     *             if this stream is closed or another IOException occurs.
+     * reached.
+     * @throws IOException if this stream is closed or another IOException occurs.
      */
     @Override
     public synchronized int read() throws IOException {
@@ -254,19 +249,17 @@ public class RecyclableBufferedInputStream extends FilterInputStream {
      * the receiver's buffer size, this implementation bypasses the buffer and
      * simply places the results directly into {@code buffer}.
      *
-     * @param buffer
-     *            the byte array in which to store the bytes read.
+     * @param buffer the byte array in which to store the bytes read.
      * @return the number of bytes actually read or -1 if end of stream.
-     * @throws IndexOutOfBoundsException
-     *             if {@code offset < 0} or {@code byteCount < 0}, or if
-     *             {@code offset + byteCount} is greater than the size of
-     *             {@code buffer}.
-     * @throws IOException
-     *             if the stream is already closed or another IOException
-     *             occurs.
+     * @throws IndexOutOfBoundsException if {@code offset < 0} or {@code byteCount < 0}, or if
+     *                                   {@code offset + byteCount} is greater than the size of
+     *                                   {@code buffer}.
+     * @throws IOException               if the stream is already closed or another IOException
+     *                                   occurs.
      */
     @Override
-    public synchronized int read(byte[] buffer, int offset, int byteCount) throws IOException {
+    public synchronized int read(byte[] buffer, int offset, int byteCount)
+            throws IOException {
         // Use local ref since buf may be invalidated by an unsynchronized close()
         byte[] localBuf = buf;
         if (localBuf == null) {
@@ -335,10 +328,9 @@ public class RecyclableBufferedInputStream extends FilterInputStream {
     /**
      * Resets this stream to the last marked location.
      *
-     * @throws IOException
-     *             if this stream is closed, no mark has been set or the mark is
-     *             no longer valid because more than {@code readlimit} bytes
-     *             have been read since setting the mark.
+     * @throws IOException if this stream is closed, no mark has been set or the mark is
+     * no longer valid because more than {@code readlimit} bytes
+     * have been read since setting the mark.
      * @see #mark(int)
      */
     @Override
@@ -357,12 +349,10 @@ public class RecyclableBufferedInputStream extends FilterInputStream {
      * {@link #read} will not return these bytes unless {@link #reset} is
      * used.
      *
-     * @param byteCount
-     *            the number of bytes to skip. {@link #skip} does nothing and
-     *            returns 0 if {@code byteCount} is less than zero.
+     * @param byteCount the number of bytes to skip. {@link #skip} does nothing and
+     *                  returns 0 if {@code byteCount} is less than zero.
      * @return the number of bytes actually skipped.
-     * @throws IOException
-     *             if this stream is closed or another IOException occurs.
+     * @throws IOException if this stream is closed or another IOException occurs.
      */
     @Override
     public synchronized long skip(long byteCount) throws IOException {
@@ -403,7 +393,8 @@ public class RecyclableBufferedInputStream extends FilterInputStream {
     }
 
     /**
-     * An exception thrown when a mark can no longer be obeyed because the underlying buffer size is smaller than the
+     * An exception thrown when a mark can no longer be obeyed because the underlying buffer size is
+     * smaller than the
      * amount of data read after the mark position.
      */
     public static class InvalidMarkException extends RuntimeException {
@@ -411,6 +402,6 @@ public class RecyclableBufferedInputStream extends FilterInputStream {
 
         public InvalidMarkException(String detailMessage) {
             super(detailMessage);
-        }
+    }
     }
 }

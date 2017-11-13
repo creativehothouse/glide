@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * A source encoder that writes a {@link com.bumptech.glide.load.model.ImageVideoWrapper} to disk by preferentially
+ * A source encoder that writes a {@link ImageVideoWrapper} to disk by preferentially
  * writing data from the wrapper's {@link java.io.InputStream} and falling back to the wrapper's
  * {@link android.os.ParcelFileDescriptor} if the {@link java.io.InputStream} isn't available.
  */
@@ -29,7 +29,7 @@ public class ImageVideoWrapperEncoder implements Encoder<ImageVideoWrapper> {
             return streamEncoder.encode(data.getStream(), os);
         } else {
             return fileDescriptorEncoder.encode(data.getFileDescriptor(), os);
-        }
+    }
     }
 
     @Override

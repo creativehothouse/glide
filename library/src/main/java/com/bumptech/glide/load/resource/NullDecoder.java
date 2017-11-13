@@ -4,7 +4,7 @@ import com.bumptech.glide.load.ResourceDecoder;
 import com.bumptech.glide.load.engine.Resource;
 
 /**
- * A simple {@link com.bumptech.glide.load.ResourceDecoder} that always returns null.
+ * A simple {@link ResourceDecoder} that always returns null.
  *
  * @param <T> The type of the data that will be ignored by this class.
  * @param <Z> The type of the decoded resource that will always be null.

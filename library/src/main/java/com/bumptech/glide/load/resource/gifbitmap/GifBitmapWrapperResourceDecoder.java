@@ -19,13 +19,13 @@ import java.io.InputStream;
  * An {@link ResourceDecoder} that can decode either an {@link Bitmap} or an {@link GifDrawable}
  * from an {@link InputStream} or a {@link android.os.ParcelFileDescriptor ParcelFileDescriptor}.
  */
-public class GifBitmapWrapperResourceDecoder implements ResourceDecoder<ImageVideoWrapper, GifBitmapWrapper> {
-    private static final ImageTypeParser DEFAULT_PARSER = new ImageTypeParser();
-    private static final BufferedStreamFactory DEFAULT_STREAM_FACTORY = new BufferedStreamFactory();
+public class GifBitmapWrapperResourceDecoder
+        implements ResourceDecoder<ImageVideoWrapper, GifBitmapWrapper> {
     // 2048 is rather arbitrary, for most well formatted image types we only need 32 bytes.
     // Visible for testing.
     static final int MARK_LIMIT_BYTES = 2048;
-
+    private static final ImageTypeParser DEFAULT_PARSER = new ImageTypeParser();
+    private static final BufferedStreamFactory DEFAULT_STREAM_FACTORY = new BufferedStreamFactory();
     private final ResourceDecoder<ImageVideoWrapper, Bitmap> bitmapDecoder;
     private final ResourceDecoder<InputStream, GifDrawable> gifDecoder;
     private final BitmapPool bitmapPool;
@@ -40,8 +40,8 @@ public class GifBitmapWrapperResourceDecoder implements ResourceDecoder<ImageVid
 
     // Visible for testing.
     GifBitmapWrapperResourceDecoder(ResourceDecoder<ImageVideoWrapper, Bitmap> bitmapDecoder,
-            ResourceDecoder<InputStream, GifDrawable> gifDecoder, BitmapPool bitmapPool, ImageTypeParser parser,
-            BufferedStreamFactory streamFactory) {
+            ResourceDecoder<InputStream, GifDrawable> gifDecoder, BitmapPool bitmapPool,
+            ImageTypeParser parser, BufferedStreamFactory streamFactory) {
         this.bitmapDecoder = bitmapDecoder;
         this.gifDecoder = gifDecoder;
         this.bitmapPool = bitmapPool;
@@ -52,7 +52,8 @@ public class GifBitmapWrapperResourceDecoder implements ResourceDecoder<ImageVid
     @SuppressWarnings("resource")
     // @see ResourceDecoder.decode
     @Override
-    public Resource<GifBitmapWrapper> decode(ImageVideoWrapper source, int width, int height) throws IOException {
+    public Resource<GifBitmapWrapper> decode(ImageVideoWrapper source, int width, int height)
+            throws IOException {
         ByteArrayPool pool = ByteArrayPool.get();
         byte[] tempBytes = pool.getBytes();
 
@@ -65,7 +66,8 @@ public class GifBitmapWrapperResourceDecoder implements ResourceDecoder<ImageVid
         return wrapper != null ? new GifBitmapWrapperResource(wrapper) : null;
     }
 
-    private GifBitmapWrapper decode(ImageVideoWrapper source, int width, int height, byte[] bytes) throws IOException {
+    private GifBitmapWrapper decode(ImageVideoWrapper source, int width, int height, byte[] bytes)
+            throws IOException {
         final GifBitmapWrapper result;
         if (source.getStream() != null) {
             result = decodeStream(source, width, height, bytes);
@@ -75,8 +77,8 @@ public class GifBitmapWrapperResourceDecoder implements ResourceDecoder<ImageVid
         return result;
     }
 
-    private GifBitmapWrapper decodeStream(ImageVideoWrapper source, int width, int height, byte[] bytes)
-            throws IOException {
+    private GifBitmapWrapper decodeStream(ImageVideoWrapper source, int width, int height,
+            byte[] bytes) throws IOException {
         InputStream bis = streamFactory.build(source.getStream(), bytes);
         bis.mark(MARK_LIMIT_BYTES);
         ImageHeaderParser.ImageType type = parser.parse(bis);
@@ -96,7 +98,8 @@ public class GifBitmapWrapperResourceDecoder implements ResourceDecoder<ImageVid
         return result;
     }
 
-    private GifBitmapWrapper decodeGifWrapper(InputStream bis, int width, int height) throws IOException {
+    private GifBitmapWrapper decodeGifWrapper(InputStream bis, int width, int height)
+            throws IOException {
         GifBitmapWrapper result = null;
         Resource<GifDrawable> gifResource = gifDecoder.decode(bis, width, height);
         if (gifResource != null) {
@@ -115,7 +118,8 @@ public class GifBitmapWrapperResourceDecoder implements ResourceDecoder<ImageVid
         return result;
     }
 
-    private GifBitmapWrapper decodeBitmapWrapper(ImageVideoWrapper toDecode, int width, int height) throws IOException {
+    private GifBitmapWrapper decodeBitmapWrapper(ImageVideoWrapper toDecode, int width, int height)
+            throws IOException {
         GifBitmapWrapper result = null;
 
         Resource<Bitmap> bitmapResource = bitmapDecoder.decode(toDecode, width, height);
@@ -138,7 +142,7 @@ public class GifBitmapWrapperResourceDecoder implements ResourceDecoder<ImageVid
     static class BufferedStreamFactory {
         public InputStream build(InputStream is, byte[] buffer) {
             return new RecyclableBufferedInputStream(is, buffer);
-        }
+    }
     }
 
     // Visible for testing.

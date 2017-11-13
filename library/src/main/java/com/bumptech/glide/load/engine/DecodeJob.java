@@ -20,12 +20,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * A class responsible for decoding resources either from cached data or from the original source and applying
+ * A class responsible for decoding resources either from cached data or from the original source
+ * and applying
  * transformations and transcodes.
  *
  * @param <A> The type of the source data the resource can be decoded from.
  * @param <T> The type of resource that will be decoded.
- * @param <Z> The type of resource that will be transcoded from the decoded and transformed resource.
+ * @param <Z> The type of resource that will be transcoded from the decoded and transformed
+ * resource.
  */
 class DecodeJob<A, T, Z> {
     private static final String TAG = "DecodeJob";
@@ -46,17 +48,18 @@ class DecodeJob<A, T, Z> {
     private volatile boolean isCancelled;
 
     public DecodeJob(EngineKey resultKey, int width, int height, DataFetcher<A> fetcher,
-            DataLoadProvider<A, T> loadProvider, Transformation<T> transformation, ResourceTranscoder<T, Z> transcoder,
-            DiskCacheProvider diskCacheProvider, DiskCacheStrategy diskCacheStrategy, Priority priority) {
-        this(resultKey, width, height, fetcher, loadProvider, transformation, transcoder, diskCacheProvider,
-                diskCacheStrategy, priority, DEFAULT_FILE_OPENER);
+            DataLoadProvider<A, T> loadProvider, Transformation<T> transformation,
+            ResourceTranscoder<T, Z> transcoder, DiskCacheProvider diskCacheProvider,
+            DiskCacheStrategy diskCacheStrategy, Priority priority) {
+        this(resultKey, width, height, fetcher, loadProvider, transformation, transcoder,
+                diskCacheProvider, diskCacheStrategy, priority, DEFAULT_FILE_OPENER);
     }
 
     // Visible for testing.
     DecodeJob(EngineKey resultKey, int width, int height, DataFetcher<A> fetcher,
-            DataLoadProvider<A, T> loadProvider, Transformation<T> transformation, ResourceTranscoder<T, Z> transcoder,
-            DiskCacheProvider diskCacheProvider, DiskCacheStrategy diskCacheStrategy, Priority priority, FileOpener
-            fileOpener) {
+            DataLoadProvider<A, T> loadProvider, Transformation<T> transformation,
+            ResourceTranscoder<T, Z> transcoder, DiskCacheProvider diskCacheProvider,
+            DiskCacheStrategy diskCacheStrategy, Priority priority, FileOpener fileOpener) {
         this.resultKey = resultKey;
         this.width = width;
         this.height = height;
@@ -71,7 +74,9 @@ class DecodeJob<A, T, Z> {
     }
 
     /**
-     * Returns a transcoded resource decoded from transformed resource data in the disk cache, or null if no such
+     * Returns a transcoded resource decoded from transformed resource data in the disk cache, or
+     * null
+     * if no such
      * resource exists.
      *
      * @throws Exception
@@ -95,7 +100,8 @@ class DecodeJob<A, T, Z> {
     }
 
     /**
-     * Returns a transformed and transcoded resource decoded from source data in the disk cache, or null if no such
+     * Returns a transformed and transcoded resource decoded from source data in the disk cache, or
+     * null if no such
      * resource exists.
      *
      * @throws Exception
@@ -114,12 +120,13 @@ class DecodeJob<A, T, Z> {
     }
 
     /**
-     * Returns a transformed and transcoded resource decoded from source data, or null if no source data could be
+     * Returns a transformed and transcoded resource decoded from source data, or null if no source
+     * data could be
      * obtained or no resource could be decoded.
-     *
      * <p>
-     *     Depending on the {@link com.bumptech.glide.load.engine.DiskCacheStrategy} used, source data is either decoded
-     *     directly or first written to the disk cache and then decoded from the disk cache.
+     * <p>
+     * Depending on the {@link DiskCacheStrategy} used, source data is either decoded
+     * directly or first written to the disk cache and then decoded from the disk cache.
      * </p>
      *
      * @throws Exception
@@ -156,7 +163,8 @@ class DecodeJob<A, T, Z> {
             return;
         }
         long startTime = LogTime.getLogTime();
-        SourceWriter<Resource<T>> writer = new SourceWriter<Resource<T>>(loadProvider.getEncoder(), transformed);
+        SourceWriter<Resource<T>> writer =
+                new SourceWriter<Resource<T>>(loadProvider.getEncoder(), transformed);
         diskCacheProvider.getDiskCache().put(resultKey, writer);
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
             logWithTimeAndKey("Wrote transformed from source to cache", startTime);
@@ -251,6 +259,16 @@ class DecodeJob<A, T, Z> {
         Log.v(TAG, message + " in " + LogTime.getElapsedMillis(startTime) + ", key: " + resultKey);
     }
 
+    interface DiskCacheProvider {
+        DiskCache getDiskCache();
+    }
+
+    static class FileOpener {
+        public OutputStream open(File file) throws FileNotFoundException {
+            return new BufferedOutputStream(new FileOutputStream(file));
+        }
+    }
+
     class SourceWriter<DataType> implements DiskCache.Writer {
 
         private final Encoder<DataType> encoder;
@@ -282,16 +300,6 @@ class DecodeJob<A, T, Z> {
                 }
             }
             return success;
-        }
     }
-
-    interface DiskCacheProvider {
-        DiskCache getDiskCache();
-    }
-
-    static class FileOpener {
-        public OutputStream open(File file) throws FileNotFoundException {
-            return new BufferedOutputStream(new FileOutputStream(file));
-        }
     }
 }

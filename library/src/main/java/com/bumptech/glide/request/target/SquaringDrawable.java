@@ -12,9 +12,12 @@ import android.os.Build;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 
 /**
- * A wrapper drawable to square the wrapped drawable so that it expands to fill a square with exactly the given side
- * length. The goal of this drawable is to ensure that square thumbnail drawables always match the size of the view
- * they will be displayed in to avoid a costly requestLayout call. This class should not be used with views or drawables
+ * A wrapper drawable to square the wrapped drawable so that it expands to fill a square with
+ * exactly the given side
+ * length. The goal of this drawable is to ensure that square thumbnail drawables always match the
+ * size of the view
+ * they will be displayed in to avoid a costly requestLayout call. This class should not be used
+ * with views or drawables
  * that are not square.
  */
 public class SquaringDrawable extends GlideDrawable {
@@ -29,14 +32,14 @@ public class SquaringDrawable extends GlideDrawable {
     SquaringDrawable(State state, GlideDrawable wrapped, Resources res) {
         this.state = state;
         if (wrapped == null) {
-          if (res != null) {
-            this.wrapped = (GlideDrawable) state.wrapped.newDrawable(res);
-          } else {
-            this.wrapped = (GlideDrawable) state.wrapped.newDrawable();
-          }
+            if (res != null) {
+                this.wrapped = (GlideDrawable) state.wrapped.newDrawable(res);
+            } else {
+                this.wrapped = (GlideDrawable) state.wrapped.newDrawable();
+            }
         } else {
-          this.wrapped = wrapped;
-        }
+            this.wrapped = wrapped;
+    }
     }
 
     @Override
@@ -52,13 +55,13 @@ public class SquaringDrawable extends GlideDrawable {
     }
 
     @Override
-    public void setChangingConfigurations(int configs) {
-        wrapped.setChangingConfigurations(configs);
+    public int getChangingConfigurations() {
+        return wrapped.getChangingConfigurations();
     }
 
     @Override
-    public int getChangingConfigurations() {
-        return wrapped.getChangingConfigurations();
+    public void setChangingConfigurations(int configs) {
+        wrapped.setChangingConfigurations(configs);
     }
 
     @Override
@@ -81,6 +84,11 @@ public class SquaringDrawable extends GlideDrawable {
     @Override
     public int getAlpha() {
         return wrapped.getAlpha();
+    }
+
+    @Override
+    public void setAlpha(int i) {
+        wrapped.setAlpha(i);
     }
 
     @Override
@@ -152,11 +160,6 @@ public class SquaringDrawable extends GlideDrawable {
     }
 
     @Override
-    public void setAlpha(int i) {
-        wrapped.setAlpha(i);
-    }
-
-    @Override
     public void setColorFilter(ColorFilter colorFilter) {
         wrapped.setColorFilter(colorFilter);
     }
@@ -211,27 +214,27 @@ public class SquaringDrawable extends GlideDrawable {
         private final int side;
 
         State(State other) {
-          this(other.wrapped, other.side);
+            this(other.wrapped, other.side);
         }
 
         State(ConstantState wrapped, int side) {
-          this.wrapped = wrapped;
-          this.side = side;
+            this.wrapped = wrapped;
+            this.side = side;
         }
 
         @Override
         public Drawable newDrawable() {
-          return newDrawable(null /*res*/);
+            return newDrawable(null /*res*/);
         }
 
         @Override
         public Drawable newDrawable(Resources res) {
-          return new SquaringDrawable(this, null /*wrapped*/, res);
+            return new SquaringDrawable(this, null /*wrapped*/, res);
         }
 
         @Override
         public int getChangingConfigurations() {
-          return 0;
+            return 0;
         }
     }
 }

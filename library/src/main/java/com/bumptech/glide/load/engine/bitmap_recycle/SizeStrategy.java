@@ -9,8 +9,10 @@ import com.bumptech.glide.util.Util;
 import java.util.TreeMap;
 
 /**
- * A strategy for reusing bitmaps that relies on {@link Bitmap#reconfigure(int, int, Bitmap.Config)}.
- * Requires {@link Build.VERSION_CODES#KITKAT KitKat} (API {@value Build.VERSION_CODES#KITKAT}) or higher.
+ * A strategy for reusing bitmaps that relies on {@link Bitmap#reconfigure(int, int,
+ * Bitmap.Config)}.
+ * Requires {@link Build.VERSION_CODES#KITKAT KitKat} (API {@value Build.VERSION_CODES#KITKAT}) or
+ * higher.
  */
 @TargetApi(Build.VERSION_CODES.KITKAT)
 class SizeStrategy implements LruPoolStrategy {
@@ -18,6 +20,15 @@ class SizeStrategy implements LruPoolStrategy {
     private final KeyPool keyPool = new KeyPool();
     private final GroupedLinkedMap<Key, Bitmap> groupedMap = new GroupedLinkedMap<Key, Bitmap>();
     private final TreeMap<Integer, Integer> sortedSizes = new PrettyPrintTreeMap<Integer, Integer>();
+
+    private static String getBitmapString(Bitmap bitmap) {
+        int size = Util.getBitmapByteSize(bitmap);
+        return getBitmapString(size);
+    }
+
+    private static String getBitmapString(int size) {
+        return "[" + size + "]";
+    }
 
     @Override
     public void put(Bitmap bitmap) {
@@ -67,7 +78,7 @@ class SizeStrategy implements LruPoolStrategy {
             sortedSizes.remove(size);
         } else {
             sortedSizes.put(size, current - 1);
-        }
+    }
     }
 
     @Override
@@ -88,18 +99,7 @@ class SizeStrategy implements LruPoolStrategy {
 
     @Override
     public String toString() {
-        return "SizeStrategy:\n  "
-                + groupedMap + "\n"
-                + "  SortedSizes" + sortedSizes;
-    }
-
-    private static String getBitmapString(Bitmap bitmap) {
-        int size = Util.getBitmapByteSize(bitmap);
-        return getBitmapString(size);
-    }
-
-    private static String getBitmapString(int size) {
-        return "[" + size + "]";
+        return "SizeStrategy:\n  " + groupedMap + "\n" + "  SortedSizes" + sortedSizes;
     }
 
     // Visible for testing.
@@ -114,7 +114,7 @@ class SizeStrategy implements LruPoolStrategy {
         @Override
         protected Key create() {
             return new Key(this);
-        }
+    }
     }
 
     // Visible for testing.

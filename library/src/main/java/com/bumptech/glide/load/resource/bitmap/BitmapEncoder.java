@@ -11,16 +11,19 @@ import com.bumptech.glide.util.Util;
 import java.io.OutputStream;
 
 /**
- * An {@link com.bumptech.glide.load.ResourceEncoder} that writes {@link android.graphics.Bitmap}s to
+ * An {@link ResourceEncoder} that writes {@link android.graphics.Bitmap}s to
  * {@link java.io.OutputStream}s.
- *
  * <p>
- *     {@link android.graphics.Bitmap}s that return true from {@link android.graphics.Bitmap#hasAlpha()}} are written
- *     using {@link android.graphics.Bitmap.CompressFormat#PNG} to preserve alpha and all other bitmaps are written
- *     using {@link android.graphics.Bitmap.CompressFormat#JPEG}.
+ * <p>
+ * {@link android.graphics.Bitmap}s that return true from {@link android.graphics.Bitmap#hasAlpha()}}
+ * are written
+ * using {@link android.graphics.Bitmap.CompressFormat#PNG} to preserve alpha and all other bitmaps
+ * are written
+ * using {@link android.graphics.Bitmap.CompressFormat#JPEG}.
  * </p>
  *
- * @see android.graphics.Bitmap#compress(android.graphics.Bitmap.CompressFormat, int, java.io.OutputStream)
+ * @see android.graphics.Bitmap#compress(android.graphics.Bitmap.CompressFormat, int,
+ * java.io.OutputStream)
  */
 public class BitmapEncoder implements ResourceEncoder<Bitmap> {
     private static final String TAG = "BitmapEncoder";
@@ -45,7 +48,11 @@ public class BitmapEncoder implements ResourceEncoder<Bitmap> {
         Bitmap.CompressFormat format = getFormat(bitmap);
         bitmap.compress(format, quality, os);
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
-            Log.v(TAG, "Compressed with type: " + format + " of size " + Util.getBitmapByteSize(bitmap) + " in "
+            Log.v(TAG, "Compressed with type: "
+                    + format
+                    + " of size "
+                    + Util.getBitmapByteSize(bitmap)
+                    + " in "
                     + LogTime.getElapsedMillis(start));
         }
         return true;
@@ -53,7 +60,7 @@ public class BitmapEncoder implements ResourceEncoder<Bitmap> {
 
     @Override
     public String getId() {
-        return "BitmapEncoder.com.bumptech.glide.load.resource.bitmap";
+        return "BitmapEncoder.com.jet8.sdk.ui.screen.marketplace.glide.load.resource.bitmap";
     }
 
     private Bitmap.CompressFormat getFormat(Bitmap bitmap) {
@@ -63,7 +70,6 @@ public class BitmapEncoder implements ResourceEncoder<Bitmap> {
             return Bitmap.CompressFormat.PNG;
         } else {
             return Bitmap.CompressFormat.JPEG;
-        }
     }
-
+    }
 }

@@ -18,7 +18,7 @@ final class PreFillQueue {
 
         for (Integer count : bitmapsPerType.values()) {
             bitmapsRemaining += count;
-        }
+    }
     }
 
     public PreFillType remove() {
@@ -34,7 +34,7 @@ final class PreFillQueue {
         bitmapsRemaining--;
 
         // Avoid divide by 0.
-        keyIndex =  keyList.isEmpty() ? 0 : (keyIndex + 1) % keyList.size();
+        keyIndex = keyList.isEmpty() ? 0 : (keyIndex + 1) % keyList.size();
 
         return result;
     }

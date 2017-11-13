@@ -71,13 +71,6 @@ public class PngAnimationComposer {
     this.srcModePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
   }
 
-  public static Bitmap getReferenceImage(Resources resources) {
-    if (referenceImage == null) {
-      referenceImage = BitmapFactory.decodeResource(resources, R.drawable.onepxtransparent);
-    }
-    return referenceImage;
-  }
-
   public int getDurationScale() {
     return durationScale;
   }

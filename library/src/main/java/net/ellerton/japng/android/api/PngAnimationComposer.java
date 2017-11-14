@@ -11,7 +11,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.ColorInt;
-import com.bumptech.glide.R;
 import com.bumptech.glide.load.resource.apng.ApngBitmapProvider;
 import com.bumptech.glide.load.resource.apng.ApngDrawable;
 import java.util.ArrayList;

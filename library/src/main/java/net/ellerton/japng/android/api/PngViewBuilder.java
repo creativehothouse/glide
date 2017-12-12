@@ -1,6 +1,6 @@
 package net.ellerton.japng.android.api;
 
-import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -21,7 +21,8 @@ import net.ellerton.japng.error.PngException;
  * Able to build android Views from PNG (ARGB8888) content.
  */
 public class PngViewBuilder extends BasicArgb8888Director<ApngDrawable> {
-  final Context context;
+
+  final Resources resources;
   //View result = null;
   //ImageView iv = null;
   Drawable drawableResult = null;
@@ -34,8 +35,8 @@ public class PngViewBuilder extends BasicArgb8888Director<ApngDrawable> {
   @ColorInt private int[] mainScratch;
   private Bitmap defaultBitmap;
 
-  public PngViewBuilder(Context context, ApngBitmapProvider apngBitmapProvider) {
-    this.context = context;
+  public PngViewBuilder(Resources resources, ApngBitmapProvider apngBitmapProvider) {
+    this.resources = resources;
     this.apngBitmapProvider = apngBitmapProvider;
   }
 
@@ -75,12 +76,12 @@ public class PngViewBuilder extends BasicArgb8888Director<ApngDrawable> {
         apngBitmapProvider.obtain(defaultImage.width, defaultImage.height, Bitmap.Config.ARGB_8888);
     defaultBitmap.setPixels(defaultImage.getPixelArray(), offset, stride, 0, 0, defaultImage.width,
         defaultImage.height);
-    drawableResult = new BitmapDrawable(context.getResources(), defaultBitmap);
+    drawableResult = new BitmapDrawable(resources, defaultBitmap);
   }
 
   @Override public void receiveAnimationControl(PngAnimationControl animationControl) {
     this.animationComposer =
-        new PngAnimationComposer(context.getResources(), header, scanlineProcessor,
+        new PngAnimationComposer(resources, header, scanlineProcessor,
             animationControl, apngBitmapProvider);
   }
 

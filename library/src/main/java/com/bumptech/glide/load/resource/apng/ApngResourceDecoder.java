@@ -1,6 +1,7 @@
 package com.bumptech.glide.load.resource.apng;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.annotation.Nullable;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.ResourceDecoder;
@@ -22,12 +23,12 @@ import net.ellerton.japng.reader.PngReadHelper;
  */
 public class ApngResourceDecoder implements ResourceDecoder<InputStream, ApngDrawable> {
 
-  final PngViewBuilder apngViewBuilder;
+  final Resources resources;
   final ApngBitmapProvider apngBitmapProvider;
 
   public ApngResourceDecoder(Context context, BitmapPool bitmapPool, ArrayPool arrayPool) {
+    this.resources = context.getResources();
     this.apngBitmapProvider = new ApngBitmapProvider(bitmapPool, arrayPool);
-    this.apngViewBuilder = new PngViewBuilder(context, apngBitmapProvider);
   }
 
   @Override public boolean handles(InputStream source, Options options) throws IOException {
@@ -37,14 +38,15 @@ public class ApngResourceDecoder implements ResourceDecoder<InputStream, ApngDra
   @Nullable @Override
   public Resource<ApngDrawable> decode(InputStream source, int width, int height, Options options)
       throws IOException {
-    Argb8888Processor<ApngDrawable> processor = new Argb8888Processor<>(apngViewBuilder);
+    PngViewBuilder pngViewBuilder = new PngViewBuilder(resources, apngBitmapProvider);
+    Argb8888Processor<ApngDrawable> processor = new Argb8888Processor<>(pngViewBuilder);
     try {
       return new ApngDrawableResource(
           PngReadHelper.read(source, new DefaultPngChunkReader<>(processor)));
     } catch (PngException e) {
       e.printStackTrace();
     } finally {
-      apngViewBuilder.clear();
+      pngViewBuilder.clear();
     }
     return null;
   }

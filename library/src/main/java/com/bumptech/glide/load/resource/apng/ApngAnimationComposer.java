@@ -1,4 +1,4 @@
-package net.ellerton.japng.android.api;
+package com.bumptech.glide.load.resource.apng;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -24,19 +24,7 @@ import net.ellerton.japng.chunks.PngHeader;
 /**
  * Takes loaded PNG frames and composes them into an android AnimationDrawable.
  */
-public class PngAnimationComposer {
-  /**
-   * Keep a 1x1 transparent image around as reference for creating a scaled starting bitmap.
-   * Considering this because of some reported OutOfMemory errors, and this post:
-   *
-   * http://stackoverflow.com/a/8527745/963195
-   *
-   * Specifically: "NEVER use Bitmap.createBitmap(width, height, Config.ARGB_8888). I mean NEVER!"
-   *
-   * Instead the 1x1 image (68 bytes of resources) is scaled up to the needed size.
-   * Whether or not this fixes the OOM problems is TBD...
-   */
-  private static Bitmap referenceImage = null;
+public class ApngAnimationComposer {
   private Resources resources;
   private Canvas canvas;
   private PngHeader header;
@@ -51,7 +39,7 @@ public class PngAnimationComposer {
 
   @ColorInt private int[] mainScratch;
 
-  public PngAnimationComposer(Resources resources, PngHeader header,
+  public ApngAnimationComposer(Resources resources, PngHeader header,
       Argb8888ScanlineProcessor scanlineProcessor, PngAnimationControl animationControl,
       ApngBitmapProvider apngBitmapProvider) {
     this.resources = resources;
@@ -62,8 +50,6 @@ public class PngAnimationComposer {
 
     this.canvasBitmap =
         apngBitmapProvider.obtain(this.header.width, this.header.height, Bitmap.Config.ARGB_8888);
-    //this.canvasBitmap = Bitmap.createScaledBitmap(getReferenceImage(resources), this.header.width,
-    //    this.header.height, false);
     this.canvas = new Canvas(this.canvasBitmap);
     this.frames = new ArrayList<>(animationControl.numFrames);
     this.srcModePaint = new Paint();
@@ -81,20 +67,6 @@ public class PngAnimationComposer {
   public boolean isSingleFrame() {
     return 1 == animationControl.numFrames;
   }
-
-  //    public int getNumFrames() {
-  //        return animationControl.numFrames;
-  //    }
-
-  //public ImageView buildInto(ImageView view) {
-  //  if (isSingleFrame()) {
-  //    Argb8888Bitmap bitmap = scanlineProcessor.getBitmap(); // TODO: ok?
-  //    view.setImageBitmap(PngAndroid.toBitmap(bitmap)); // TODO: ok?
-  //  } else {
-  //    view.setBackgroundDrawable(assemble());
-  //  }
-  //  return view;
-  //}
 
   public ApngDrawable assemble() {
     // TODO: handle special case of one frame animation as a plain ImageView

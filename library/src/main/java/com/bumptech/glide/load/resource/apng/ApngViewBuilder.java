@@ -1,12 +1,8 @@
-package net.ellerton.japng.android.api;
+package com.bumptech.glide.load.resource.apng;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
-import com.bumptech.glide.load.resource.apng.ApngBitmapProvider;
-import com.bumptech.glide.load.resource.apng.ApngDrawable;
 import net.ellerton.japng.PngScanlineBuffer;
 import net.ellerton.japng.argb8888.Argb8888Bitmap;
 import net.ellerton.japng.argb8888.Argb8888Processors;
@@ -20,22 +16,17 @@ import net.ellerton.japng.error.PngException;
 /**
  * Able to build android Views from PNG (ARGB8888) content.
  */
-public class PngViewBuilder extends BasicArgb8888Director<ApngDrawable> {
+public class ApngViewBuilder extends BasicArgb8888Director<ApngDrawable> {
 
-  final Resources resources;
-  //View result = null;
-  //ImageView iv = null;
-  Drawable drawableResult = null;
-  Argb8888Bitmap pngBitmap;
-  PngHeader header;
-  PngAnimationComposer animationComposer = null;
-  PngScanlineBuffer buffer;
-  ApngBitmapProvider apngBitmapProvider;
+  private final Resources resources;
+  private PngHeader header;
+  private ApngAnimationComposer animationComposer = null;
+  private ApngBitmapProvider apngBitmapProvider;
 
   @ColorInt private int[] mainScratch;
   private Bitmap defaultBitmap;
 
-  public PngViewBuilder(Resources resources, ApngBitmapProvider apngBitmapProvider) {
+  public ApngViewBuilder(Resources resources, ApngBitmapProvider apngBitmapProvider) {
     this.resources = resources;
     this.apngBitmapProvider = apngBitmapProvider;
   }
@@ -43,9 +34,8 @@ public class PngViewBuilder extends BasicArgb8888Director<ApngDrawable> {
   @Override public void receiveHeader(PngHeader header, PngScanlineBuffer buffer)
       throws PngException {
     this.header = header;
-    this.buffer = buffer;
     mainScratch = apngBitmapProvider.obtainIntArray(header.width * header.height);
-    this.pngBitmap = new Argb8888Bitmap(mainScratch, header.width, header.height);
+    Argb8888Bitmap pngBitmap = new Argb8888Bitmap(mainScratch, header.width, header.height);
     this.scanlineProcessor = Argb8888Processors.from(header, buffer, pngBitmap);
   }
 
@@ -54,34 +44,24 @@ public class PngViewBuilder extends BasicArgb8888Director<ApngDrawable> {
   }
 
   @Override public boolean wantAnimationFrames() {
-    return true; // isAnimated;
+    return true;
   }
 
   @Override public Argb8888ScanlineProcessor beforeDefaultImage() {
-    //        this.pngBitmap = new Argb8888Bitmap(header.width, header.height);
-    //        try {
-    //            this.scanlineProcessor = Argb8888Processors.from(header, buffer, pngBitmap);
-    //        } catch (PngException e) {
-    //            // should never happen
-    //        }
     return scanlineProcessor;
   }
 
   @Override public void receiveDefaultImage(Argb8888Bitmap defaultImage) {
-    //iv = new ImageView(context);
-    //iv.setImageBitmap(PngAndroid.toBitmap(defaultImage));
     int offset = 0;
     int stride = defaultImage.width;
     defaultBitmap =
         apngBitmapProvider.obtain(defaultImage.width, defaultImage.height, Bitmap.Config.ARGB_8888);
     defaultBitmap.setPixels(defaultImage.getPixelArray(), offset, stride, 0, 0, defaultImage.width,
         defaultImage.height);
-    drawableResult = new BitmapDrawable(resources, defaultBitmap);
   }
 
   @Override public void receiveAnimationControl(PngAnimationControl animationControl) {
-    this.animationComposer =
-        new PngAnimationComposer(resources, header, scanlineProcessor,
+    this.animationComposer = new ApngAnimationComposer(resources, header, scanlineProcessor,
             animationControl, apngBitmapProvider);
   }
 
@@ -94,33 +74,6 @@ public class PngViewBuilder extends BasicArgb8888Director<ApngDrawable> {
     assert (animationComposer != null);
     animationComposer.completeFrame(frameImage);
   }
-
-
-    /*
-    @Override
-    public View getResult() {
-        if (isAnimated) {
-            if (animationComposer==null) {
-                // error
-                Log.e(getClass().getName(), "animated result but no composer in place");
-            } else {
-                //AnimationDrawable ad = animationComposer.assemble();
-                iv = new ImageView(context);
-                animationComposer.buildInto(iv);
-                //iv.setBackgroundDrawable(ad);
-                return iv;
-            }
-        } else {
-            if (iv==null) {
-                // error
-                Log.e(getClass().getName(), "non-animated result but no image view ready");
-            } else {
-                return iv;
-            }
-        }
-        //return result;
-        return null;
-    }*/
 
   @Override public ApngDrawable getResult() {
     return animationComposer.assemble();

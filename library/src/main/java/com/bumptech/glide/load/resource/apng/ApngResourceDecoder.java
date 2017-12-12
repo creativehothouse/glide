@@ -11,7 +11,6 @@ import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
 import java.io.IOException;
 import java.io.InputStream;
-import net.ellerton.japng.android.api.PngViewBuilder;
 import net.ellerton.japng.argb8888.Argb8888Processor;
 import net.ellerton.japng.error.PngException;
 import net.ellerton.japng.reader.DefaultPngChunkReader;
@@ -38,15 +37,15 @@ public class ApngResourceDecoder implements ResourceDecoder<InputStream, ApngDra
   @Nullable @Override
   public Resource<ApngDrawable> decode(InputStream source, int width, int height, Options options)
       throws IOException {
-    PngViewBuilder pngViewBuilder = new PngViewBuilder(resources, apngBitmapProvider);
-    Argb8888Processor<ApngDrawable> processor = new Argb8888Processor<>(pngViewBuilder);
+    ApngViewBuilder apngViewBuilder = new ApngViewBuilder(resources, apngBitmapProvider);
+    Argb8888Processor<ApngDrawable> processor = new Argb8888Processor<>(apngViewBuilder);
     try {
       return new ApngDrawableResource(
           PngReadHelper.read(source, new DefaultPngChunkReader<>(processor)));
     } catch (PngException e) {
       e.printStackTrace();
     } finally {
-      pngViewBuilder.clear();
+      apngViewBuilder.clear();
     }
     return null;
   }

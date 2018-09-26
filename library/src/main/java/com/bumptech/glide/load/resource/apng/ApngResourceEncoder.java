@@ -3,6 +3,7 @@ package com.bumptech.glide.load.resource.apng;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import com.bumptech.glide.load.EncodeStrategy;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.ResourceEncoder;
@@ -153,12 +154,12 @@ public class ApngResourceEncoder implements ResourceEncoder<ApngDrawable> {
       fos.write(makeIENDChunk().array());
       return true;
     } catch (IOException e) {
-      e.printStackTrace();
+      Log.e("ApngResourceEncoder:",e.getMessage(),e.getCause());
     } finally {
       try {
         if (fos != null) fos.close();
       } catch (IOException e) {
-        e.printStackTrace();
+        Log.e("ApngResourceEncoder:",e.getMessage(),e.getCause());
       }
     }
     return false;

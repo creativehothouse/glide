@@ -355,6 +355,8 @@ public class Glide implements ComponentCallbacks2 {
             arrayPool);
     ByteBufferGifDecoder byteBufferGifDecoder =
         new ByteBufferGifDecoder(context, imageHeaderParsers, bitmapPool, arrayPool);
+
+    ApngResourceDecoder apngResourceDecoder = new ApngResourceDecoder(context, bitmapPool, arrayPool);
     ResourceDecoder<ParcelFileDescriptor, Bitmap> parcelFileDescriptorVideoDecoder =
         VideoDecoder.parcel(bitmapPool);
     ByteBufferBitmapDecoder byteBufferBitmapDecoder = new ByteBufferBitmapDecoder(downsampler);
@@ -375,8 +377,6 @@ public class Glide implements ComponentCallbacks2 {
     GifDrawableBytesTranscoder gifDrawableBytesTranscoder = new GifDrawableBytesTranscoder();
 
     ContentResolver contentResolver = context.getContentResolver();
-        new ByteBufferGifDecoder(context, registry.getImageHeaderParsers(), bitmapPool, arrayPool);
-    ApngResourceDecoder apngResourceDecoder = new ApngResourceDecoder(context, bitmapPool, arrayPool);
 
     registry.append(ByteBuffer.class, new ByteBufferEncoder())
         .append(InputStream.class, new StreamEncoder(arrayPool))

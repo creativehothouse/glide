@@ -11,6 +11,8 @@ import java.io.File;
  *
  * <p><b>Images can be read by everyone when using external disk cache.</b>
  */
+// Public API.
+@SuppressWarnings({"unused", "WeakerAccess"})
 public final class ExternalPreferredCacheDiskCacheFactory extends DiskLruCacheFactory {
 
   public ExternalPreferredCacheDiskCacheFactory(Context context) {
@@ -18,12 +20,12 @@ public final class ExternalPreferredCacheDiskCacheFactory extends DiskLruCacheFa
         DiskCache.Factory.DEFAULT_DISK_CACHE_SIZE);
   }
 
-  public ExternalPreferredCacheDiskCacheFactory(Context context, int diskCacheSize) {
+  public ExternalPreferredCacheDiskCacheFactory(Context context, long diskCacheSize) {
     this(context, DiskCache.Factory.DEFAULT_DISK_CACHE_DIR, diskCacheSize);
   }
 
   public ExternalPreferredCacheDiskCacheFactory(final Context context, final String diskCacheName,
-                                                final int diskCacheSize) {
+                                                final long diskCacheSize) {
     super(new CacheDirectoryGetter() {
       @Nullable
       private File getInternalCacheDirectory() {
@@ -50,7 +52,7 @@ public final class ExternalPreferredCacheDiskCacheFactory extends DiskLruCacheFa
         File cacheDirectory = context.getExternalCacheDir();
 
         // Shared storage is not available.
-        if (cacheDirectory == null) {
+        if ((cacheDirectory == null) || (!cacheDirectory.canWrite())) {
           return internalCacheDirectory;
         }
         if (diskCacheName != null) {

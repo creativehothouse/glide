@@ -1,9 +1,5 @@
 package com.bumptech.glide;
 
-import static com.bumptech.glide.request.RequestOptions.decodeTypeOf;
-import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
-import static com.bumptech.glide.request.RequestOptions.skipMemoryCacheOf;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -14,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.apng.ApngDrawable;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.manager.ConnectivityMonitor;
 import com.bumptech.glide.manager.ConnectivityMonitorFactory;
@@ -31,6 +28,10 @@ import com.bumptech.glide.util.Synthetic;
 import com.bumptech.glide.util.Util;
 import java.io.File;
 
+import static com.bumptech.glide.request.RequestOptions.decodeTypeOf;
+import static com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf;
+import static com.bumptech.glide.request.RequestOptions.skipMemoryCacheOf;
+
 /**
  * A class for managing and starting requests for Glide. Can use activity, fragment and connectivity
  * lifecycle events to intelligently stop, start, and restart requests. Retrieve either by
@@ -46,6 +47,7 @@ import java.io.File;
 public class RequestManager implements LifecycleListener {
   private static final RequestOptions DECODE_TYPE_BITMAP = decodeTypeOf(Bitmap.class).lock();
   private static final RequestOptions DECODE_TYPE_GIF = decodeTypeOf(GifDrawable.class).lock();
+  private static final RequestOptions DECODE_TYPE_APNG = decodeTypeOf(ApngDrawable.class).lock();
   private static final RequestOptions DOWNLOAD_ONLY_OPTIONS =
       diskCacheStrategyOf(DiskCacheStrategy.DATA).priority(Priority.LOW)
           .skipMemoryCache(true);
@@ -324,6 +326,24 @@ public class RequestManager implements LifecycleListener {
   @CheckResult
   public RequestBuilder<GifDrawable> asGif() {
     return as(GifDrawable.class).apply(DECODE_TYPE_GIF);
+  }
+
+  /**
+   * Attempts to always load the resource as a
+   * {@link com.bumptech.glide.load.resource.apng.ApngDrawable}.
+   *
+   * <p> If the underlying data is not a APNG, this will fail. As a result, this should only be used
+   * if the model represents an animated APNG and the caller wants to interact with the ApngDrawable
+   * directly. Normally using just {@link #asDrawable()} is sufficient because it will determine
+   * whether or not the given data represents an animated APNG and return the appropriate {@link
+   * Drawable}, animated or not, automatically. </p>
+   *
+   * @return A new request builder for loading a
+   * {@link com.bumptech.glide.load.resource.apng.ApngDrawable}.
+   */
+  @CheckResult
+  public RequestBuilder<ApngDrawable> asApng() {
+    return as(ApngDrawable.class).apply(DECODE_TYPE_APNG);
   }
 
   /**

@@ -46,6 +46,9 @@ import com.bumptech.glide.load.model.stream.HttpUriLoader;
 import com.bumptech.glide.load.model.stream.MediaStoreImageThumbLoader;
 import com.bumptech.glide.load.model.stream.MediaStoreVideoThumbLoader;
 import com.bumptech.glide.load.model.stream.UrlLoader;
+import com.bumptech.glide.load.resource.apng.ApngDrawable;
+import com.bumptech.glide.load.resource.apng.ApngResourceDecoder;
+import com.bumptech.glide.load.resource.apng.ApngResourceEncoder;
 import com.bumptech.glide.load.resource.bitmap.BitmapDrawableDecoder;
 import com.bumptech.glide.load.resource.bitmap.BitmapDrawableEncoder;
 import com.bumptech.glide.load.resource.bitmap.BitmapEncoder;
@@ -89,8 +92,8 @@ import java.util.Set;
  * {@link RequestBuilder} and maintaining an {@link Engine}, {@link BitmapPool},
  * {@link com.bumptech.glide.load.engine.cache.DiskCache} and {@link MemoryCache}.
  */
-@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-public class Glide implements ComponentCallbacks2 {
+@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH) public class Glide
+    implements ComponentCallbacks2 {
   private static final String DEFAULT_DISK_CACHE_DIR = "image_manager_disk_cache";
   private static final String TAG = "Glide";
   private static volatile Glide glide;
@@ -115,8 +118,7 @@ public class Glide implements ComponentCallbacks2 {
    * @param context A context.
    * @see #getPhotoCacheDir(android.content.Context, String)
    */
-  @Nullable
-  public static File getPhotoCacheDir(Context context) {
+  @Nullable public static File getPhotoCacheDir(Context context) {
     return getPhotoCacheDir(context, DEFAULT_DISK_CACHE_DIR);
   }
 
@@ -124,12 +126,11 @@ public class Glide implements ComponentCallbacks2 {
    * Returns a directory with the given name in the private cache directory of the application to
    * use to store retrieved media and thumbnails.
    *
-   * @param context   A context.
+   * @param context A context.
    * @param cacheName The name of the subdirectory in which to store the cache.
    * @see #getPhotoCacheDir(android.content.Context)
    */
-  @Nullable
-  public static File getPhotoCacheDir(Context context, String cacheName) {
+  @Nullable public static File getPhotoCacheDir(Context context, String cacheName) {
     File cacheDir = context.getCacheDir();
     if (cacheDir != null) {
       File result = new File(cacheDir, cacheName);
@@ -174,18 +175,15 @@ public class Glide implements ComponentCallbacks2 {
     isInitializing = false;
   }
 
-  @VisibleForTesting
-  public static synchronized void init(Glide glide) {
+  @VisibleForTesting public static synchronized void init(Glide glide) {
     Glide.glide = glide;
   }
 
-  @VisibleForTesting
-  public static synchronized void tearDown() {
+  @VisibleForTesting public static synchronized void tearDown() {
     glide = null;
   }
 
-  @SuppressWarnings("deprecation")
-  private static void initializeGlide(Context context) {
+  @SuppressWarnings("deprecation") private static void initializeGlide(Context context) {
     Context applicationContext = context.getApplicationContext();
 
     GeneratedAppGlideModule annotationGeneratedModule = getAnnotationGeneratedGlideModules();
@@ -194,10 +192,9 @@ public class Glide implements ComponentCallbacks2 {
       manifestModules = new ManifestParser(applicationContext).parse();
     }
 
-    if (annotationGeneratedModule != null
-        && !annotationGeneratedModule.getExcludedModuleClasses().isEmpty()) {
-      Set<Class<?>> excludedModuleClasses =
-          annotationGeneratedModule.getExcludedModuleClasses();
+    if (annotationGeneratedModule != null && !annotationGeneratedModule.getExcludedModuleClasses()
+        .isEmpty()) {
+      Set<Class<?>> excludedModuleClasses = annotationGeneratedModule.getExcludedModuleClasses();
       Iterator<com.bumptech.glide.module.GlideModule> iterator = manifestModules.iterator();
       while (iterator.hasNext()) {
         com.bumptech.glide.module.GlideModule current = iterator.next();
@@ -218,10 +215,9 @@ public class Glide implements ComponentCallbacks2 {
     }
 
     RequestManagerRetriever.RequestManagerFactory factory =
-        annotationGeneratedModule != null
-            ? annotationGeneratedModule.getRequestManagerFactory() : null;
-    GlideBuilder builder = new GlideBuilder()
-        .setRequestManagerFactory(factory);
+        annotationGeneratedModule != null ? annotationGeneratedModule.getRequestManagerFactory()
+            : null;
+    GlideBuilder builder = new GlideBuilder().setRequestManagerFactory(factory);
     for (com.bumptech.glide.module.GlideModule module : manifestModules) {
       module.applyOptions(applicationContext, builder);
     }
@@ -239,14 +235,12 @@ public class Glide implements ComponentCallbacks2 {
     Glide.glide = glide;
   }
 
-  @Nullable
-  @SuppressWarnings({"unchecked", "deprecation", "TryWithIdenticalCatches"})
+  @Nullable @SuppressWarnings({ "unchecked", "deprecation", "TryWithIdenticalCatches" })
   private static GeneratedAppGlideModule getAnnotationGeneratedGlideModules() {
     GeneratedAppGlideModule result = null;
     try {
-      Class<GeneratedAppGlideModule> clazz =
-          (Class<GeneratedAppGlideModule>)
-              Class.forName("com.bumptech.glide.GeneratedAppGlideModuleImpl");
+      Class<GeneratedAppGlideModule> clazz = (Class<GeneratedAppGlideModule>) Class.forName(
+          "com.bumptech.glide.GeneratedAppGlideModuleImpl");
       result = clazz.newInstance();
     } catch (ClassNotFoundException e) {
       if (Log.isLoggable(TAG, Log.WARN)) {
@@ -268,16 +262,10 @@ public class Glide implements ComponentCallbacks2 {
     return result;
   }
 
-  @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-  Glide(
-      Context context,
-      Engine engine,
-      MemoryCache memoryCache,
-      BitmapPool bitmapPool,
-      ArrayPool arrayPool,
+  @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH) Glide(Context context, Engine engine,
+      MemoryCache memoryCache, BitmapPool bitmapPool, ArrayPool arrayPool,
       RequestManagerRetriever requestManagerRetriever,
-      ConnectivityMonitorFactory connectivityMonitorFactory,
-      int logLevel,
+      ConnectivityMonitorFactory connectivityMonitorFactory, int logLevel,
       RequestOptions defaultRequestOptions,
       Map<Class<?>, TransitionOptions<?, ?>> defaultTransitionOptions) {
     this.engine = engine;
@@ -295,13 +283,14 @@ public class Glide implements ComponentCallbacks2 {
     registry = new Registry();
     registry.register(new DefaultImageHeaderParser());
 
-    Downsampler downsampler = new Downsampler(registry.getImageHeaderParsers(),
-        resources.getDisplayMetrics(), bitmapPool, arrayPool);
+    Downsampler downsampler =
+        new Downsampler(registry.getImageHeaderParsers(), resources.getDisplayMetrics(), bitmapPool,
+            arrayPool);
     ByteBufferGifDecoder byteBufferGifDecoder =
         new ByteBufferGifDecoder(context, registry.getImageHeaderParsers(), bitmapPool, arrayPool);
+    ApngResourceDecoder apngResourceDecoder = new ApngResourceDecoder(context, bitmapPool, arrayPool);
 
-    registry
-        .append(ByteBuffer.class, new ByteBufferEncoder())
+    registry.append(ByteBuffer.class, new ByteBufferEncoder())
         .append(InputStream.class, new StreamEncoder(arrayPool))
         /* Bitmaps */
         .append(Registry.BUCKET_BITMAP, ByteBuffer.class, Bitmap.class,
@@ -331,6 +320,9 @@ public class Glide implements ComponentCallbacks2 {
         .append(GifDecoder.class, GifDecoder.class, new UnitModelLoader.Factory<GifDecoder>())
         .append(Registry.BUCKET_BITMAP, GifDecoder.class, Bitmap.class,
             new GifFrameResourceDecoder(bitmapPool))
+        /* APNG */
+        .append(Registry.BUCKET_APNG, InputStream.class, ApngDrawable.class, apngResourceDecoder)
+        .append(ApngDrawable.class, new ApngResourceEncoder())
         /* Drawables */
         .append(Uri.class, Drawable.class, new ResourceDrawableDecoder(context))
         /* Files */
@@ -344,15 +336,11 @@ public class Glide implements ComponentCallbacks2 {
         /* Models */
         .register(new InputStreamRewinder.Factory(arrayPool))
         .append(int.class, InputStream.class, new ResourceLoader.StreamFactory(resources))
-        .append(
-                int.class,
-                ParcelFileDescriptor.class,
-                new ResourceLoader.FileDescriptorFactory(resources))
+        .append(int.class, ParcelFileDescriptor.class,
+            new ResourceLoader.FileDescriptorFactory(resources))
         .append(Integer.class, InputStream.class, new ResourceLoader.StreamFactory(resources))
-        .append(
-                Integer.class,
-                ParcelFileDescriptor.class,
-                new ResourceLoader.FileDescriptorFactory(resources))
+        .append(Integer.class, ParcelFileDescriptor.class,
+            new ResourceLoader.FileDescriptorFactory(resources))
         .append(Integer.class, Uri.class, new ResourceLoader.UriFactory(resources))
         .append(int.class, Uri.class, new ResourceLoader.UriFactory(resources))
         .append(String.class, InputStream.class, new DataUrlLoader.StreamFactory())
@@ -360,18 +348,14 @@ public class Glide implements ComponentCallbacks2 {
         .append(String.class, ParcelFileDescriptor.class, new StringLoader.FileDescriptorFactory())
         .append(Uri.class, InputStream.class, new HttpUriLoader.Factory())
         .append(Uri.class, InputStream.class, new AssetUriLoader.StreamFactory(context.getAssets()))
-        .append(
-                Uri.class,
-                ParcelFileDescriptor.class,
-                new AssetUriLoader.FileDescriptorFactory(context.getAssets()))
+        .append(Uri.class, ParcelFileDescriptor.class,
+            new AssetUriLoader.FileDescriptorFactory(context.getAssets()))
         .append(Uri.class, InputStream.class, new MediaStoreImageThumbLoader.Factory(context))
         .append(Uri.class, InputStream.class, new MediaStoreVideoThumbLoader.Factory(context))
-        .append(
-            Uri.class,
-            InputStream.class,
+        .append(Uri.class, InputStream.class,
             new UriLoader.StreamFactory(context.getContentResolver()))
         .append(Uri.class, ParcelFileDescriptor.class,
-             new UriLoader.FileDescriptorFactory(context.getContentResolver()))
+            new UriLoader.FileDescriptorFactory(context.getContentResolver()))
         .append(Uri.class, InputStream.class, new UrlUriLoader.StreamFactory())
         .append(URL.class, InputStream.class, new UrlLoader.StreamFactory())
         .append(Uri.class, File.class, new MediaStoreFileLoader.Factory(context))
@@ -387,8 +371,7 @@ public class Glide implements ComponentCallbacks2 {
 
     ImageViewTargetFactory imageViewTargetFactory = new ImageViewTargetFactory();
     glideContext =
-        new GlideContext(
-            context, registry, imageViewTargetFactory, defaultRequestOptions,
+        new GlideContext(context, registry, imageViewTargetFactory, defaultRequestOptions,
             defaultTransitionOptions, engine, logLevel);
   }
 
@@ -496,7 +479,7 @@ public class Glide implements ComponentCallbacks2 {
    * Clears disk cache.
    *
    * <p>
-   *     This method should always be called on a background thread, since it is a blocking call.
+   * This method should always be called on a background thread, since it is a blocking call.
    * </p>
    */
   @SuppressWarnings("unused") // Public API
@@ -504,7 +487,6 @@ public class Glide implements ComponentCallbacks2 {
     Util.assertBackgroundThread();
     engine.clearDiskCache();
   }
-
 
   /**
    * Internal method.
@@ -539,8 +521,7 @@ public class Glide implements ComponentCallbacks2 {
   private static RequestManagerRetriever getRetriever(@Nullable Context context) {
     // Context could be null for other reasons (ie the user passes in null), but in practice it will
     // only occur due to errors with the Fragment lifecycle.
-    Preconditions.checkNotNull(
-        context,
+    Preconditions.checkNotNull(context,
         "You cannot start a load on a not yet attached View or a  Fragment where getActivity() "
             + "returns null (which usually occurs when getActivity() is called before the Fragment "
             + "is attached or after the Fragment is destroyed).");
@@ -681,18 +662,15 @@ public class Glide implements ComponentCallbacks2 {
     }
   }
 
-  @Override
-  public void onTrimMemory(int level) {
+  @Override public void onTrimMemory(int level) {
     trimMemory(level);
   }
 
-  @Override
-  public void onConfigurationChanged(Configuration newConfig) {
+  @Override public void onConfigurationChanged(Configuration newConfig) {
     // Do nothing.
   }
 
-  @Override
-  public void onLowMemory() {
+  @Override public void onLowMemory() {
     clearMemory();
   }
 }

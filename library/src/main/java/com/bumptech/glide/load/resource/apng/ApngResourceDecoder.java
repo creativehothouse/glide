@@ -3,6 +3,7 @@ package com.bumptech.glide.load.resource.apng;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.ResourceDecoder;
 import com.bumptech.glide.load.engine.Resource;
@@ -43,7 +44,7 @@ public class ApngResourceDecoder implements ResourceDecoder<InputStream, ApngDra
       return new ApngDrawableResource(
           PngReadHelper.read(source, new DefaultPngChunkReader<>(processor)));
     } catch (PngException e) {
-      e.printStackTrace();
+      Log.e("ApngResourceDecoder:",e.getMessage(),e.getCause());
     } finally {
       apngViewBuilder.clear();
     }

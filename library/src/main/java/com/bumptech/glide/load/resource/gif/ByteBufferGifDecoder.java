@@ -2,12 +2,16 @@ package com.bumptech.glide.load.resource.gif;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.gifdecoder.GifDecoder;
 import com.bumptech.glide.gifdecoder.GifHeader;
 import com.bumptech.glide.gifdecoder.GifHeaderParser;
 import com.bumptech.glide.gifdecoder.StandardGifDecoder;
+import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.ImageHeaderParser;
 import com.bumptech.glide.load.ImageHeaderParser.ImageType;
 import com.bumptech.glide.load.ImageHeaderParserUtils;
@@ -36,10 +40,11 @@ public class ByteBufferGifDecoder implements ResourceDecoder<ByteBuffer, GifDraw
   private final Context context;
   private final List<ImageHeaderParser> parsers;
   private final GifHeaderParserPool parserPool;
-  private final BitmapPool bitmapPool;
   private final GifDecoderFactory gifDecoderFactory;
   private final GifBitmapProvider provider;
 
+  // Public API.
+  @SuppressWarnings("unused")
   public ByteBufferGifDecoder(Context context) {
     this(context, Glide.get(context).getRegistry().getImageHeaderParsers(),
         Glide.get(context).getBitmapPool(), Glide.get(context).getArrayPool());
@@ -51,7 +56,7 @@ public class ByteBufferGifDecoder implements ResourceDecoder<ByteBuffer, GifDraw
     this(context, parsers, bitmapPool, arrayPool, PARSER_POOL, GIF_DECODER_FACTORY);
   }
 
-  // Visible for testing.
+  @VisibleForTesting
   ByteBufferGifDecoder(
       Context context,
       List<ImageHeaderParser> parsers,
@@ -61,56 +66,62 @@ public class ByteBufferGifDecoder implements ResourceDecoder<ByteBuffer, GifDraw
       GifDecoderFactory gifDecoderFactory) {
     this.context = context.getApplicationContext();
     this.parsers = parsers;
-    this.bitmapPool = bitmapPool;
     this.gifDecoderFactory = gifDecoderFactory;
     this.provider = new GifBitmapProvider(bitmapPool, arrayPool);
     this.parserPool = parserPool;
   }
 
   @Override
-  public boolean handles(ByteBuffer source, Options options) throws IOException {
+  public boolean handles(@NonNull ByteBuffer source, @NonNull Options options) throws IOException {
     return !options.get(GifOptions.DISABLE_ANIMATION)
         && ImageHeaderParserUtils.getType(parsers, source) == ImageType.GIF;
   }
 
   @Override
-  public GifDrawableResource decode(ByteBuffer source, int width, int height, Options options) {
+  public GifDrawableResource decode(@NonNull ByteBuffer source, int width, int height,
+      @NonNull Options options) {
     final GifHeaderParser parser = parserPool.obtain(source);
     try {
-      return decode(source, width, height, parser);
+      return decode(source, width, height, parser, options);
     } finally {
       parserPool.release(parser);
     }
   }
 
-  private GifDrawableResource decode(ByteBuffer byteBuffer, int width, int height,
-      GifHeaderParser parser) {
+  @Nullable
+  private GifDrawableResource decode(
+      ByteBuffer byteBuffer, int width, int height, GifHeaderParser parser, Options options) {
     long startTime = LogTime.getLogTime();
-    final GifHeader header = parser.parseHeader();
-    if (header.getNumFrames() <= 0 || header.getStatus() != GifDecoder.STATUS_OK) {
-      // If we couldn't decode the GIF, we will end up with a frame count of 0.
-      return null;
+    try {
+      final GifHeader header = parser.parseHeader();
+      if (header.getNumFrames() <= 0 || header.getStatus() != GifDecoder.STATUS_OK) {
+        // If we couldn't decode the GIF, we will end up with a frame count of 0.
+        return null;
+      }
+
+      Bitmap.Config config = options.get(GifOptions.DECODE_FORMAT) == DecodeFormat.PREFER_RGB_565
+          ? Bitmap.Config.RGB_565 : Bitmap.Config.ARGB_8888;
+
+      int sampleSize = getSampleSize(header, width, height);
+      GifDecoder gifDecoder = gifDecoderFactory.build(provider, header, byteBuffer, sampleSize);
+      gifDecoder.setDefaultBitmapConfig(config);
+      gifDecoder.advance();
+      Bitmap firstFrame = gifDecoder.getNextFrame();
+      if (firstFrame == null) {
+        return null;
+      }
+
+      Transformation<Bitmap> unitTransformation = UnitTransformation.get();
+
+      GifDrawable gifDrawable =
+          new GifDrawable(context, gifDecoder, unitTransformation, width, height, firstFrame);
+
+      return new GifDrawableResource(gifDrawable);
+    } finally {
+      if (Log.isLoggable(TAG, Log.VERBOSE)) {
+        Log.v(TAG, "Decoded GIF from stream in " + LogTime.getElapsedMillis(startTime));
+      }
     }
-
-    int sampleSize = getSampleSize(header, width, height);
-    GifDecoder gifDecoder = gifDecoderFactory.build(provider, header, byteBuffer, sampleSize);
-    gifDecoder.advance();
-    Bitmap firstFrame = gifDecoder.getNextFrame();
-    if (firstFrame == null) {
-      return null;
-    }
-
-    Transformation<Bitmap> unitTransformation = UnitTransformation.get();
-
-    GifDrawable gifDrawable =
-        new GifDrawable(context, gifDecoder, bitmapPool, unitTransformation, width, height,
-            firstFrame);
-
-    if (Log.isLoggable(TAG, Log.VERBOSE)) {
-      Log.v(TAG, "Decoded GIF from stream in " + LogTime.getElapsedMillis(startTime));
-    }
-
-    return new GifDrawableResource(gifDrawable);
   }
 
   private static int getSampleSize(GifHeader gifHeader, int targetWidth, int targetHeight) {
@@ -129,19 +140,19 @@ public class ByteBufferGifDecoder implements ResourceDecoder<ByteBuffer, GifDraw
     return sampleSize;
   }
 
-  // Visible for testing.
+  @VisibleForTesting
   static class GifDecoderFactory {
-    public GifDecoder build(GifDecoder.BitmapProvider provider, GifHeader header,
+    GifDecoder build(GifDecoder.BitmapProvider provider, GifHeader header,
         ByteBuffer data, int sampleSize) {
       return new StandardGifDecoder(provider, header, data, sampleSize);
     }
   }
 
-  // Visible for testing.
+  @VisibleForTesting
   static class GifHeaderParserPool {
     private final Queue<GifHeaderParser> pool = Util.createQueue(0);
 
-    public synchronized GifHeaderParser obtain(ByteBuffer buffer) {
+    synchronized GifHeaderParser obtain(ByteBuffer buffer) {
       GifHeaderParser result = pool.poll();
       if (result == null) {
         result = new GifHeaderParser();
@@ -149,7 +160,7 @@ public class ByteBufferGifDecoder implements ResourceDecoder<ByteBuffer, GifDraw
       return result.setData(buffer);
     }
 
-    public synchronized void release(GifHeaderParser parser) {
+    synchronized void release(GifHeaderParser parser) {
       parser.clear();
       pool.offer(parser);
     }

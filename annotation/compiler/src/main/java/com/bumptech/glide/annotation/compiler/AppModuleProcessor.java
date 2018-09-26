@@ -88,7 +88,8 @@ final class AppModuleProcessor {
       writeRequestOptions(generatedCodePackageName, generatedRequestOptions);
 
     TypeSpec generatedRequestBuilder =
-        requestBuilderGenerator.generate(generatedCodePackageName, generatedRequestOptions);
+        requestBuilderGenerator.generate(
+            generatedCodePackageName, indexedClassNames.extensions, generatedRequestOptions);
     writeRequestBuilder(generatedCodePackageName, generatedRequestBuilder);
 
     TypeSpec requestManager =
@@ -166,8 +167,8 @@ final class AppModuleProcessor {
   }
 
   private static final class FoundIndexedClassNames {
-    final Set<String> glideModules;
-    final Set<String> extensions;
+    private final Set<String> glideModules;
+    private final Set<String> extensions;
 
     private FoundIndexedClassNames(Set<String> glideModules, Set<String> extensions) {
       this.glideModules = glideModules;

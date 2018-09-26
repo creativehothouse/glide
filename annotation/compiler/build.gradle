@@ -13,14 +13,16 @@ dependencies {
     // from https://code.google.com/archive/p/jarjar/downloads
     jarjar files('libs/jarjar-1.4.jar')
 
-    compileOnly 'com.squareup:javapoet:1.9.0'
-    compileOnly 'com.google.auto.service:auto-service:1.0-rc3'
-    compileOnly 'com.google.code.findbugs:jsr305:3.0.1'
-
+    compileOnly "com.squareup:javapoet:${JAVAPOET_VERSION}"
+    compileOnly "com.google.auto.service:auto-service:${AUTO_SERVICE_VERSION}"
+    compileOnly "com.google.code.findbugs:jsr305:${JSR_305_VERSION}"
     compile project(':annotation')
-    // This is to support com.sun.tootls.javac.util.List, currently used in RootModuleGenerator.
+    // This is to support com.sun.tools.javac.util.List, currently used in RootModuleGenerator.
     compile files(Jvm.current().getToolsJar())
 }
+
+// Make sure running `gradlew :annotation:compiler:check` actually does full quality control.
+test.dependsOn ':annotation:compiler:test:test'
 
 def packagingFolder = file("${buildDir}/intermediates")
 def repackagedJar = file("${packagingFolder}/repackaged.jar")
@@ -35,7 +37,7 @@ task compiledJar(type: Jar, dependsOn: classes) {
 // Repackage compileOnly dependencies to avoid namespace collisions.
 task jarjar(dependsOn: [tasks.compiledJar, configurations.compileOnly]) {
     // Set up inputs and outputs to only rebuild when necessary (code change, dependency change).
-    inputs.file compiledJar
+    inputs.files compiledJar
     inputs.files configurations.compileOnly
     outputs.file repackagedJar
 

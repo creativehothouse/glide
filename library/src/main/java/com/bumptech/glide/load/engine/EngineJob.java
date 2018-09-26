@@ -3,6 +3,8 @@ package com.bumptech.glide.load.engine;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.Pools;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.Key;
@@ -45,6 +47,7 @@ class EngineJob<R> implements DecodeJob.Callback<R>,
   private boolean isCacheable;
   private boolean useUnlimitedSourceGeneratorPool;
   private boolean useAnimationPool;
+  private boolean onlyRetrieveFromCache;
   private Resource<?> resource;
   private DataSource dataSource;
   private boolean hasResource;
@@ -76,7 +79,7 @@ class EngineJob<R> implements DecodeJob.Callback<R>,
         DEFAULT_FACTORY);
   }
 
-  // Visible for testing.
+  @VisibleForTesting
   EngineJob(
       GlideExecutor diskCacheExecutor,
       GlideExecutor sourceExecutor,
@@ -94,16 +97,18 @@ class EngineJob<R> implements DecodeJob.Callback<R>,
     this.engineResourceFactory = engineResourceFactory;
   }
 
-  // Visible for testing.
+  @VisibleForTesting
   EngineJob<R> init(
       Key key,
       boolean isCacheable,
       boolean useUnlimitedSourceGeneratorPool,
-      boolean useAnimationPool) {
+      boolean useAnimationPool,
+      boolean onlyRetrieveFromCache) {
     this.key = key;
     this.isCacheable = isCacheable;
     this.useUnlimitedSourceGeneratorPool = useUnlimitedSourceGeneratorPool;
     this.useAnimationPool = useAnimationPool;
+    this.onlyRetrieveFromCache = onlyRetrieveFromCache;
     return this;
   }
 
@@ -115,7 +120,7 @@ class EngineJob<R> implements DecodeJob.Callback<R>,
     executor.execute(decodeJob);
   }
 
-  public void addCallback(ResourceCallback cb) {
+  void addCallback(ResourceCallback cb) {
     Util.assertMainThread();
     stateVerifier.throwIfRecycled();
     if (hasResource) {
@@ -127,7 +132,7 @@ class EngineJob<R> implements DecodeJob.Callback<R>,
     }
   }
 
-  public void removeCallback(ResourceCallback cb) {
+  void removeCallback(ResourceCallback cb) {
     Util.assertMainThread();
     stateVerifier.throwIfRecycled();
     if (hasResource || hasLoadFailed) {
@@ -138,6 +143,10 @@ class EngineJob<R> implements DecodeJob.Callback<R>,
         cancel();
       }
     }
+  }
+
+  boolean onlyRetrieveFromCache() {
+    return onlyRetrieveFromCache;
   }
 
   private GlideExecutor getActiveSourceExecutor() {
@@ -199,9 +208,11 @@ class EngineJob<R> implements DecodeJob.Callback<R>,
     // Hold on to resource for duration of request so we don't recycle it in the middle of
     // notifying if it synchronously released by one of the callbacks.
     engineResource.acquire();
-    listener.onEngineJobComplete(key, engineResource);
+    listener.onEngineJobComplete(this, key, engineResource);
 
-    for (ResourceCallback cb : cbs) {
+    //noinspection ForLoopReplaceableByForEach to improve perf
+    for (int i = 0, size = cbs.size(); i < size; i++) {
+      ResourceCallback cb = cbs.get(i);
       if (!isInIgnoredCallbacks(cb)) {
         engineResource.acquire();
         cb.onResourceReady(engineResource, dataSource);
@@ -275,7 +286,7 @@ class EngineJob<R> implements DecodeJob.Callback<R>,
     }
     hasLoadFailed = true;
 
-    listener.onEngineJobComplete(key, null);
+    listener.onEngineJobComplete(this, key, null);
 
     for (ResourceCallback cb : cbs) {
       if (!isInIgnoredCallbacks(cb)) {
@@ -286,21 +297,23 @@ class EngineJob<R> implements DecodeJob.Callback<R>,
     release(false /*isRemovedFromQueue*/);
   }
 
+  @NonNull
   @Override
   public StateVerifier getVerifier() {
     return stateVerifier;
   }
 
-  // Visible for testing.
+  @VisibleForTesting
   static class EngineResourceFactory {
     public <R> EngineResource<R> build(Resource<R> resource, boolean isMemoryCacheable) {
-      return new EngineResource<>(resource, isMemoryCacheable);
+      return new EngineResource<>(resource, isMemoryCacheable, /*isRecyclable=*/ true);
     }
   }
 
   private static class MainThreadCallback implements Handler.Callback {
 
     @Synthetic
+    @SuppressWarnings("WeakerAccess")
     MainThreadCallback() { }
 
     @Override

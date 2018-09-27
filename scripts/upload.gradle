@@ -39,23 +39,19 @@ def isReleaseBuild() {
 }
 
 def getReleaseRepositoryUrl() {
-    return hasProperty('LOCAL') ? localMavenRepo()
-            : hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
-            : 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+    return "http://bb8.creativehothouse.com:8081/artifactory/libs-release-local"
 }
 
 def getSnapshotRepositoryUrl() {
-    return hasProperty('LOCAL') ? localMavenRepo()
-            : hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
-            : 'https://oss.sonatype.org/content/repositories/snapshots/'
+    return  "http://bb8.creativehothouse.com:8081/artifactory/libs-snapshot-local"
 }
 
 def getRepositoryUsername() {
-    return hasProperty('USERNAME') ? USERNAME : (hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : '')
+    return artifactory_user_deployer
 }
 
 def getRepositoryPassword() {
-    return hasProperty('PASSWORD') ? PASSWORD : (hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : '')
+    return artifactory_password_deployer
 }
 
 afterEvaluate { project ->

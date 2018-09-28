@@ -15,12 +15,10 @@
  *
  *
  * Based on: https://github.com/mcxiaoke/gradle-mvn-push/blob/master/gradle-mvn-push.gradle.
+ * Local test with (..._REPOSITORY_URL properties must be full paths):
+ * gradlew clean buildArchives uploadArchives --stacktrace --info -PSNAPSHOT_REPOSITORY_URL=file://p:\projects\contrib\github-glide\repo-snapshot -PRELEASE_REPOSITORY_URL=file://p:\projects\contrib\github-glide\repo-release
+ * For faster runs add: -x check
  *
- * To install in a local maven repo:
- * 1. In the project you want to test (not Glide), add mavenLocal() to the repositories list.
- * 2. In Glide, run: ./gradlew uploadArchives -PLOCAL
- *
- * For faster runs add: -x check when building Glide.
  */
 
 apply plugin: 'maven'
@@ -29,13 +27,8 @@ apply plugin: 'signing'
 version = VERSION_NAME
 group = GROUP
 
-static def localMavenRepo() {
-    'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
-}
-
-@SuppressWarnings("GrMethodMayBeStatic")
 def isReleaseBuild() {
-    return !VERSION_NAME.contains("SNAPSHOT")
+    return VERSION_NAME.contains("SNAPSHOT") == false
 }
 
 def getReleaseRepositoryUrl() {
@@ -55,7 +48,6 @@ def getRepositoryPassword() {
 }
 
 afterEvaluate { project ->
-    def isAndroidProject = project.plugins.hasPlugin('com.android.application') || project.plugins.hasPlugin('com.android.library')
     // To avoid uploading the default empty jar artifact in the project root directory, we use a custom
     // configuration to specify which artifacts we want to upload.
     uploadArchives {
@@ -79,40 +71,9 @@ afterEvaluate { project ->
                     authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                 }
 
-                pom.whenConfigured { pom ->
-                    pom.packaging = POM_PACKAGING
-                }
-
-                // Dependencies are only automatically included by the release plugin if the release
-                // variant is built. Since we've disabled the release variant to improve build
-                // times, we need to add the dependencies to the pom file explicitly.
-                if (isAndroidProject) {
-                    pom.withXml {
-                        def dependenciesNode = asNode().appendNode('dependencies')
-
-                        project.configurations.implementation.allDependencies.each {
-                            def groupId = it.group
-                            def artifactId = it.name
-                            // If we specify an artifact id that differs from the project name, it won't
-                            // match. To avoid that, we look up the artifact id (and group) by property
-                            // for any project dependencies.
-                            // TODO: there must be a neater way to do this.
-                            if (it instanceof ProjectDependency) {
-                                def properties = it.getDependencyProject().getProperties()
-                                groupId = properties.get("GROUP")
-                                artifactId = properties.get("POM_ARTIFACT_ID")
-                            }
-                            def dependencyNode = dependenciesNode.appendNode('dependency')
-                            dependencyNode.appendNode('groupId', groupId)
-                            dependencyNode.appendNode('artifactId', artifactId)
-                            dependencyNode.appendNode('version', it.version)
-                            dependencyNode.appendNode('scope', 'compile')
-                        }
-                    }
-                }
-
                 pom.project {
                     name = POM_NAME
+                    packaging = POM_PACKAGING
                     description = POM_DESCRIPTION
                     url = POM_URL
 
@@ -152,10 +113,11 @@ afterEvaluate { project ->
         sign configurations.archives
     }
 
+    def isAndroidProject = project.plugins.hasPlugin('com.android.application') || project.plugins.hasPlugin('com.android.library')
 
     if (isAndroidProject) {
-        def variants = project.android.libraryVariants.findAll {
-            it.buildType.name.equalsIgnoreCase('debug')
+        def releaseVariants = project.android.libraryVariants.findAll {
+            it.buildType.name.equalsIgnoreCase('release')
         }
 
         def getAndroidSdkDirectory = project.android.sdkDirectory
@@ -163,14 +125,13 @@ afterEvaluate { project ->
         def getAndroidJar = "${getAndroidSdkDirectory}/platforms/${project.android.compileSdkVersion}/android.jar"
 
         task androidJavadocs(type: Javadoc, dependsOn: assembleDebug) {
-            source = variants.collect { it.javaCompile.source }
+            source = releaseVariants.collect { it.javaCompile.source }
             classpath = files(
                     getAndroidJar,
-                    project.file("build/intermediates/classes/debug")
+                    releaseVariants.collect { it.javaCompile.classpath.files },
+                    project.file("build/intermediates/classes/release")
             )
-            doFirst {
-                classpath += files(variants.collect { it.javaCompile.classpath.files })
-            }
+
             options {
                 links("http://docs.oracle.com/javase/7/docs/api/")
                 linksOffline("http://d.android.com/reference",
@@ -210,11 +171,6 @@ afterEvaluate { project ->
             archives androidLibraryJar
             archives androidSourcesJar
             archives androidJavadocsJar
-            // This is unnecessary with a release variant because by default the release variant
-            // includes the release aar in archives. Since we've disabled our release variants and
-            // want to include an aar, we need to manually specify the task that produces the aar
-            // here.
-            archives project.tasks.bundleDebug
         }
     } else if (project.plugins.hasPlugin('java')) {
         task sourcesJar(type: Jar, dependsOn: classes) {
@@ -233,5 +189,5 @@ afterEvaluate { project ->
         }
     }
     logger.info("Published artifacts in ${configurations.archives}:")
-    configurations.archives.artifacts.files.files.each { logger.info("\t$it") }
+    configurations.archives.artifacts.files.files.each { logger.info("\t$it"); }
 }

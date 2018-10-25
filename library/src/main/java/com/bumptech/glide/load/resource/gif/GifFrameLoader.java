@@ -8,6 +8,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.RequestManager;
@@ -31,24 +34,27 @@ class GifFrameLoader {
   private final GifDecoder gifDecoder;
   private final Handler handler;
   private final List<FrameCallback> callbacks = new ArrayList<>();
-  @Synthetic final RequestManager requestManager;
+  @SuppressWarnings("WeakerAccess") @Synthetic final RequestManager requestManager;
   private final BitmapPool bitmapPool;
 
-  private boolean isRunning = false;
-  private boolean isLoadPending = false;
-  private boolean startFromFirstFrame = false;
+  private boolean isRunning;
+  private boolean isLoadPending;
+  private boolean startFromFirstFrame;
   private RequestBuilder<Bitmap> requestBuilder;
   private DelayTarget current;
   private boolean isCleared;
   private DelayTarget next;
   private Bitmap firstFrame;
   private Transformation<Bitmap> transformation;
+  private DelayTarget pendingTarget;
+  @Nullable
+  private GifFrameLoader.OnEveryFrameListener onEveryFrameListener;
 
   public interface FrameCallback {
     void onFrameReady();
   }
 
-  public GifFrameLoader(
+  GifFrameLoader(
       Glide glide,
       GifDecoder gifDecoder,
       int width,
@@ -105,10 +111,10 @@ class GifFrameLoader {
     if (isCleared) {
       throw new IllegalStateException("Cannot subscribe to a cleared frame loader");
     }
-    boolean start = callbacks.isEmpty();
     if (callbacks.contains(frameCallback)) {
       throw new IllegalStateException("Cannot subscribe twice in a row");
     }
+    boolean start = callbacks.isEmpty();
     callbacks.add(frameCallback);
     if (start) {
       start();
@@ -181,6 +187,10 @@ class GifFrameLoader {
       requestManager.clear(next);
       next = null;
     }
+    if (pendingTarget != null) {
+      requestManager.clear(pendingTarget);
+      pendingTarget = null;
+    }
     gifDecoder.clear();
     isCleared = true;
   }
@@ -194,8 +204,16 @@ class GifFrameLoader {
       return;
     }
     if (startFromFirstFrame) {
+      Preconditions.checkArgument(
+          pendingTarget == null, "Pending target must be null when starting from the first frame");
       gifDecoder.resetFrameIndex();
       startFromFirstFrame = false;
+    }
+    if (pendingTarget != null) {
+      DelayTarget temp = pendingTarget;
+      pendingTarget = null;
+      onFrameReady(temp);
+      return;
     }
     isLoadPending = true;
     // Get the delay before incrementing the pointer because the delay indicates the amount of time
@@ -218,12 +236,33 @@ class GifFrameLoader {
   void setNextStartFromFirstFrame() {
     Preconditions.checkArgument(!isRunning, "Can't restart a running animation");
     startFromFirstFrame = true;
+    if (pendingTarget != null) {
+      requestManager.clear(pendingTarget);
+      pendingTarget = null;
+    }
   }
 
-  // Visible for testing.
+  @VisibleForTesting
+  void setOnEveryFrameReadyListener(@Nullable OnEveryFrameListener onEveryFrameListener) {
+    this.onEveryFrameListener = onEveryFrameListener;
+  }
+
+  @VisibleForTesting
   void onFrameReady(DelayTarget delayTarget) {
+    if (onEveryFrameListener != null) {
+      onEveryFrameListener.onFrameReady();
+    }
+    isLoadPending = false;
     if (isCleared) {
       handler.obtainMessage(FrameLoaderCallback.MSG_CLEAR, delayTarget).sendToTarget();
+      return;
+    }
+    // If we're not running, notifying here will recycle the frame that we might currently be
+    // showing, which breaks things (see #2526). We also can't discard this frame because we've
+    // already incremented the frame pointer and can't decode the same frame again. Instead we'll
+    // just hang on to this next frame until start() or clear() are called.
+    if (!isRunning) {
+      pendingTarget = delayTarget;
       return;
     }
 
@@ -242,13 +281,12 @@ class GifFrameLoader {
       }
     }
 
-    isLoadPending = false;
     loadNextFrame();
   }
 
   private class FrameLoaderCallback implements Handler.Callback {
-    public static final int MSG_DELAY = 1;
-    public static final int MSG_CLEAR = 2;
+    static final int MSG_DELAY = 1;
+    static final int MSG_CLEAR = 2;
 
     @Synthetic
     FrameLoaderCallback() { }
@@ -267,7 +305,7 @@ class GifFrameLoader {
     }
   }
 
-  // Visible for testing.
+  @VisibleForTesting
   static class DelayTarget extends SimpleTarget<Bitmap> {
     private final Handler handler;
     @Synthetic final int index;
@@ -285,7 +323,8 @@ class GifFrameLoader {
     }
 
     @Override
-    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+    public void onResourceReady(@NonNull Bitmap resource,
+        @Nullable Transition<? super Bitmap> transition) {
       this.resource = resource;
       Message msg = handler.obtainMessage(FrameLoaderCallback.MSG_DELAY, this);
       handler.sendMessageAtTime(msg, targetTime);
@@ -307,5 +346,10 @@ class GifFrameLoader {
     // Some devices seem to have crypto bugs that throw exceptions when you create a new UUID.
     // See #1510.
     return new ObjectKey(Math.random());
+  }
+
+  @VisibleForTesting
+  interface OnEveryFrameListener {
+    void onFrameReady();
   }
 }
